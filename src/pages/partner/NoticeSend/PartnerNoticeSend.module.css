@@ -1,0 +1,197 @@
+/* 알림/공지 · 공지 보내기 — KPI 카드 4개 + 공지 작성 폼 + 확인 모달 + 토스트 */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  flex: 1;
+}
+
+/* 상단 KPI: 3장 가로 배치 (파트너는 '발송 가능 파트너' 카드 없음) */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+/* ===== 공지 작성 카드 ===== */
+.formCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background-color: color-mix(in srgb, #141027 84%, transparent);
+  border: 1px solid color-mix(in srgb, #7c5cff 32%, transparent);
+  border-radius: 22px;
+}
+.cardTitle {
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
+}
+
+/* 라벨 + 컨트롤을 묶는 한 필드 그룹 */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.fieldLabel {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: #8c86b5;
+}
+
+/* 칩(알약) 묶음 — 대상 필터 / 발송 옵션 */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+/* 칩 한 개 — 색은 --chip(항목별)으로 주입, 선택 시 링 강조 */
+.chip {
+  padding: 6px var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  border: 1px solid color-mix(in srgb, var(--chip) 32%, transparent);
+  cursor: pointer;
+}
+.chipTranslucent {
+  color: #ffffff;
+  background-color: color-mix(in srgb, var(--chip) 24%, transparent);
+}
+.chipSolid {
+  color: #061612;
+  background-color: color-mix(in srgb, var(--chip) 92%, transparent);
+}
+/* 선택된 칩 — 같은 색 링으로 강조 (UI 선택 상태만 표현) */
+.chipActive {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--chip) 70%, transparent);
+}
+
+/* 입력 필드 공통 (제목/유형) — 48px 박스 */
+.input {
+  width: 100%;
+  height: 48px;
+  padding: 0 var(--space-4);
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, #7c5cff 32%, transparent);
+  background-color: color-mix(in srgb, #0d0a20 86%, transparent);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 13px;
+}
+/* 공지 내용 — 큰 textarea */
+.textarea {
+  width: 100%;
+  min-height: 228px;
+  padding: var(--space-4);
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, #7c5cff 32%, transparent);
+  background-color: color-mix(in srgb, #0d0a20 86%, transparent);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+.input::placeholder,
+.textarea::placeholder,
+.schedule::placeholder {
+  color: #8c86b5;
+}
+
+/* 발송 옵션 줄: 좌(옵션 칩) + 우(예약 시간 입력) */
+.optionRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+/* 예약 발송 시간 입력 — 더 낮은 32px 박스 */
+.schedule {
+  width: 100%;
+  height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, #7c5cff 32%, transparent);
+  background-color: color-mix(in srgb, #0d0a20 86%, transparent);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-12);
+}
+/* 즉시 발송 선택 시 예약 시간 입력 비활성(흐리게) */
+.scheduleDisabled {
+  opacity: 0.45;
+}
+
+/* 하단 버튼 줄 — 우측 정렬 */
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/* ===== 확인 모달 (오버레이) ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background-color: rgba(4, 3, 10, 0.6);
+  z-index: 100;
+}
+.modal {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background-color: color-mix(in srgb, #141027 96%, transparent);
+  border: 1px solid color-mix(in srgb, #22d9ff 32%, transparent);
+  border-radius: 22px;
+  box-shadow: 0 12px 40px rgba(117, 51, 255, 0.28), 0 0 28px rgba(0, 204, 255, 0.14);
+}
+.modalTitle {
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
+}
+.modalDesc {
+  font-size: var(--font-size-12);
+  line-height: 1.6;
+  color: #bdb7e7;
+}
+.modalButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/* ===== 성공 토스트 ===== */
+.toast {
+  position: fixed;
+  right: var(--space-6);
+  bottom: var(--space-6);
+  max-width: 440px;
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--font-size-12);
+  color: var(--color-text);
+  background-color: color-mix(in srgb, #1b1534 94%, transparent);
+  border: 1px solid color-mix(in srgb, #24e6b8 80%, transparent);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(117, 51, 255, 0.28), 0 0 28px rgba(0, 204, 255, 0.14);
+  z-index: 110;
+}
+
+/* 반응형: 좁은 화면에서 KPI/옵션 줄 단을 줄인다 */
+@media (max-width: 1024px) {
+  .metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .optionRow {
+    grid-template-columns: 1fr;
+  }
+}

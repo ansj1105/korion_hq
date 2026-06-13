@@ -20,6 +20,7 @@ import Profile from './pages/Profile'
 import PartnerDashboard from './pages/partner/Dashboard'
 import PartnerRequestsMerchant from './pages/partner/RequestsMerchant'
 import PartnerSettlementRequest from './pages/partner/SettlementRequest'
+import PartnerNoticeSend from './pages/partner/NoticeSend'
 import PartnerSettlementHistory from './pages/partner/SettlementHistory'
 import PartnerSettlementDetail from './pages/partner/SettlementDetail'
 import { ROLES } from './roles'
@@ -62,6 +63,10 @@ const PARTNER_PAGES: Record<string, JSX.Element> = {
   'settlement/history/detail': <PartnerSettlementDetail />,
   // 리더 소식지 페이지 내용은 리더 본사 소식지와 동일(사이드바 그룹명만 다름) → 재사용.
   'hq-notices': <HqNotices />,
+  'notices/send': <PartnerNoticeSend />,
+  // 발송 내역·활동 로그는 Figma상 리더 화면과 동일 → 리더 컴포넌트 재사용.
+  'notices/history': <NoticeHistory />,
+  'settings/activity-log': <ActivityLog />,
 }
 
 /** nav(그룹/항목) → 상대 경로 자식 라우트 배열. 미구현은 Placeholder. */
