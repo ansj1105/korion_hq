@@ -1,0 +1,74 @@
+/* 정산 신청 화면 — 확인 카드(모달 스타일) + 토스트 */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/*
+ * 확인 카드 — Figma "확인 모달" 스타일.
+ * 배경 #141027 96% + 시안 테두리 + 보라/시안 글로우. (강조 CTA 카드)
+ */
+.card {
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background-color: color-mix(in srgb, #141027 96%, transparent);
+  border: 1px solid #22d9ff;
+  border-radius: 28px;
+  box-shadow: 0 12px 40px rgba(117, 51, 255, 0.28), 0 0 28px rgba(0, 204, 255, 0.14);
+}
+
+.cardTitle {
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-bold);
+}
+
+.cardDesc {
+  font-size: var(--font-size-11);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+/* 요약 필드 — 라벨/값 2열 */
+.fields {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  row-gap: var(--space-3);
+  column-gap: var(--space-5);
+}
+
+.fieldLabel {
+  font-size: var(--font-size-12);
+  color: var(--color-text-muted);
+}
+
+.fieldValue {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
+}
+
+/* 버튼 줄 (우측 정렬) */
+.buttonRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/*
+ * 성공 토스트 — 배경 #1c1637 94% + 청록 테두리 + 글로우.
+ * (UI 표시용 — 실제 토스트 동작은 범위 밖)
+ */
+.toast {
+  max-width: 520px;
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--font-size-12);
+  color: var(--color-text);
+  background-color: color-mix(in srgb, #1c1637 94%, transparent);
+  border: 1px solid #24e6b8;
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(117, 51, 255, 0.28), 0 0 28px rgba(0, 204, 255, 0.14);
+}

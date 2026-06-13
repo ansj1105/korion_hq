@@ -9,6 +9,7 @@ import PartnerSales from './pages/PartnerSales'
 import Merchants from './pages/Merchants'
 import MerchantSales from './pages/MerchantSales'
 import TransactionLog from './pages/Transactions'
+import SettlementRequest from './pages/SettlementRequest'
 import { LEADER_NAV } from './components/organisms/Sidebar/navConfig'
 
 /*
@@ -27,6 +28,7 @@ const IMPLEMENTED_PAGES: Record<string, JSX.Element> = {
   '/transactions': <TransactionLog variant="all" />,
   '/transactions/offline': <TransactionLog variant="offline" />,
   '/transactions/failed': <TransactionLog variant="failed" />,
+  '/settlement/request': <SettlementRequest />,
 }
 
 /*

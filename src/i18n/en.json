@@ -237,5 +237,19 @@
   "tx.failed.col.errorCode": "Error Code",
   "tx.failed.col.reason": "Reason",
   "tx.failed.col.status": "Status",
-  "tx.failed.col.action": "Actions"
+  "tx.failed.col.action": "Actions",
+
+  "settle.req.title": "Fees / Settlement - Settlement Request",
+  "settle.req.cardTitle": "Send a settlement request to HQ?",
+  "settle.req.cardDesc": "This settlement includes only confirmed transactions from the day after the last settlement date up to yesterday. Same-day transactions, refunds, problem transactions, Sync failures, and risk transactions are excluded and held. After HQ approval, sub-partners are also settled automatically.",
+  "settle.req.field.leaderName": "Leader",
+  "settle.req.field.leaderCode": "Leader Code",
+  "settle.req.field.period": "Settlement Period",
+  "settle.req.field.finalAmount": "Final Settleable Amount",
+  "settle.req.field.autoSettle": "Sub-Partner Auto-Settlement",
+  "settle.req.field.heldAmount": "Held / Excluded Amount",
+  "settle.req.field.wallet": "Payout Wallet",
+  "settle.req.cancel": "Cancel",
+  "settle.req.submit": "Send Settlement Request",
+  "settle.req.toast": "Settlement request sent to HQ. After approval, sub-partner settlements are processed automatically."
 }

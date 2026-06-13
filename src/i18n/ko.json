@@ -237,5 +237,19 @@
   "tx.failed.col.errorCode": "오류코드",
   "tx.failed.col.reason": "사유",
   "tx.failed.col.status": "처리상태",
-  "tx.failed.col.action": "액션"
+  "tx.failed.col.action": "액션",
+
+  "settle.req.title": "수수료 / 정산 - 정산 신청",
+  "settle.req.cardTitle": "본사에 정산 요청을 보내시겠습니까?",
+  "settle.req.cardDesc": "이번 정산은 마지막 정산일 다음날부터 전일까지의 확정 거래만 포함합니다. 당일 거래, 환불, 문제 거래, Sync 실패, 리스크 거래는 정산에서 제외되며 보류 처리됩니다. 본사 승인 후 하부 파트너에게도 자동 정산 처리됩니다.",
+  "settle.req.field.leaderName": "리더명",
+  "settle.req.field.leaderCode": "리더 코드",
+  "settle.req.field.period": "정산 대상 기간",
+  "settle.req.field.finalAmount": "최종 정산 가능 금액",
+  "settle.req.field.autoSettle": "하부 파트너 자동 정산 예정",
+  "settle.req.field.heldAmount": "보류 제외 금액",
+  "settle.req.field.wallet": "지급 Wallet",
+  "settle.req.cancel": "취소",
+  "settle.req.submit": "본사 정산 요청 보내기",
+  "settle.req.toast": "본사 정산 요청이 전송되었습니다. 승인 후 하부 파트너 정산도 자동 처리됩니다."
 }
