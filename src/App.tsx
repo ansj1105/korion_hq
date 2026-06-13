@@ -43,7 +43,7 @@ export default function App() {
             key={item.path}
             path={item.path}
             // 구현된 화면이면 실제 페이지, 아니면 "구현 예정" Placeholder
-            element={IMPLEMENTED_PAGES[item.path] ?? <Placeholder title={item.label} />}
+            element={IMPLEMENTED_PAGES[item.path] ?? <Placeholder titleKey={item.labelKey} />}
           />
         ))}
       </Route>
@@ -52,7 +52,7 @@ export default function App() {
         가맹점 회원가입(Admin Auth 폼)은 사이드바 없는 독립 화면으로 추정되어
         레이아웃 밖 라우트로 분리해 둠. (구현 단계에서 레이아웃 포함 여부 확정)
       */}
-      <Route path="/merchant-signup" element={<Placeholder title="가맹점 회원가입" />} />
+      <Route path="/merchant-signup" element={<Placeholder titleKey="page.merchantSignup" />} />
 
       {/* 정의되지 않은 경로는 대시보드로 폴백 */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -1,15 +1,36 @@
+import { useTranslation } from '../../i18n'
+import type { AccentKey } from '../../types'
 import type { KpiCardData } from '../../components/molecules/KpiCard'
-import dashboardData from './dashboardData.json'
+import data from './dashboardData.json'
+
+/** JSON 원본 KPI 형태 (라벨은 i18n 키로 저장) */
+interface KpiRaw {
+  id: string
+  labelKey: string
+  value: string
+  delta?: string
+  tag?: string
+  accent: string
+}
 
 /*
  * useDashboardData — 대시보드 데이터 훅
  * ------------------------------------------------------------------
- * 현재는 dashboardData.json(하드코딩 JSON)을 그대로 반환한다.
- * 추후 실데이터 연동 시 이 훅 내부만 API 호출(fetch / react-query 등)로 교체하면,
- * 화면 컴포넌트는 수정 없이 동작한다. → 데이터 출처를 한 곳에 격리하는 패턴.
+ * dashboardData.json(하드코딩)을 읽어, KPI 라벨은 현재 언어로 번역해서 반환한다.
+ * (값·증감·태그는 데이터/enum이라 그대로 둔다)
+ * 추후 실데이터 연동 시 이 훅 내부만 API 호출로 교체하면 화면은 그대로 동작한다.
  */
 export function useDashboardData() {
-  // JSON에서 accent 등은 string으로 추론되므로 컴포넌트 타입으로 단언한다.
-  const kpis = dashboardData.kpis as KpiCardData[]
+  const { t } = useTranslation()
+
+  const kpis: KpiCardData[] = (data.kpis as KpiRaw[]).map((k) => ({
+    id: k.id,
+    label: t(k.labelKey), // UI 라벨만 번역
+    value: k.value,
+    delta: k.delta,
+    tag: k.tag,
+    accent: k.accent as AccentKey,
+  }))
+
   return { kpis }
 }

@@ -1,9 +1,9 @@
 {
   "stats": [
-    { "id": "active", "label": "활성화 된 파트너", "value": "136" },
-    { "id": "requesting", "label": "승인 신청중 파트너", "value": "36", "tag": "본사", "tagAccent": "orange" },
-    { "id": "waiting", "label": "승인 대기 파트너", "value": "36" },
-    { "id": "black", "label": "블랙 파트너", "value": "3" }
+    { "id": "active", "labelKey": "partner.kpi.active", "value": "136" },
+    { "id": "requesting", "labelKey": "partner.kpi.requesting", "value": "36", "tag": "본사", "tagAccent": "orange" },
+    { "id": "waiting", "labelKey": "partner.kpi.waiting", "value": "36" },
+    { "id": "black", "labelKey": "partner.kpi.black", "value": "3" }
   ],
   "rows": [
     { "no": "5", "code": "NG-SP-0005", "name": "Lagos Mart5", "region": "Lagos", "subCount": "128", "volume": "128,000 KORI", "txCount": "1,560", "hqStatus": "승인", "opStatus": "정지", "date": "2026.06.03" },

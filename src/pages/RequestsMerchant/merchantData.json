@@ -1,9 +1,9 @@
 {
   "stats": [
-    { "id": "active", "label": "활성화 된 가맹점", "value": "136" },
-    { "id": "recommended", "label": "파트너 추천 가맹점", "value": "36" },
-    { "id": "direct", "label": "다이렉트 신청 가맹점", "value": "3" },
-    { "id": "black", "label": "블랙 가맹점", "value": "3" }
+    { "id": "active", "labelKey": "merchant.kpi.active", "value": "136" },
+    { "id": "recommended", "labelKey": "merchant.kpi.recommended", "value": "36" },
+    { "id": "direct", "labelKey": "merchant.kpi.direct", "value": "3" },
+    { "id": "black", "labelKey": "merchant.kpi.black", "value": "3" }
   ],
   "rows": [
     { "no": "5", "code": "NG-SP-0005", "name": "Lagos Mart5", "telegram": "@samuel5", "region": "Lagos", "industry": "카페", "opStatus": "대기", "date": "2026.06.03" },

@@ -1,14 +1,14 @@
 {
   "kpis": [
-    { "id": "sales-partner", "label": "세일즈 파트너", "value": "148", "delta": "+10", "tag": "관리", "accent": "cyan" },
-    { "id": "sub-merchant", "label": "하부 가맹점", "value": "2,840", "delta": "+18", "tag": "관리", "accent": "green" },
-    { "id": "total-members", "label": "국가 전체 회원수", "value": "1.28M", "delta": "+21k", "accent": "cyan" },
-    { "id": "active-members", "label": "활성 회원수", "value": "1.28M", "delta": "+21k", "accent": "cyan" },
-    { "id": "monthly-volume", "label": "월 거래량", "value": "$1.28M", "delta": "+21k", "accent": "cyan" },
-    { "id": "settled-count", "label": "정산 후 거래건수", "value": "1.28M", "delta": "+30k", "accent": "green" },
-    { "id": "pending-approval", "label": "가맹점/파트너 승인 대기", "value": "36", "tag": "본사", "accent": "orange" },
-    { "id": "unread-notice", "label": "공지 미확인", "value": "4건", "accent": "orange" },
-    { "id": "expected-fee", "label": "현재 예상 수수료", "value": "18,420 KORI", "tag": "정산가능", "accent": "purple" },
-    { "id": "risk", "label": "리스크", "value": "17건", "tag": "주의", "accent": "red" }
+    { "id": "sales-partner", "labelKey": "dashboard.kpi.salesPartner", "value": "148", "delta": "+10", "tag": "관리", "accent": "cyan" },
+    { "id": "sub-merchant", "labelKey": "dashboard.kpi.subMerchant", "value": "2,840", "delta": "+18", "tag": "관리", "accent": "green" },
+    { "id": "total-members", "labelKey": "dashboard.kpi.totalMembers", "value": "1.28M", "delta": "+21k", "accent": "cyan" },
+    { "id": "active-members", "labelKey": "dashboard.kpi.activeMembers", "value": "1.28M", "delta": "+21k", "accent": "cyan" },
+    { "id": "monthly-volume", "labelKey": "dashboard.kpi.monthlyVolume", "value": "$1.28M", "delta": "+21k", "accent": "cyan" },
+    { "id": "settled-count", "labelKey": "dashboard.kpi.settledCount", "value": "1.28M", "delta": "+30k", "accent": "green" },
+    { "id": "pending-approval", "labelKey": "dashboard.kpi.pendingApproval", "value": "36", "tag": "본사", "accent": "orange" },
+    { "id": "unread-notice", "labelKey": "dashboard.kpi.unreadNotice", "value": "4건", "accent": "orange" },
+    { "id": "expected-fee", "labelKey": "dashboard.kpi.expectedFee", "value": "18,420 KORI", "tag": "정산가능", "accent": "purple" },
+    { "id": "risk", "labelKey": "dashboard.kpi.risk", "value": "17건", "tag": "주의", "accent": "red" }
   ]
 }

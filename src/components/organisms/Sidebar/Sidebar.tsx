@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom'
+import { useTranslation } from '../../../i18n'
 import { LEADER_NAV } from './navConfig'
 import styles from './Sidebar.module.css'
 
@@ -17,14 +18,15 @@ import styles from './Sidebar.module.css'
 export default function Sidebar() {
   // 현재 경로 — 어떤 그룹이 활성인지 판단하는 데 사용
   const { pathname } = useLocation()
+  const { t } = useTranslation()
 
   return (
     <aside className={styles.sidebar}>
       {/* 상단 브랜드 + 리더 프로필 카드
           (Figma상 브랜드/역할/프로필/전체목록/메뉴가 모두 동일 간격 8의 형제 요소라
            래퍼로 묶지 않고 사이드바의 flex gap이 직접 적용되게 둔다) */}
-      <div className={styles.brand}>KORION PAY Portal</div>
-      <div className={styles.role}>국가 리더 관리자</div>
+      <div className={styles.brand}>{t('common.brand')}</div>
+      <div className={styles.role}>{t('common.role')}</div>
 
       <div className={styles.profileCard}>
         <div className={styles.profileCountry}>Race / Nigeria</div>
@@ -32,7 +34,7 @@ export default function Sidebar() {
       </div>
 
       {/* "전체 목록" — 동작 미확정이라 우선 비클릭 라벨 (Sidebar.module.css 주석 참고) */}
-      <div className={styles.allLabel}>전체 목록</div>
+      <div className={styles.allLabel}>{t('common.allList')}</div>
 
       {/* 메뉴 그룹 목록 */}
       <nav className={styles.nav}>
@@ -42,7 +44,7 @@ export default function Sidebar() {
 
           return (
             <div
-              key={group.title}
+              key={group.titleKey}
               className={isGroupActive ? `${styles.group} ${styles.groupActive}` : styles.group}
             >
               <div
@@ -50,7 +52,7 @@ export default function Sidebar() {
                   isGroupActive ? `${styles.groupTitle} ${styles.groupTitleActive}` : styles.groupTitle
                 }
               >
-                {group.title}
+                {t(group.titleKey)}
               </div>
 
               {group.items.map((item) => (
@@ -62,7 +64,7 @@ export default function Sidebar() {
                     isActive ? `${styles.item} ${styles.itemActive}` : styles.item
                   }
                 >
-                  {item.label}
+                  {t(item.labelKey)}
                 </NavLink>
               ))}
             </div>

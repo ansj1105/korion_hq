@@ -1,19 +1,18 @@
 import RequestListPage from '../../components/templates/RequestListPage'
 import ActionBadges from '../../components/molecules/ActionBadges'
 import type { TableRow } from '../../components/organisms/DataTable'
-import {
-  usePartnerRequests,
-  PARTNER_COLUMNS,
-  PARTNER_ACTIONS,
-} from './usePartnerRequests'
+import { useTranslation } from '../../i18n'
+import { usePartnerRequests, PARTNER_ACTIONS } from './usePartnerRequests'
 
 /*
  * RequestsPartner (page) — 요청 관리 · 파트너 가입 요청
  * ------------------------------------------------------------------
- * 데이터는 usePartnerRequests 훅에서 받고(하드코딩 JSON), 공통 RequestListPage에 주입한다.
+ * 데이터는 usePartnerRequests 훅(하드코딩 JSON)에서, UI 문구는 t()로 받아
+ * 공통 RequestListPage에 주입한다.
  */
 export default function RequestsPartner() {
-  const { stats, rows: rawRows } = usePartnerRequests()
+  const { t } = useTranslation()
+  const { stats, columns, rows: rawRows } = usePartnerRequests()
 
   // 원본 행 → 테이블 행 변환 (액션 컬럼은 공통 ActionBadges로 렌더링)
   const rows: TableRow[] = rawRows.map((r) => ({
@@ -35,13 +34,13 @@ export default function RequestsPartner() {
 
   return (
     <RequestListPage
-      title="요청 관리"
-      sectionTitle="파트너 가입 요청"
-      sectionDesc="리더가 가입정보를 확인하고 본사에 최종 승인요청하면 본사에서 승인 / 보류 / 거절 / 자료요청을 결정합니다."
+      title={t('requests.title')}
+      sectionTitle={t('partner.sectionTitle')}
+      sectionDesc={t('partner.sectionDesc')}
       stats={stats}
-      columns={PARTNER_COLUMNS}
+      columns={columns}
       rows={rows}
-      toolbar={['검색', '필터', 'Excel']}
+      toolbar={[t('common.search'), t('common.filter'), t('common.excel')]}
     />
   )
 }

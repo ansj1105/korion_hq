@@ -2,6 +2,7 @@ import PageHeader from '../../components/organisms/PageHeader'
 import DateRangeSelect from '../../components/molecules/DateRangeSelect'
 import KpiGrid from '../../components/organisms/KpiGrid'
 import Panel from '../../components/molecules/Panel'
+import { useTranslation } from '../../i18n'
 import { useDashboardData } from './useDashboardData'
 import styles from './Dashboard.module.css'
 
@@ -16,13 +17,14 @@ import styles from './Dashboard.module.css'
  * (내용 정의되면 각 Panel의 children으로 실제 리스트/위젯을 넣으면 됨)
  */
 export default function Dashboard() {
+  const { t } = useTranslation()
   // 데이터는 훅에서 받아온다 (현재는 하드코딩 JSON, 추후 API로 교체 가능)
   const { kpis } = useDashboardData()
 
   return (
     <div className={styles.page}>
       {/* 공통 헤더 + 대시보드 전용 기간 선택 드롭다운(우측 정렬, children 슬롯) */}
-      <PageHeader title="리더 관리자 - 국가 운영 대시보드">
+      <PageHeader title={t('dashboard.title')}>
         <DateRangeSelect />
       </PageHeader>
 
@@ -35,23 +37,23 @@ export default function Dashboard() {
         내용이 비어 있는 패널은 "들어갈 자리" 주석만 남기고 빈 공간으로 둔다.
       */}
       <div className={styles.panelGrid}>
-        <Panel title="파트너 순위">
+        <Panel title={t('dashboard.panel.partnerRank')}>
           {/* 들어갈 자리: 상위 파트너 순위 리스트 (매출/거래량 기준 정렬) */}
         </Panel>
-        <Panel title="가맹점 순위">
+        <Panel title={t('dashboard.panel.merchantRank')}>
           {/* 들어갈 자리: 상위 가맹점 순위 리스트 */}
         </Panel>
         {/* 최근 활동 패널만 디자인에 설명줄이 있어 subtitle로 표시 */}
         <Panel
-          title="최근 활동"
-          subtitle="거래 발생 · 신청 제출 · 승인 결과 · 공지 읽음 · 권한 변경 로그"
+          title={t('dashboard.panel.recentActivity')}
+          subtitle={t('dashboard.panel.recentActivityDesc')}
         >
           {/* 들어갈 자리: 활동 피드 항목 리스트 */}
         </Panel>
-        <Panel title="요청">
+        <Panel title={t('dashboard.panel.request')}>
           {/* 들어갈 자리: 처리 대기 중인 요청 목록 (내용 정의 필요) */}
         </Panel>
-        <Panel title="공지">
+        <Panel title={t('dashboard.panel.notice')}>
           {/* 들어갈 자리: 본사 공지/소식 요약 (내용 정의 필요) */}
         </Panel>
       </div>

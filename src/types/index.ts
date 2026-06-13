@@ -13,16 +13,16 @@ export type AccentKey = 'cyan' | 'blue' | 'purple' | 'green' | 'orange' | 'red'
 
 /** 사이드바의 개별 메뉴 항목 (실제 이동 가능한 링크) */
 export interface NavItem {
-  /** 화면에 표시되는 라벨 (Figma 표기 그대로) */
-  label: string
+  /** 라벨의 i18n 번역 키 (예: 'nav.item.dashboard') */
+  labelKey: string
   /** 이동할 라우트 경로 */
   path: string
 }
 
 /** 사이드바의 메뉴 그룹 (카테고리). 제목은 묶음 라벨이며 그 자체로 이동하진 않는다. */
 export interface NavGroup {
-  /** 그룹 제목 (예: "요청 관리") */
-  title: string
+  /** 그룹 제목의 i18n 번역 키 (예: 'nav.group.requests') */
+  titleKey: string
   /** 그룹에 속한 메뉴 항목들 */
   items: NavItem[]
 }
