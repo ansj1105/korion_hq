@@ -1,0 +1,5 @@
+{
+  "leader": { "titleKey": "auth.card.leaderLogin", "subtitleKey": "auth.login.subtitle.leader", "buttonKey": "auth.btn.leaderLogin", "accessRoleKey": "auth.access.role.leader", "chip": "#7b5cff" },
+  "partner": { "titleKey": "auth.card.partnerLogin", "subtitleKey": "auth.login.subtitle.partner", "buttonKey": "auth.btn.partnerLogin", "accessRoleKey": "auth.access.role.partner", "chip": "#238cff" },
+  "merchant": { "titleKey": "auth.card.merchantLogin", "subtitleKey": "auth.login.subtitle.merchant", "buttonKey": "auth.btn.merchantLogin", "accessRoleKey": "auth.access.role.merchant", "chip": "#26e6b2" }
+}

@@ -1,0 +1,79 @@
+/* AuthShell — 로그인/회원가입 공통 셸 (사이드바 없는 공개 화면) */
+.page {
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+/* 배경 글로우 (Figma: 보라 우상단 + 시안 좌하단) */
+.glow {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: var(--radius-pill);
+  filter: blur(110px);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+.glowPurple {
+  top: -160px;
+  right: -120px;
+  background-color: var(--color-accent-purple);
+}
+.glowCyan {
+  bottom: -180px;
+  left: -140px;
+  background-color: var(--color-accent-cyan);
+  opacity: 0.32;
+}
+
+/* 콘텐츠 컨테이너 (가운데, 최대폭 제한) */
+.inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1320px;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.brandRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.brand {
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
+}
+/* 언어 토글 — 어드민 TopControls 버튼과 동일 톤 */
+.langButton {
+  padding: var(--space-2) var(--space-3);
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-accent-cyan) 70%, transparent);
+  background-color: color-mix(in srgb, #1a122a 90%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+.subtitle {
+  font-size: var(--font-size-11);
+  color: var(--color-text-muted);
+}
+.title {
+  font-size: 28px;
+  font-weight: var(--font-weight-bold);
+}

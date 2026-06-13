@@ -1,0 +1,125 @@
+/* 역할별 로그인 — 좌 폼 + 우 권한 안내 (2열) */
+.cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background-color: color-mix(in srgb, #151127 82%, transparent);
+  border: 1px solid color-mix(in srgb, #7b5cff 34%, transparent);
+  border-radius: 22px;
+}
+
+/* 역할 칩 */
+.chip {
+  align-self: flex-start;
+  padding: 4px var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: #ffffff;
+  background-color: color-mix(in srgb, var(--chip) 24%, transparent);
+  border: 1px solid color-mix(in srgb, var(--chip) 34%, transparent);
+}
+.cardDesc {
+  font-size: var(--font-size-12);
+  color: var(--color-text-muted);
+}
+
+/* 입력 필드 */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.fieldLabel {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: #ffffff;
+}
+.input {
+  width: 100%;
+  height: 46px;
+  padding: 0 var(--space-4);
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, #7b5cff 34%, transparent);
+  background-color: color-mix(in srgb, #0c0a1e 88%, transparent);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 13px;
+}
+.input::placeholder {
+  color: #8c86b5;
+}
+
+/* 로그인 유지 + 비밀번호 찾기 */
+.formRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+.keep {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-12);
+  color: var(--color-text-muted);
+}
+.findPw {
+  font-size: var(--font-size-12);
+  color: var(--color-accent-cyan);
+  cursor: pointer;
+}
+
+/* 권한 안내 패널 */
+.accessTitle {
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-bold);
+}
+.accessRows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.accessRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: 12px;
+  background-color: color-mix(in srgb, #0c0a1e 60%, transparent);
+  border: 1px solid color-mix(in srgb, #7b5cff 24%, transparent);
+}
+.accessLabel {
+  font-size: var(--font-size-12);
+  color: var(--color-text-muted);
+}
+.accessValue {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: #e2dff8;
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-pill);
+  background-color: color-mix(in srgb, #5c5878 50%, transparent);
+}
+.accessFooter {
+  font-size: var(--font-size-11);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+/* 반응형: 좁은 화면에서 1열 */
+@media (max-width: 900px) {
+  .cols {
+    grid-template-columns: 1fr;
+  }
+}

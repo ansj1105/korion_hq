@@ -25,6 +25,8 @@ import PartnerProfile from './pages/partner/Profile'
 import MerchantProfile from './pages/merchant/Profile'
 import MerchantDashboard from './pages/merchant/Dashboard'
 import MerchantTransactions from './pages/merchant/Transactions'
+import AuthMain from './pages/auth/AuthMain'
+import RoleLogin from './pages/auth/RoleLogin'
 import PartnerSettlementHistory from './pages/partner/SettlementHistory'
 import PartnerSettlementDetail from './pages/partner/SettlementDetail'
 import { ROLES } from './roles'
@@ -106,8 +108,14 @@ function navRoutes(nav: NavGroup[], pages: Record<string, JSX.Element>) {
 export default function App() {
   return (
     <Routes>
-      {/* 진입("/") → 현재는 리더 대시보드로. (로그인 도입 시 역할 분기로 교체) */}
-      <Route index element={<Navigate to="/leader/dashboard" replace />} />
+      {/* 진입("/") → 로그인/회원가입 허브 */}
+      <Route index element={<Navigate to="/login" replace />} />
+
+      {/* 공개(사이드바 없는) 인증 화면 */}
+      <Route path="/login" element={<AuthMain />} />
+      <Route path="/login/:role" element={<RoleLogin />} />
+      {/* 회원가입(파트너/가맹점)은 단계적으로 구현 — 우선 라우트만 */}
+      <Route path="/signup/:role" element={<Placeholder titleKey="auth.tab.signup" />} />
 
       {/* 리더 어드민 */}
       <Route path={ROLES.leader.basePath} element={<AdminLayout role="leader" />}>
@@ -143,8 +151,8 @@ export default function App() {
       */}
       <Route path="/merchant-signup" element={<Placeholder titleKey="page.merchantSignup" />} />
 
-      {/* 정의되지 않은 경로는 리더 대시보드로 폴백 */}
-      <Route path="*" element={<Navigate to="/leader/dashboard" replace />} />
+      {/* 정의되지 않은 경로는 로그인 허브로 폴백 */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   )
 }
