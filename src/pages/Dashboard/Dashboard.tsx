@@ -2,7 +2,7 @@ import PageHeader from '../../components/organisms/PageHeader'
 import DateRangeSelect from '../../components/molecules/DateRangeSelect'
 import KpiGrid from '../../components/organisms/KpiGrid'
 import Panel from '../../components/molecules/Panel'
-import { DASHBOARD_KPIS } from './dashboardData'
+import { useDashboardData } from './useDashboardData'
 import styles from './Dashboard.module.css'
 
 /*
@@ -16,6 +16,9 @@ import styles from './Dashboard.module.css'
  * (내용 정의되면 각 Panel의 children으로 실제 리스트/위젯을 넣으면 됨)
  */
 export default function Dashboard() {
+  // 데이터는 훅에서 받아온다 (현재는 하드코딩 JSON, 추후 API로 교체 가능)
+  const { kpis } = useDashboardData()
+
   return (
     <div className={styles.page}>
       {/* 공통 헤더 + 대시보드 전용 기간 선택 드롭다운(우측 정렬, children 슬롯) */}
@@ -23,8 +26,8 @@ export default function Dashboard() {
         <DateRangeSelect />
       </PageHeader>
 
-      {/* KPI 카드 그리드 (데이터: dashboardData.ts) */}
-      <KpiGrid items={DASHBOARD_KPIS} />
+      {/* KPI 카드 그리드 (데이터: useDashboardData 훅) */}
+      <KpiGrid items={kpis} />
 
       {/*
         요약 패널 5종 — 모두 동일 크기(330×220) 3열 그리드.

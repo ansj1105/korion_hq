@@ -1,0 +1,15 @@
+{
+  "stats": [
+    { "id": "active", "label": "활성화 된 가맹점", "value": "136" },
+    { "id": "recommended", "label": "파트너 추천 가맹점", "value": "36" },
+    { "id": "direct", "label": "다이렉트 신청 가맹점", "value": "3" },
+    { "id": "black", "label": "블랙 가맹점", "value": "3" }
+  ],
+  "rows": [
+    { "no": "5", "code": "NG-SP-0005", "name": "Lagos Mart5", "telegram": "@samuel5", "region": "Lagos", "industry": "카페", "opStatus": "대기", "date": "2026.06.03" },
+    { "no": "4", "code": "NG-SP-0004", "name": "Lagos Mart4", "telegram": "@samuel4", "region": "Lagos", "industry": "노래방", "opStatus": "대기", "date": "2026.06.03" },
+    { "no": "3", "code": "NG-MER-0001", "name": "Lagos Mart3", "telegram": "@samuel3", "region": "Lagos", "industry": "PC방", "opStatus": "대기", "date": "2026.06.03" },
+    { "no": "2", "code": "NG-MER-0002", "name": "Lagos Mart2", "telegram": "@samuel2", "region": "Lagos", "industry": "중국집", "opStatus": "대기", "date": "2026.06.03" },
+    { "no": "1", "code": "NG-SP-0001", "name": "Lagos Mart1", "telegram": "@samuel1", "region": "Lagos", "industry": "편의점", "opStatus": "대기", "date": "2026.06.03" }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "stats": [
+    { "id": "active", "label": "활성화 된 파트너", "value": "136" },
+    { "id": "requesting", "label": "승인 신청중 파트너", "value": "36", "tag": "본사", "tagAccent": "orange" },
+    { "id": "waiting", "label": "승인 대기 파트너", "value": "36" },
+    { "id": "black", "label": "블랙 파트너", "value": "3" }
+  ],
+  "rows": [
+    { "no": "5", "code": "NG-SP-0005", "name": "Lagos Mart5", "region": "Lagos", "subCount": "128", "volume": "128,000 KORI", "txCount": "1,560", "hqStatus": "승인", "opStatus": "정지", "date": "2026.06.03" },
+    { "no": "4", "code": "NG-SP-0004", "name": "Lagos Mart4", "region": "Lagos", "subCount": "128", "volume": "128,000 KORI", "txCount": "1,560", "hqStatus": "검토중", "opStatus": "대기", "date": "2026.06.03" },
+    { "no": "3", "code": "NG-SP-0003", "name": "Lagos Mart3", "region": "Lagos", "subCount": "128", "volume": "128,000 KORI", "txCount": "1,560", "hqStatus": "자료요청", "opStatus": "대기", "date": "2026.06.03" },
+    { "no": "2", "code": "NG-SP-0002", "name": "Lagos Mart2", "region": "Lagos", "subCount": "128", "volume": "128,000 KORI", "txCount": "1,560", "hqStatus": "보류", "opStatus": "대기", "date": "2026.06.03" },
+    { "no": "1", "code": "NG-SP-0001", "name": "Lagos Mart1", "region": "Lagos", "subCount": "128", "volume": "128,000 KORI", "txCount": "1,560", "hqStatus": "승인", "opStatus": "활성", "date": "2026.06.03" }
+  ]
+}
