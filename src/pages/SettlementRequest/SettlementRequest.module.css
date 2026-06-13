@@ -33,6 +33,11 @@
   color: #bdb7e7;
   line-height: 1.6;
 }
+/* 파트너별 수수료 테이블 '자동 예정' 값 — 시안 강조 */
+.autoTag {
+  color: #24e6b8;
+  font-weight: var(--font-weight-semibold);
+}
 
 /* ===== 상단 배너 박스 (전용: radius 22 + 보라/시안 글로우) ===== */
 /* 높이는 고정하지 않고, 세로 패딩 + 헤더/InfoGrid 사이 간격으로 ~156px가 되도록 조정.
@@ -359,18 +364,20 @@
   color: #bdb7e7;
   line-height: 1.6;
 }
-/* 골드 강조 박스 (안내 박스와 분리된 별도 박스, 한 줄: 골드 제목 + 흐린 설명 나란히) */
+/* 골드 강조 박스 (안내 박스와 분리, 한 줄: 골드 제목 + 흐린 설명 나란히)
+   Figma: 폭 992(전체 1072보다 좁게 인셋) · 위 ~37 / 아래 ~51 여백
+   (.page flex gap 18 + 추가 margin으로 맞춤) */
 .autoHighlight {
   display: flex;
   flex-direction: row;
   align-items: baseline;
   flex-wrap: wrap;
   gap: var(--space-3);
+  margin: 20px 40px 32px;
   padding: var(--space-4) var(--space-5);
   border-radius: 16px;
   background-color: color-mix(in srgb, #201733 90%, transparent);
   border: 1px solid color-mix(in srgb, #f6c85a 36%, transparent);
-  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.35);
 }
 .autoHlTitle {
   font-size: 18px;

@@ -64,7 +64,11 @@ export default function SettlementRequest() {
   } = useSettlementRequest()
 
   const detailCell = <ActionBadges labels={['보기']} />
-  const ptRows: TableRow[] = partnerTable.rows.map((r) => ({ id: r.code, cells: { ...r, detail: detailCell } }))
+  const ptRows: TableRow[] = partnerTable.rows.map((r) => ({
+    id: r.code,
+    // 'auto'(자동 예정) 값은 시안색으로 강조 — 데이터는 그대로 두고 화면에서만 색 입힘
+    cells: { ...r, auto: <span className={styles.autoTag}>{r.auto}</span>, detail: detailCell },
+  }))
   const dtRows: TableRow[] = directTable.rows.map((r) => ({ id: r.code, cells: { ...r, detail: detailCell } }))
   const htRows: TableRow[] = heldTable.rows.map((r) => ({ id: r.txNo, cells: { ...r, detail: detailCell } }))
 
