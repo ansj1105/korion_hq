@@ -1,0 +1,41 @@
+/* 파트너 · 내 가맹점 대시보드 — 리더 대시보드와 동일 레이아웃 */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* 제목 아래 줄: 설명(좌) + 기간 토글(우) */
+.subRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.desc {
+  font-size: var(--font-size-12);
+  color: var(--color-text-muted);
+}
+
+/*
+ * 하단 요약 패널 — 4개, 3열 그리드(윗줄 3 + 아랫줄 1, 왼쪽 정렬).
+ * 행 높이 220px 고정 → 패널 크기 균일(리더 대시보드와 동일).
+ */
+.panelGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 220px;
+  gap: var(--space-6);
+}
+
+/* 반응형: 좁은 화면에서 열 수 축소 */
+@media (max-width: 1024px) {
+  .panelGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .panelGrid {
+    grid-template-columns: 1fr;
+  }
+}

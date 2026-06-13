@@ -520,5 +520,21 @@
   "profile.modal.desc": "Some information may be reflected after HQ review.",
   "profile.modal.cancel": "Cancel",
   "profile.modal.confirm": "Save",
-  "profile.toast": "Processing completed."
+  "profile.toast": "Processing completed.",
+
+  "pdash.title": "Partner Admin - My Merchants Dashboard",
+  "pdash.desc": "Sales partners manage only the merchants they onboarded and send additional requests.",
+  "pdash.kpi.salesPartner": "Sales Partners",
+  "pdash.kpi.subMerchant": "Sub Merchants",
+  "pdash.kpi.pendingApproval": "Merchant Approval Pending",
+  "pdash.kpi.unreadNotice": "Unread Notices",
+  "pdash.kpi.monthlyVolume": "Monthly Volume",
+  "pdash.kpi.monthlyCount": "Monthly Tx Count",
+  "pdash.kpi.totalFee": "Total Fee",
+  "pdash.kpi.risk": "Risk",
+  "pdash.panel.merchantRank": "Merchant Ranking",
+  "pdash.panel.merchantApproval": "Merchant Approval",
+  "pdash.panel.recentActivity": "Recent Activity",
+  "pdash.panel.notice": "Notice",
+  "pdash.panel.activityDesc": "Tx events · submissions · approvals · notice reads · permission change logs"
 }

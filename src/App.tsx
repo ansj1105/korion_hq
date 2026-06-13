@@ -17,6 +17,7 @@ import NoticeHistory from './pages/NoticeHistory'
 import NoticeSend from './pages/NoticeSend'
 import ActivityLog from './pages/ActivityLog'
 import Profile from './pages/Profile'
+import PartnerDashboard from './pages/partner/Dashboard'
 import { ROLES } from './roles'
 import type { NavGroup } from './types'
 
@@ -44,8 +45,10 @@ const LEADER_PAGES: Record<string, JSX.Element> = {
   'settings/activity-log': <ActivityLog />,
 }
 
-// 파트너 화면은 골격 검증 후 하나씩 채운다(현재는 전부 Placeholder).
-const PARTNER_PAGES: Record<string, JSX.Element> = {}
+// 파트너 화면은 골격 검증 후 하나씩 채운다(나머지는 Placeholder).
+const PARTNER_PAGES: Record<string, JSX.Element> = {
+  dashboard: <PartnerDashboard />,
+}
 
 /** nav(그룹/항목) → 상대 경로 자식 라우트 배열. 미구현은 Placeholder. */
 function navRoutes(nav: NavGroup[], pages: Record<string, JSX.Element>) {

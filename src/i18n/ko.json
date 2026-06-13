@@ -520,5 +520,21 @@
   "profile.modal.desc": "일부 정보는 본사 검토 후 반영될 수 있습니다.",
   "profile.modal.cancel": "취소",
   "profile.modal.confirm": "저장하기",
-  "profile.toast": "처리가 완료되었습니다."
+  "profile.toast": "처리가 완료되었습니다.",
+
+  "pdash.title": "파트너 관리자 - 내 가맹점 대시보드",
+  "pdash.desc": "세일즈 파트너는 본인이 유치한 가맹점만 관리하고 추가 요청을 보냅니다.",
+  "pdash.kpi.salesPartner": "세일즈 파트너",
+  "pdash.kpi.subMerchant": "하부 가맹점",
+  "pdash.kpi.pendingApproval": "가맹점 승인 대기",
+  "pdash.kpi.unreadNotice": "공지 미확인",
+  "pdash.kpi.monthlyVolume": "월 거래량",
+  "pdash.kpi.monthlyCount": "월 거래 건수",
+  "pdash.kpi.totalFee": "총 수수료",
+  "pdash.kpi.risk": "리스크",
+  "pdash.panel.merchantRank": "가맹점순위",
+  "pdash.panel.merchantApproval": "가맹점 승인",
+  "pdash.panel.recentActivity": "최근 활동",
+  "pdash.panel.notice": "공지",
+  "pdash.panel.activityDesc": "거래 발생 · 신청 제출 · 승인 결과 · 공지 읽음 · 권한 변경 로그"
 }

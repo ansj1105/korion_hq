@@ -1,0 +1,12 @@
+{
+  "kpis": [
+    { "id": "sales-partner", "labelKey": "pdash.kpi.salesPartner", "value": "148", "delta": "+10", "tag": "관리", "accent": "cyan" },
+    { "id": "sub-merchant", "labelKey": "pdash.kpi.subMerchant", "value": "2,840", "delta": "+18", "tag": "관리", "accent": "green" },
+    { "id": "pending-approval", "labelKey": "pdash.kpi.pendingApproval", "value": "36", "tag": "리더/본사", "accent": "orange" },
+    { "id": "unread-notice", "labelKey": "pdash.kpi.unreadNotice", "value": "4건", "accent": "orange" },
+    { "id": "monthly-volume", "labelKey": "pdash.kpi.monthlyVolume", "value": "$1.28M", "delta": "+21 k", "accent": "cyan" },
+    { "id": "monthly-count", "labelKey": "pdash.kpi.monthlyCount", "value": "1.28M", "delta": "+30 k", "accent": "green" },
+    { "id": "total-fee", "labelKey": "pdash.kpi.totalFee", "value": "18,420 KORI", "tag": "정산가능", "accent": "purple" },
+    { "id": "risk", "labelKey": "pdash.kpi.risk", "value": "17건", "tag": "주의", "accent": "red" }
+  ]
+}
