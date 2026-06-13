@@ -3,13 +3,15 @@
 .sidebar {
   width: var(--sidebar-width);
   flex-shrink: 0;               /* 콘텐츠가 넓어져도 사이드바 폭은 고정 */
+  /* 화면 높이에 맞춰 고정 (상대 단위). 레이아웃이 화면 높이로 고정돼 있어
+     사이드바는 페이지와 함께 스크롤되지 않고 항상 같은 자리에 머문다. */
   height: 100vh;
-  position: sticky;             /* 콘텐츠 스크롤 시에도 사이드바는 따라옴 */
-  top: 0;
+  height: 100dvh;
   padding: var(--space-6) var(--space-4);
   background-color: var(--color-bg-sidebar);
   border-right: 1px solid color-mix(in srgb, var(--color-border-accent) 45%, transparent);
-  overflow-y: auto;             /* 메뉴가 길면 사이드바 자체 스크롤 */
+  /* 메뉴가 화면보다 길 때만 사이드바 내부에서 스크롤(평소엔 스크롤바 없음) */
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);          /* Figma: 최상위 요소 간격 8 */
