@@ -20,13 +20,14 @@
   font-size: var(--font-size-12);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-muted);
+  white-space: nowrap; /* 라벨 + 부가설명이 한 줄을 유지하도록 (줄바꿈 방지) */
 }
 
-/* 라벨 아래 작은 부가설명 (예: 집계 기간 안내) */
+/* 라벨 옆 작은 부가설명 (예: 집계 기간 안내). 같은 줄에 인라인으로 붙는다. */
 .note {
+  margin-left: var(--space-1);
   font-size: var(--font-size-9);
   color: var(--color-text-subtle);
-  white-space: nowrap; /* 집계 기간 문구가 좁은 카드에서 줄바꿈되지 않도록 한 줄 고정 */
 }
 
 /* 값 + (선택) 태그 한 줄 */

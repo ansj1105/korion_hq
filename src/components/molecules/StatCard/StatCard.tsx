@@ -27,8 +27,11 @@ export interface StatCardData {
 export default function StatCard({ label, value, tag, tagAccent, note }: StatCardData) {
   return (
     <article className={styles.card}>
-      <span className={styles.label}>{label}</span>
-      {note && <span className={styles.note}>{note}</span>}
+      {/* 라벨 + (부가설명)을 한 줄에 인라인으로 표시 (Figma에선 한 텍스트 한 줄) */}
+      <span className={styles.label}>
+        {label}
+        {note && <span className={styles.note}>{note}</span>}
+      </span>
       <div className={styles.valueRow}>
         <span className={styles.value}>{value}</span>
         {tag && <Badge accent={tagAccent}>{tag}</Badge>}
