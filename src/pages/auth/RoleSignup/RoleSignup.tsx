@@ -109,9 +109,10 @@ export default function RoleSignup() {
                 <span className={styles.modeDesc}>{t(m.descKey)}</span>
 
                 {m.type === 'code' ? (
-                  <>
-                    {/* 추천인(리더/파트너) 코드 입력 + 코드 확인 + 확인 완료 상태 */}
-                    <div className={styles.codeRow}>
+                  {/* 추천인(리더/파트너) 코드 입력 + 코드 확인 버튼.
+                      '확인 완료' 상태 배지는 입력란 안 우측에 표시(Figma 기준). */}
+                  <div className={styles.codeRow}>
+                    <div className={styles.codeInputWrap}>
                       <input
                         className={styles.codeInput}
                         type="text"
@@ -119,10 +120,10 @@ export default function RoleSignup() {
                         defaultValue={selected ? m.confirmed : ''}
                         onClick={(e) => e.stopPropagation()}
                       />
-                      <span className={styles.codeCheckBtn}>{t('auth.signup.btn.codeCheck')}</span>
+                      <span className={styles.codeConfirmed}>{t('auth.signup.codeConfirmed')}</span>
                     </div>
-                    <span className={styles.codeConfirmed}>{t('auth.signup.codeConfirmed')}</span>
-                  </>
+                    <span className={styles.codeCheckBtn}>{t('auth.signup.btn.codeCheck')}</span>
+                  </div>
                 ) : (
                   // 본사 직접 계약: 본사 검토 필요 배지
                   <span className={styles.hqBadge}>{t('auth.signup.hqReview')}</span>

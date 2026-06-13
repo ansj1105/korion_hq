@@ -54,11 +54,17 @@
   gap: var(--space-2);
   width: 100%;
 }
-.codeInput {
+/* 입력란 래퍼 — '확인 완료' 배지를 입력란 안에 겹쳐 배치하기 위해 relative */
+.codeInputWrap {
+  position: relative;
   flex: 1;
   min-width: 0;
+}
+.codeInput {
+  width: 100%;
   height: 46px;
-  padding: 0 var(--space-4);
+  /* 우측은 '확인 완료' 배지 자리만큼 패딩 확보 */
+  padding: 0 96px 0 var(--space-4);
   border-radius: 12px;
   border: 1px solid color-mix(in srgb, #7b5cff 34%, transparent);
   background-color: color-mix(in srgb, #0c0a1e 88%, transparent);
@@ -82,14 +88,19 @@
   font-size: var(--font-size-12);
   font-weight: var(--font-weight-semibold);
 }
-/* 확인 완료 — 청록 솔리드 상태 배지 */
+/* 확인 완료 — 청록 솔리드 상태 배지 (입력란 안 우측에 겹쳐 표시) */
 .codeConfirmed {
+  position: absolute;
+  right: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
   padding: 4px var(--space-3);
   border-radius: var(--radius-pill);
   font-size: var(--font-size-11);
   font-weight: var(--font-weight-semibold);
   color: #061612;
   background-color: color-mix(in srgb, #26e6b2 92%, transparent);
+  pointer-events: none;        /* 입력 클릭을 가리지 않도록 */
 }
 /* 본사 검토확인 — 보라 상태 배지 */
 .hqBadge {
