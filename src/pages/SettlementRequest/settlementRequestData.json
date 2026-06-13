@@ -42,7 +42,8 @@
     ["직계약", "본사 100%", "가맹점"]
   ],
   "autoDesc": "리더가 본사에 정산을 요청하면, 정산 대상 기간 내 확정된 거래를 기준으로 리더 수수료와 하부 파트너 수수료가 함께 계산됩니다. 본사 승인 후 하부 파트너에게도 자동 정산 처리되며, 문제 거래와 보류 거래는 정산 대상에서 제외됩니다.",
-  "autoHighlight": "하부 파트너 자동 정산 예정 2,950 KORI · 리더가 요청하면 본사 승인 후 하부 파트너 수수료까지 자동 정산 처리됩니다.",
+  "autoHighlightTitle": "하부 파트너 자동 정산 예정 2,950 KORI",
+  "autoHighlightDesc": "리더가 요청하면 본사 승인 후 하부 파트너 수수료까지 자동 정산 처리됩니다.",
   "autoStats": [
     { "labelKey": "settle.req.stat.partnerFee", "value": "3,120 KORI", "note": "하부 파트너 가맹점 거래 리더 수수료" },
     { "labelKey": "settle.req.auto.directFeeProfit", "value": "1,480 KORI", "note": "리더 직접 계약 가맹점 수수료" },

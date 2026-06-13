@@ -23,8 +23,9 @@
   box-shadow: 0 10px 34px rgba(0, 0, 0, 0.45);
 }
 
+/* 섹션 제목 — 자동 정산 안내 제목(.autoTitle)과 동일하게 19/700 동기화 */
 .sectionTitle {
-  font-size: var(--font-size-15);
+  font-size: 19px;
   font-weight: var(--font-weight-bold);
 }
 .sectionDesc {
@@ -346,17 +347,37 @@
   border-radius: 20px;
   box-shadow: 0 10px 34px rgba(0, 0, 0, 0.45);
 }
-/* 자동 정산 안내 제목 — "수수료 구조"(.feeTitle)와 동일하게 19/700 */
+/* 자동 정산 안내 제목 (Figma: 20/700) */
 .autoTitle {
-  font-size: 19px;
+  font-size: 20px;
   font-weight: var(--font-weight-bold);
 }
+/* 자동 정산 안내 설명 (Figma: 14/400) */
+.autoDesc {
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-regular);
+  color: #bdb7e7;
+  line-height: 1.6;
+}
+/* 골드 강조 박스 (2줄: 골드 제목 + 흐린 설명) */
 .autoHighlight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
   padding: var(--space-3) var(--space-4);
   border-radius: 16px;
   background-color: color-mix(in srgb, #201733 90%, transparent);
   border: 1px solid color-mix(in srgb, #f6c85a 36%, transparent);
-  font-size: var(--font-size-12);
+}
+.autoHlTitle {
+  font-size: 18px;
+  font-weight: var(--font-weight-bold);
+  color: #f6c85a;
+}
+.autoHlDesc {
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  color: #bdb7e7;
 }
 .summaryGrid {
   display: grid;
@@ -366,12 +387,29 @@
 .summaryCard {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-1);
   min-height: 130px;
   padding: var(--space-4);
   background-color: color-mix(in srgb, #141027 82%, transparent);
   border: 1px solid color-mix(in srgb, #7c5cff 32%, transparent);
   border-radius: 18px;
+}
+/* 요약 카드 내부 텍스트 (Figma: 라벨 17/700, 노트 12/400, 값 24/700) */
+.summaryCardLabel {
+  font-size: 17px;
+  font-weight: var(--font-weight-bold);
+  color: #ffffff;
+}
+.summaryNote {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-regular);
+  color: #bdb7e7;
+}
+.summaryValue {
+  margin-top: auto;
+  font-size: var(--font-size-23);
+  font-weight: var(--font-weight-bold);
+  color: #ffffff;
 }
 
 /* ===== 본사 정산 요청 폼 (필드 카드) ===== */

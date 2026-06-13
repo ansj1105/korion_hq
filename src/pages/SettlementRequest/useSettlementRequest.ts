@@ -91,7 +91,8 @@ export function useSettlementRequest() {
     calc: data.calc,
     feeStructure: data.feeStructure as string[][],
     autoDesc: data.autoDesc,
-    autoHighlight: data.autoHighlight,
+    autoHighlightTitle: data.autoHighlightTitle,
+    autoHighlightDesc: data.autoHighlightDesc,
     autoStats: toStats(data.autoStats as StatRaw[]),
     partnerTable: {
       desc: t(data.partnerTable.descKey),

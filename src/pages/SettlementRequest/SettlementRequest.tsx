@@ -59,7 +59,7 @@ export default function SettlementRequest() {
   const [submitted, setSubmitted] = useState(false)
 
   const {
-    banner, kpis, calc, feeStructure, autoDesc, autoHighlight, autoStats,
+    banner, kpis, calc, feeStructure, autoDesc, autoHighlightTitle, autoHighlightDesc, autoStats,
     partnerTable, directTable, heldTable, summary, checks, formFields,
   } = useSettlementRequest()
 
@@ -185,24 +185,25 @@ export default function SettlementRequest() {
         ))}
       </div>
 
-      {/* 자동 정산 안내 — 제목 + 설명 박스 */}
+      {/* 자동 정산 안내 박스 — 제목 + 설명 + 골드 강조(2줄) */}
       <div className={styles.autoBox}>
         <h3 className={styles.autoTitle}>{t('settle.req.auto.title')}</h3>
-        <p className={styles.sectionDesc}>{autoDesc}</p>
+        <p className={styles.autoDesc}>{autoDesc}</p>
+        <div className={styles.autoHighlight}>
+          <span className={styles.autoHlTitle}>{autoHighlightTitle}</span>
+          <span className={styles.autoHlDesc}>{autoHighlightDesc}</span>
+        </div>
       </div>
 
-      {/* 자동 정산 요약 — 하이라이트 + 요약 카드 (위 안내 박스와 분리된 별도 박스) */}
-      <div className={styles.autoBox}>
-        <div className={styles.autoHighlight}>{autoHighlight}</div>
-        <div className={styles.summaryGrid}>
-          {autoStats.map((s) => (
-            <div key={s.id} className={styles.summaryCard}>
-              <span className={styles.summaryLabel}>{s.label}</span>
-              <span className={styles.kpiValue}>{s.value}</span>
-              {s.note && <span className={styles.kpiNote}>{s.note}</span>}
-            </div>
-          ))}
-        </div>
+      {/* 자동 정산 요약 카드 4개 (안내 박스와 분리, 각 카드가 박스) */}
+      <div className={styles.summaryGrid}>
+        {autoStats.map((s) => (
+          <div key={s.id} className={styles.summaryCard}>
+            <span className={styles.summaryCardLabel}>{s.label}</span>
+            {s.note && <span className={styles.summaryNote}>{s.note}</span>}
+            <span className={styles.summaryValue}>{s.value}</span>
+          </div>
+        ))}
       </div>
 
       {/* 파트너별 수수료 수익 */}
