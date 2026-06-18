@@ -62,9 +62,12 @@ const LEADER_PAGES: Record<string, JSX.Element> = {
 const MERCHANT_PAGES: Record<string, JSX.Element> = {
   dashboard: <MerchantDashboard />,
   transactions: <MerchantTransactions />,
+  'transactions/refund': <MerchantTransactions variant="refund" />,
+  'settlement/history': <SettlementHistory />,
   // 전체 공지(파트너 소식지)는 리더 본사 소식지와 동일 → 재사용.
   'hq-notices': <HqNotices />,
   'settings/profile': <MerchantProfile />,
+  'settings/activity-log': <ActivityLog />,
 }
 
 // 파트너 화면은 골격 검증 후 하나씩 채운다(나머지는 Placeholder).

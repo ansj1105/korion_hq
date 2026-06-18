@@ -1,6 +1,7 @@
 import { useTranslation } from '../../i18n'
 import type { Column } from '../../components/organisms/DataTable'
 import type { MetricCardData } from '../../components/molecules/MetricCard'
+import { useRolePageData } from '../../hooks/useRolePageData'
 import data from './activityLogData.json'
 
 /** 활동 로그 행 원본 데이터 형태 */
@@ -36,8 +37,16 @@ interface MetricRaw {
  */
 export function useActivityLog() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useRolePageData(
+    {
+      leader: '/api/leader/activity-logs',
+      partner: '/api/partner/activity-logs',
+      merchant: '/api/merchant/activity-logs',
+    },
+    data
+  )
 
-  const metrics: MetricCardData[] = (data.metrics as MetricRaw[]).map((m) => ({
+  const metrics: MetricCardData[] = (pageData.metrics as MetricRaw[]).map((m) => ({
     id: m.id,
     label: t(m.labelKey),
     value: m.value,
@@ -62,6 +71,8 @@ export function useActivityLog() {
   return {
     metrics,
     columns,
-    rows: data.rows as ActivityLogRow[],
+    rows: pageData.rows as ActivityLogRow[],
+    isLoading,
+    error,
   }
 }

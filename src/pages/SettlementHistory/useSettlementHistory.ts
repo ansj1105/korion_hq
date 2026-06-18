@@ -1,5 +1,6 @@
 import { useTranslation } from '../../i18n'
 import type { Column } from '../../components/organisms/DataTable'
+import { useRolePageData } from '../../hooks/useRolePageData'
 import data from './settlementHistoryData.json'
 
 /** 정산 내역 행 원본 데이터 형태 */
@@ -22,6 +23,13 @@ export interface SettlementHistoryRow {
  */
 export function useSettlementHistory() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useRolePageData(
+    {
+      leader: '/api/leader/settlements',
+      merchant: '/api/merchant/settlements',
+    },
+    data
+  )
 
   const columns: Column[] = [
     { key: 'no', label: t('settle.hist.col.no'), width: '1.4fr' },
@@ -45,10 +53,12 @@ export function useSettlementHistory() {
   ]
 
   return {
-    lastSettleDate: data.lastSettleDate,
-    thisRequestAmount: data.thisRequestAmount,
+    lastSettleDate: pageData.lastSettleDate,
+    thisRequestAmount: pageData.thisRequestAmount,
     tabs,
     columns,
-    rows: data.rows as SettlementHistoryRow[],
+    rows: pageData.rows as SettlementHistoryRow[],
+    isLoading,
+    error,
   }
 }

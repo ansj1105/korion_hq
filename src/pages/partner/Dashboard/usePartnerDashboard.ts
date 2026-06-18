@@ -1,6 +1,7 @@
 import { useTranslation } from '../../../i18n'
 import type { AccentKey } from '../../../types'
 import type { KpiCardData } from '../../../components/molecules/KpiCard'
+import { usePartnerPageData } from '../../../hooks/usePartnerPageData'
 import data from './partnerDashboardData.json'
 
 /** JSON 원본 KPI 형태 (라벨은 i18n 키, 값·증감·태그는 데이터) */
@@ -21,8 +22,9 @@ interface KpiRaw {
  */
 export function usePartnerDashboard() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = usePartnerPageData('/api/partner/dashboard', data)
 
-  const kpis: KpiCardData[] = (data.kpis as KpiRaw[]).map((k) => ({
+  const kpis: KpiCardData[] = (pageData.kpis as KpiRaw[]).map((k) => ({
     id: k.id,
     label: t(k.labelKey),
     value: k.value,
@@ -31,5 +33,5 @@ export function usePartnerDashboard() {
     accent: k.accent as AccentKey,
   }))
 
-  return { kpis }
+  return { kpis, isLoading, error }
 }

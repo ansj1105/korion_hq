@@ -1,4 +1,5 @@
 const API_BASE_URL = (import.meta.env.VITE_KORION_CHONG_API_URL ?? '').replace(/\/$/, '')
+type Headers = Record<string, string>
 
 function buildUrl(path: string, query?: Record<string, string | number | undefined>) {
   const params = new URLSearchParams()
@@ -22,14 +23,52 @@ function leaderHeaders() {
   }
 }
 
-async function getJson<T>(path: string, query?: Record<string, string | number | undefined>) {
+function partnerHeaders() {
+  return {
+    'X-Partner-Id':
+      window.localStorage.getItem('korion.partnerId') ??
+      import.meta.env.VITE_KORION_PARTNER_ID ??
+      '',
+    'X-Country-Scopes':
+      window.localStorage.getItem('korion.countryScopes') ??
+      import.meta.env.VITE_KORION_COUNTRY_SCOPES ??
+      '',
+  }
+}
+
+function merchantHeaders() {
+  return {
+    'X-Merchant-Id':
+      window.localStorage.getItem('korion.merchantId') ??
+      import.meta.env.VITE_KORION_MERCHANT_ID ??
+      '',
+    'X-Country-Scopes':
+      window.localStorage.getItem('korion.countryScopes') ??
+      import.meta.env.VITE_KORION_COUNTRY_SCOPES ??
+      '',
+  }
+}
+
+export async function getJson<T>(path: string, query?: Record<string, string | number | undefined>, headers?: Headers) {
   const response = await fetch(buildUrl(path, query), {
-    headers: leaderHeaders(),
+    headers,
   })
   if (!response.ok) {
     throw new Error(`KORION Chong API ${response.status}`)
   }
   return response.json() as Promise<T>
+}
+
+export function fetchLeaderPageData<T>(path: string, query?: Record<string, string | number | undefined>) {
+  return getJson<T>(path, query, leaderHeaders())
+}
+
+export function fetchPartnerPageData<T>(path: string, query?: Record<string, string | number | undefined>) {
+  return getJson<T>(path, query, partnerHeaders())
+}
+
+export function fetchMerchantPageData<T>(path: string, query?: Record<string, string | number | undefined>) {
+  return getJson<T>(path, query, merchantHeaders())
 }
 
 async function postJson<T>(path: string, body: unknown) {
@@ -51,6 +90,10 @@ async function postJson<T>(path: string, body: unknown) {
     throw new Error(detail || `KORION Chong API ${response.status}`)
   }
   return response.json() as Promise<T>
+}
+
+function requestId(prefix: string) {
+  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
 export interface LeaderDashboardApiResponse {
@@ -112,7 +155,7 @@ export function fetchLeaderDashboard(period: string, countryScope: string) {
   return getJson<LeaderDashboardApiResponse>('/api/leader/dashboard', {
     period,
     countryScope,
-  })
+  }, leaderHeaders())
 }
 
 export function fetchLeaderPartners(countryScope: string, page = 0, size = 20) {
@@ -121,7 +164,7 @@ export function fetchLeaderPartners(countryScope: string, page = 0, size = 20) {
     status: 'SALES_PARTNER_APPROVED',
     page,
     size,
-  })
+  }, leaderHeaders())
 }
 
 export type SignupAvailabilityField =
@@ -196,6 +239,34 @@ export interface WalletLinkVerifyApiResponse {
   authStatus: 'VERIFIED'
   resultCode: 'WALLET_VERIFIED'
   messageKey: string
+}
+
+export interface LoginApiRequest {
+  loginId: string
+  password: string
+  role: 'LEADER' | 'PARTNER' | 'MERCHANT'
+  requestId?: string
+}
+
+export interface LoginApiResponse {
+  authenticated: boolean
+  userId: number
+  role: 'LEADER' | 'PARTNER' | 'MERCHANT'
+  partnerId?: number | null
+  merchantId?: number | null
+  countryScopes: string[]
+  redirectPath: '/leader/dashboard' | '/partner/dashboard' | '/merchant/dashboard'
+  requiresTwoFactor: boolean
+  sessionExpiresAt?: string | null
+  resultCode: 'LOGIN_SUCCESS'
+  messageKey: string
+}
+
+export function login(payload: Omit<LoginApiRequest, 'requestId'>) {
+  return postJson<LoginApiResponse>('/api/auth/login', {
+    ...payload,
+    requestId: requestId(`login-${payload.role.toLowerCase()}`),
+  })
 }
 
 export function checkSignupAvailability(field: SignupAvailabilityField, value: string) {

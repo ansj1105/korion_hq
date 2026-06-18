@@ -1,6 +1,7 @@
 import { useTranslation } from '../../i18n'
 import type { StatCardData } from '../../components/molecules/StatCard'
 import type { Column } from '../../components/organisms/DataTable'
+import { useLeaderPageData } from '../../hooks/useLeaderPageData'
 import data from './merchantData.json'
 
 /** JSON 원본 지표 형태 (라벨은 i18n 키) */
@@ -33,8 +34,9 @@ export const MERCHANT_ACTIONS = ['승인', '거절', '보류', '자료요청', '
  */
 export function useMerchantRequests() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useLeaderPageData('/api/leader/merchant-applications', data)
 
-  const stats: StatCardData[] = (data.stats as StatRaw[]).map((s) => ({
+  const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -52,5 +54,5 @@ export function useMerchantRequests() {
     { key: 'action', label: t('merchant.col.action'), width: '2.2fr' },
   ]
 
-  return { stats, columns, rows: data.rows as MerchantRow[] }
+  return { stats, columns, rows: pageData.rows as MerchantRow[], isLoading, error }
 }

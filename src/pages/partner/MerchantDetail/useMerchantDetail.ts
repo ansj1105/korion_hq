@@ -1,4 +1,5 @@
 import { useTranslation } from '../../../i18n'
+import { usePartnerPageData } from '../../../hooks/usePartnerPageData'
 import data from './merchantDetailData.json'
 
 export interface StatusItem { label: string; value: string; chip: string }
@@ -15,14 +16,17 @@ interface FieldRaw { labelKey: string; value: string; placeholder?: string; wide
  */
 export function useMerchantDetail() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = usePartnerPageData('/api/partner/merchant-applications/detail', data)
   const toFields = (fields: FieldRaw[]): DetailField[] =>
     fields.map((f) => ({ label: t(f.labelKey), value: f.value, placeholder: f.placeholder, wide: f.wide }))
 
   return {
-    statusItems: (data.statusItems as StatusRaw[]).map((s) => ({ label: t(s.labelKey), value: s.value, chip: s.chip })),
-    code: data.code,
-    accountFields: toFields(data.accountFields as FieldRaw[]),
-    basicFields: toFields(data.basicFields as FieldRaw[]),
-    storeFields: toFields(data.storeFields as FieldRaw[]),
+    statusItems: (pageData.statusItems as StatusRaw[]).map((s) => ({ label: t(s.labelKey), value: s.value, chip: s.chip })),
+    code: pageData.code,
+    accountFields: toFields(pageData.accountFields as FieldRaw[]),
+    basicFields: toFields(pageData.basicFields as FieldRaw[]),
+    storeFields: toFields(pageData.storeFields as FieldRaw[]),
+    isLoading,
+    error,
   }
 }

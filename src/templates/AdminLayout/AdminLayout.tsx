@@ -1,6 +1,7 @@
-import { Outlet } from 'react-router-dom'
+import { Navigate, Outlet } from 'react-router-dom'
 import Sidebar from '../../components/organisms/Sidebar'
 import { ROLES, type Role } from '../../roles'
+import { readAuthSession } from '../../services/authSession'
 import styles from './AdminLayout.module.css'
 
 interface AdminLayoutProps {
@@ -16,7 +17,16 @@ interface AdminLayoutProps {
  * → 레이아웃·사이드바를 역할마다 따로 만들지 않고 하나로 재사용한다.
  */
 export default function AdminLayout({ role }: AdminLayoutProps) {
+  const session = readAuthSession()
   const { basePath, roleLabelKey, profileLines, nav } = ROLES[role]
+
+  if (!session) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (session.role !== role) {
+    return <Navigate to={`${ROLES[session.role].basePath}/dashboard`} replace />
+  }
 
   return (
     <div className={styles.layout}>

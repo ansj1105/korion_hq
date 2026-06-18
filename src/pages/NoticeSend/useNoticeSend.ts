@@ -1,5 +1,6 @@
 import { useTranslation } from '../../i18n'
 import type { MetricCardData } from '../../components/molecules/MetricCard'
+import { useLeaderPageData } from '../../hooks/useLeaderPageData'
 import data from './noticeSendData.json'
 
 /** JSON의 KPI 원본 */
@@ -20,8 +21,9 @@ interface MetricRaw {
  */
 export function useNoticeSend() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useLeaderPageData('/api/leader/notices/send-summary', data)
 
-  const metrics: MetricCardData[] = (data.metrics as MetricRaw[]).map((m) => ({
+  const metrics: MetricCardData[] = (pageData.metrics as MetricRaw[]).map((m) => ({
     id: m.id,
     label: t(m.labelKey),
     value: m.value,
@@ -30,5 +32,5 @@ export function useNoticeSend() {
     chipSolid: m.chipSolid,
   }))
 
-  return { metrics }
+  return { metrics, isLoading, error }
 }

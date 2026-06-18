@@ -1,35 +1,24 @@
 import { type CSSProperties } from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import AuthShell from '../AuthShell'
 import { useTranslation } from '../../../i18n'
-import data from './roleLoginData.json'
+import { useRoleLogin } from './useRoleLogin'
 import styles from './RoleLogin.module.css'
 
-type RoleKey = 'leader' | 'partner' | 'merchant'
-const ROLE_CFG = data as Record<string, { titleKey: string; subtitleKey: string; buttonKey: string; accessRoleKey: string; chip: string }>
-
-/*
- * RoleLogin (page) — 역할별 로그인 (리더/파트너/가맹점)
- * ------------------------------------------------------------------
- * 좌: 로그인 폼(입력 UI만), 우: 권한 기반 접근 안내 패널. 구조 동일·역할 데이터만 다름.
- * 백엔드 없음 → "로그인" 버튼은 검증 없이 해당 역할 어드민 대시보드로 라우팅한다.
- */
 export default function RoleLogin() {
-  const { role } = useParams<{ role: string }>()
-  const navigate = useNavigate()
   const { t } = useTranslation()
+  const {
+    roleKey,
+    cfg,
+    form,
+    accessRows,
+    isSubmitting,
+    error,
+    updateField,
+    submit,
+  } = useRoleLogin()
 
-  // 잘못된 역할이면 허브로
-  if (!role || !ROLE_CFG[role]) return <Navigate to="/login" replace />
-  const cfg = ROLE_CFG[role]
-
-  // 권한 안내 패널 행 (접속 권한만 역할별, 나머지는 공통)
-  const accessRows = [
-    { label: t('auth.access.row.access'), value: t(cfg.accessRoleKey) },
-    { label: t('auth.access.row.security'), value: t('auth.access.val.security') },
-    { label: t('auth.access.row.session'), value: t('auth.access.val.session') },
-    { label: t('auth.access.row.history'), value: t('auth.access.val.history') },
-  ]
+  if (!roleKey || !cfg) return <Navigate to="/login" replace />
 
   return (
     <AuthShell title={t(cfg.titleKey)} subtitle={t(cfg.subtitleKey)}>
@@ -45,29 +34,68 @@ export default function RoleLogin() {
           <p className={styles.cardDesc}>{t(cfg.subtitleKey)}</p>
 
           <div className={styles.field}>
-            <span className={styles.fieldLabel}>{t('auth.login.id')}</span>
-            <input className={styles.input} type="text" placeholder={t('auth.login.idPlaceholder')} />
+            <label className={styles.fieldLabel} htmlFor={`${roleKey}-login-id`}>
+              {t('auth.login.id')}
+            </label>
+            <input
+              id={`${roleKey}-login-id`}
+              className={styles.input}
+              type="text"
+              placeholder={t('auth.login.idPlaceholder')}
+              value={form.loginId}
+              onChange={(event) => updateField('loginId', event.target.value)}
+              autoComplete="username"
+            />
           </div>
           <div className={styles.field}>
-            <span className={styles.fieldLabel}>{t('auth.login.pw')}</span>
-            <input className={styles.input} type="password" placeholder={t('auth.login.pwPlaceholder')} />
+            <label className={styles.fieldLabel} htmlFor={`${roleKey}-password`}>
+              {t('auth.login.pw')}
+            </label>
+            <input
+              id={`${roleKey}-password`}
+              className={styles.input}
+              type="password"
+              placeholder={t('auth.login.pwPlaceholder')}
+              value={form.password}
+              onChange={(event) => updateField('password', event.target.value)}
+              autoComplete="current-password"
+            />
           </div>
           <div className={styles.field}>
-            <span className={styles.fieldLabel}>{t('auth.login.twofa')}</span>
-            <input className={styles.input} type="text" placeholder={t('auth.login.twofa')} />
+            <label className={styles.fieldLabel} htmlFor={`${roleKey}-two-factor`}>
+              {t('auth.login.twofa')}
+            </label>
+            <input
+              id={`${roleKey}-two-factor`}
+              className={styles.input}
+              type="text"
+              placeholder={t('auth.login.twofa')}
+              value={form.twoFactorCode}
+              onChange={(event) => updateField('twoFactorCode', event.target.value)}
+              autoComplete="one-time-code"
+            />
           </div>
 
           <div className={styles.formRow}>
             <label className={styles.keep}>
-              <input type="checkbox" /> {t('auth.login.keep')}
+              <input
+                type="checkbox"
+                checked={form.keepSignedIn}
+                onChange={(event) => updateField('keepSignedIn', event.target.checked)}
+              />{' '}
+              {t('auth.login.keep')}
             </label>
             <span className={styles.findPw}>{t('auth.login.findPw')}</span>
           </div>
 
-          {/* 백엔드 없음 → 검증 없이 역할 대시보드로 이동.
-              버튼 색(그라데이션)은 hover 시에만 적용(.loginBtn:hover). */}
-          <button type="button" className={styles.loginBtn} onClick={() => navigate(`/${role}/dashboard`)}>
-            {t(cfg.buttonKey)}
+          {error && (
+            <p className={styles.errorText} role="alert">
+              {error}
+            </p>
+          )}
+
+          <button type="button" className={styles.loginBtn} disabled={isSubmitting} onClick={submit}>
+            {isSubmitting ? '...' : t(cfg.buttonKey)}
           </button>
         </section>
 
@@ -81,9 +109,9 @@ export default function RoleLogin() {
 
           <div className={styles.accessRows}>
             {accessRows.map((r) => (
-              <div key={r.label} className={styles.accessRow}>
-                <span className={styles.accessLabel}>{r.label}</span>
-                <span className={styles.accessValue}>{r.value}</span>
+              <div key={r.labelKey} className={styles.accessRow}>
+                <span className={styles.accessLabel}>{t(r.labelKey)}</span>
+                <span className={styles.accessValue}>{t(r.valueKey)}</span>
               </div>
             ))}
           </div>
@@ -94,5 +122,3 @@ export default function RoleLogin() {
     </AuthShell>
   )
 }
-
-export type { RoleKey }

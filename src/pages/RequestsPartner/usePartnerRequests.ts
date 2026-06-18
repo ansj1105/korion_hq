@@ -2,6 +2,7 @@ import { useTranslation } from '../../i18n'
 import type { AccentKey } from '../../types'
 import type { StatCardData } from '../../components/molecules/StatCard'
 import type { Column } from '../../components/organisms/DataTable'
+import { useLeaderPageData } from '../../hooks/useLeaderPageData'
 import data from './partnerData.json'
 
 /** JSON 원본 지표 형태 (라벨은 i18n 키) */
@@ -38,8 +39,9 @@ export const PARTNER_ACTIONS = ['승인요청', '정지요청', '상세'] as con
  */
 export function usePartnerRequests() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useLeaderPageData('/api/leader/partner-applications', data)
 
-  const stats: StatCardData[] = (data.stats as StatRaw[]).map((s) => ({
+  const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -62,5 +64,5 @@ export function usePartnerRequests() {
     { key: 'action', label: t('partner.col.action'), width: '1.8fr' },
   ]
 
-  return { stats, columns, rows: data.rows as PartnerRow[] }
+  return { stats, columns, rows: pageData.rows as PartnerRow[], isLoading, error }
 }

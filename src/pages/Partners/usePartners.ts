@@ -3,6 +3,7 @@ import { useTranslation } from '../../i18n'
 import type { StatCardData } from '../../components/molecules/StatCard'
 import type { Column } from '../../components/organisms/DataTable'
 import { fetchLeaderPartners } from '../../services/korionChongApi'
+import { defaultSessionCountryScope } from '../../services/authSession'
 import data from './partnersData.json'
 
 interface StatRaw {
@@ -45,7 +46,7 @@ export function usePartners() {
     setIsLoading(true)
     setError(null)
 
-    fetchLeaderPartners('KR')
+    fetchLeaderPartners(defaultSessionCountryScope())
       .then((response) => {
         if (cancelled) return
         setRows(

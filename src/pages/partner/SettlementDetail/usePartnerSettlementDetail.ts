@@ -1,6 +1,7 @@
 import { useTranslation } from '../../../i18n'
 import type { InfoItem } from '../../../components/molecules/InfoGrid'
 import type { Column } from '../../../components/organisms/DataTable'
+import { usePartnerPageData } from '../../../hooks/usePartnerPageData'
 import data from './partnerSettlementDetailData.json'
 
 interface FieldRaw {
@@ -17,6 +18,7 @@ interface FieldRaw {
  */
 export function usePartnerSettlementDetail() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = usePartnerPageData('/api/partner/settlements/detail', data)
 
   const toItems = (fields: FieldRaw[]): InfoItem[] =>
     fields.map((f) => ({ label: t(f.labelKey), value: f.value, valueColor: f.color }))
@@ -42,13 +44,15 @@ export function usePartnerSettlementDetail() {
   ]
 
   return {
-    no: data.no,
-    status: data.status,
-    basicInfo: toItems(data.basicInfo as FieldRaw[]),
-    amountSummary: toItems(data.amountSummary as FieldRaw[]),
+    no: pageData.no,
+    status: pageData.status,
+    basicInfo: toItems(pageData.basicInfo as FieldRaw[]),
+    amountSummary: toItems(pageData.amountSummary as FieldRaw[]),
     merchantColumns,
-    merchantRows: data.merchantRows as Array<Record<string, string>>,
+    merchantRows: pageData.merchantRows as Array<Record<string, string>>,
     heldColumns,
-    heldRows: data.heldRows as Array<Record<string, string>>,
+    heldRows: pageData.heldRows as Array<Record<string, string>>,
+    isLoading,
+    error,
   }
 }

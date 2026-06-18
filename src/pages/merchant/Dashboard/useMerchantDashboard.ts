@@ -1,6 +1,7 @@
 import { useTranslation } from '../../../i18n'
 import type { AccentKey } from '../../../types'
 import type { KpiCardData } from '../../../components/molecules/KpiCard'
+import { useMerchantPageData } from '../../../hooks/useMerchantPageData'
 import data from './merchantDashboardData.json'
 
 interface KpiRaw {
@@ -19,8 +20,9 @@ interface KpiRaw {
  */
 export function useMerchantDashboard() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useMerchantPageData('/api/merchant/dashboard', data)
 
-  const kpis: KpiCardData[] = (data.kpis as KpiRaw[]).map((k) => ({
+  const kpis: KpiCardData[] = (pageData.kpis as KpiRaw[]).map((k) => ({
     id: k.id,
     label: t(k.labelKey),
     value: k.value,
@@ -29,5 +31,5 @@ export function useMerchantDashboard() {
     accent: k.accent as AccentKey,
   }))
 
-  return { kpis }
+  return { kpis, isLoading, error }
 }

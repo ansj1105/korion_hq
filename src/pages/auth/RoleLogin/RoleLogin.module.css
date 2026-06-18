@@ -101,6 +101,26 @@
   color: #ffffff;
   box-shadow: 0 8px 30px rgba(117, 51, 255, 0.28), 0 0 24px rgba(0, 204, 255, 0.14);
 }
+.loginBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+.loginBtn:disabled:hover {
+  background-color: rgba(33, 27, 61, 0.92);
+  background-image: none;
+  border-color: #6b62a4;
+  box-shadow: none;
+}
+.errorText {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, #ff6b6b 42%, transparent);
+  background-color: color-mix(in srgb, #ff6b6b 12%, transparent);
+  color: #ffb4b4;
+  font-size: var(--font-size-12);
+  line-height: 1.5;
+}
 
 /* 권한 안내 패널 */
 .accessTitle {

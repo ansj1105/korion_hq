@@ -1,5 +1,6 @@
 import { useTranslation } from '../../i18n'
 import type { Column } from '../../components/organisms/DataTable'
+import { useRolePageData } from '../../hooks/useRolePageData'
 import data from './hqNoticesData.json'
 
 /** 본사 소식지 행 원본 데이터 형태 */
@@ -20,6 +21,14 @@ export interface HqNoticeRow {
  */
 export function useHqNotices() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useRolePageData(
+    {
+      leader: '/api/leader/hq-notices',
+      partner: '/api/partner/hq-notices',
+      merchant: '/api/merchant/hq-notices',
+    },
+    data
+  )
 
   const columns: Column[] = [
     { key: 'no', label: t('hq.col.no'), width: '1fr' },
@@ -33,6 +42,8 @@ export function useHqNotices() {
 
   return {
     columns,
-    rows: data.rows as HqNoticeRow[],
+    rows: pageData.rows as HqNoticeRow[],
+    isLoading,
+    error,
   }
 }

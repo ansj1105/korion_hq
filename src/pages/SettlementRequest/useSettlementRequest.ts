@@ -1,6 +1,7 @@
 import { useTranslation } from '../../i18n'
 import type { StatCardData } from '../../components/molecules/StatCard'
 import type { Column } from '../../components/organisms/DataTable'
+import { useLeaderPageData } from '../../hooks/useLeaderPageData'
 import data from './settlementRequestData.json'
 
 interface StatRaw {
@@ -34,6 +35,7 @@ interface FieldRaw {
  */
 export function useSettlementRequest() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useLeaderPageData('/api/leader/settlements/request-summary', data)
   const toStats = (arr: StatRaw[]): StatCardData[] =>
     arr.map((s) => ({ id: s.labelKey, label: t(s.labelKey), value: s.value, note: s.note }))
 
@@ -77,7 +79,7 @@ export function useSettlementRequest() {
     { key: 'detail', label: t('settle.req.ht.detail'), width: '0.7fr' },
   ]
 
-  const kpis: KpiItem[] = (data.stats as StatRaw[]).map((s) => ({
+  const kpis: KpiItem[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.labelKey,
     label: t(s.labelKey),
     value: s.value,
@@ -87,31 +89,33 @@ export function useSettlementRequest() {
   }))
 
   return {
-    banner: data.banner,
+    banner: pageData.banner,
     kpis,
-    calc: data.calc,
-    feeStructure: data.feeStructure as string[][],
-    autoDesc: data.autoDesc,
-    autoHighlightTitle: data.autoHighlightTitle,
-    autoHighlightDesc: data.autoHighlightDesc,
-    autoStats: toStats(data.autoStats as StatRaw[]),
+    calc: pageData.calc,
+    feeStructure: pageData.feeStructure as string[][],
+    autoDesc: pageData.autoDesc,
+    autoHighlightTitle: pageData.autoHighlightTitle,
+    autoHighlightDesc: pageData.autoHighlightDesc,
+    autoStats: toStats(pageData.autoStats as StatRaw[]),
     partnerTable: {
-      desc: t(data.partnerTable.descKey),
+      desc: t(pageData.partnerTable.descKey),
       columns: partnerColumns,
-      rows: data.partnerTable.rows as Array<Record<string, string>>,
+      rows: pageData.partnerTable.rows as Array<Record<string, string>>,
     },
     directTable: {
-      desc: t(data.directTable.descKey),
+      desc: t(pageData.directTable.descKey),
       columns: directColumns,
-      rows: data.directTable.rows as Array<Record<string, string>>,
+      rows: pageData.directTable.rows as Array<Record<string, string>>,
     },
     heldTable: {
-      desc: t(data.heldTable.descKey),
+      desc: t(pageData.heldTable.descKey),
       columns: heldColumns,
-      rows: data.heldTable.rows as Array<Record<string, string>>,
+      rows: pageData.heldTable.rows as Array<Record<string, string>>,
     },
-    summary: data.summary,
-    checks: data.checks as string[],
-    formFields: (data.form.fields as FieldRaw[]).map((f) => ({ label: t(f.labelKey), value: f.value, color: f.color })),
+    summary: pageData.summary,
+    checks: pageData.checks as string[],
+    formFields: (pageData.form.fields as FieldRaw[]).map((f) => ({ label: t(f.labelKey), value: f.value, color: f.color })),
+    isLoading,
+    error,
   }
 }

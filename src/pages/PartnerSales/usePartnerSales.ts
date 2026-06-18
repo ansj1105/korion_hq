@@ -1,6 +1,7 @@
 import { useTranslation } from '../../i18n'
 import type { StatCardData } from '../../components/molecules/StatCard'
 import type { Column } from '../../components/organisms/DataTable'
+import { useLeaderPageData } from '../../hooks/useLeaderPageData'
 import data from './partnerSalesData.json'
 
 interface StatRaw {
@@ -47,8 +48,9 @@ export interface MerchantSalesRow {
  */
 export function usePartnerSales() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useLeaderPageData('/api/leader/partner-sales', data)
 
-  const stats: StatCardData[] = (data.stats as StatRaw[]).map((s) => ({
+  const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -90,11 +92,13 @@ export function usePartnerSales() {
     t1: {
       title: t('partnerSales.t1.title'),
       columns: t1Columns,
-      rows: data.t1Rows as PartnerSalesRow[],
+      rows: pageData.t1Rows as PartnerSalesRow[],
     },
     t2Title: t('partnerSales.t2.title'),
     t3Title: t('partnerSales.t3.title'),
     merchantColumns,
-    merchantRows: data.merchantRows as MerchantSalesRow[],
+    merchantRows: pageData.merchantRows as MerchantSalesRow[],
+    isLoading,
+    error,
   }
 }

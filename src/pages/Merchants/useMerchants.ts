@@ -1,6 +1,7 @@
 import { useTranslation } from '../../i18n'
 import type { StatCardData } from '../../components/molecules/StatCard'
 import type { Column } from '../../components/organisms/DataTable'
+import { useRolePageData } from '../../hooks/useRolePageData'
 import data from './merchantsData.json'
 
 interface StatRaw {
@@ -33,8 +34,12 @@ export interface MerchantListRow {
  */
 export function useMerchants() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useRolePageData(
+    { leader: '/api/leader/merchants', partner: '/api/partner/merchants' },
+    data
+  )
 
-  const stats: StatCardData[] = (data.stats as StatRaw[]).map((s) => ({
+  const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -54,5 +59,5 @@ export function useMerchants() {
     { key: 'action', label: t('merchantList.col.action'), width: '1.2fr' },
   ]
 
-  return { stats, columns, rows: data.rows as MerchantListRow[] }
+  return { stats, columns, rows: pageData.rows as MerchantListRow[], isLoading, error }
 }

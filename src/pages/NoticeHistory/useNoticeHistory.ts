@@ -1,6 +1,7 @@
 import { useTranslation } from '../../i18n'
 import type { Column } from '../../components/organisms/DataTable'
 import type { MetricCardData } from '../../components/molecules/MetricCard'
+import { useRolePageData } from '../../hooks/useRolePageData'
 import data from './noticeHistoryData.json'
 
 /** 발송 내역 행 원본 데이터 형태 */
@@ -34,8 +35,12 @@ interface MetricRaw {
  */
 export function useNoticeHistory() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useRolePageData(
+    { leader: '/api/leader/notices', partner: '/api/partner/notices' },
+    data
+  )
 
-  const metrics: MetricCardData[] = (data.metrics as MetricRaw[]).map((m) => ({
+  const metrics: MetricCardData[] = (pageData.metrics as MetricRaw[]).map((m) => ({
     id: m.id,
     label: t(m.labelKey),
     value: m.value,
@@ -59,6 +64,8 @@ export function useNoticeHistory() {
   return {
     metrics,
     columns,
-    rows: data.rows as NoticeHistoryRow[],
+    rows: pageData.rows as NoticeHistoryRow[],
+    isLoading,
+    error,
   }
 }

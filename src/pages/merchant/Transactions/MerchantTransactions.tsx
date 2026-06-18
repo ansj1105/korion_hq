@@ -10,9 +10,13 @@ import { useMerchantSales } from '../../MerchantSales/useMerchantSales'
  * 지표 + 가맹점 매출(t2) 테이블과 동일하여 useMerchantSales 훅을 재사용한다.
  * (리더 화면은 테이블 2개지만, 가맹점 화면은 가맹점 매출 테이블 1개만 표시.)
  */
-export default function MerchantTransactions() {
+interface MerchantTransactionsProps {
+  variant?: 'all' | 'refund'
+}
+
+export default function MerchantTransactions({ variant = 'all' }: MerchantTransactionsProps) {
   const { t } = useTranslation()
-  const { stats, t2 } = useMerchantSales()
+  const { stats, t2 } = useMerchantSales(variant)
   const toolbar = [t('common.search'), t('common.filter'), t('common.excel')]
 
   const rows: TableRow[] = t2.rows.map((r) => ({

@@ -2,6 +2,7 @@ import { useTranslation } from '../../../i18n'
 import type { AccentKey } from '../../../types'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
+import { usePartnerPageData } from '../../../hooks/usePartnerPageData'
 import data from './partnerMerchantData.json'
 
 /** JSON 원본 지표 형태 (라벨은 i18n 키, 태그는 데이터) */
@@ -38,8 +39,9 @@ export const PARTNER_MERCHANT_ACTIONS = ['승인요청', '거절', '보류', '�
  */
 export function usePartnerMerchantRequests() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = usePartnerPageData('/api/partner/merchant-applications', data)
 
-  const stats: StatCardData[] = (data.stats as StatRaw[]).map((s) => ({
+  const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -59,5 +61,5 @@ export function usePartnerMerchantRequests() {
     { key: 'action', label: t('merchant.col.action'), width: '2.2fr' },
   ]
 
-  return { stats, columns, rows: data.rows as PartnerMerchantRow[] }
+  return { stats, columns, rows: pageData.rows as PartnerMerchantRow[], isLoading, error }
 }

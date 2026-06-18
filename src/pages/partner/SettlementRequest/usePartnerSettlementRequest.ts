@@ -1,5 +1,6 @@
 import { useTranslation } from '../../../i18n'
 import type { Column } from '../../../components/organisms/DataTable'
+import { usePartnerPageData } from '../../../hooks/usePartnerPageData'
 import data from './partnerSettlementRequestData.json'
 
 interface StatRaw {
@@ -32,6 +33,7 @@ interface FieldRaw {
  */
 export function usePartnerSettlementRequest() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = usePartnerPageData('/api/partner/settlements/request-summary', data)
 
   // 가맹점별 수수료 수익 테이블 (리더 파트너 테이블과 동일 컬럼)
   const merchantColumns: Column[] = [
@@ -60,7 +62,7 @@ export function usePartnerSettlementRequest() {
     { key: 'detail', label: t('settle.req.ht.detail'), width: '0.7fr' },
   ]
 
-  const kpis: KpiItem[] = (data.stats as StatRaw[]).map((s) => ({
+  const kpis: KpiItem[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.labelKey,
     label: t(s.labelKey),
     value: s.value,
@@ -70,22 +72,24 @@ export function usePartnerSettlementRequest() {
   }))
 
   return {
-    banner: data.banner,
+    banner: pageData.banner,
     kpis,
-    calc: data.calc,
-    feeStructure: data.feeStructure as string[][],
+    calc: pageData.calc,
+    feeStructure: pageData.feeStructure as string[][],
     merchantTable: {
-      desc: t(data.merchantTable.descKey),
+      desc: t(pageData.merchantTable.descKey),
       columns: merchantColumns,
-      rows: data.merchantTable.rows as Array<Record<string, string>>,
+      rows: pageData.merchantTable.rows as Array<Record<string, string>>,
     },
     heldTable: {
-      desc: t(data.heldTable.descKey),
+      desc: t(pageData.heldTable.descKey),
       columns: heldColumns,
-      rows: data.heldTable.rows as Array<Record<string, string>>,
+      rows: pageData.heldTable.rows as Array<Record<string, string>>,
     },
-    summary: data.summary,
-    checks: data.checks as string[],
-    formFields: (data.form.fields as FieldRaw[]).map((f) => ({ label: t(f.labelKey), value: f.value, color: f.color })),
+    summary: pageData.summary,
+    checks: pageData.checks as string[],
+    formFields: (pageData.form.fields as FieldRaw[]).map((f) => ({ label: t(f.labelKey), value: f.value, color: f.color })),
+    isLoading,
+    error,
   }
 }

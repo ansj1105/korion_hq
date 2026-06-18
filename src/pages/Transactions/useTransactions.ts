@@ -1,6 +1,7 @@
 import { useTranslation } from '../../i18n'
 import type { StatCardData } from '../../components/molecules/StatCard'
 import type { Column } from '../../components/organisms/DataTable'
+import { useLeaderPageData } from '../../hooks/useLeaderPageData'
 import data from './transactionsData.json'
 
 /** 거래 로그 변형: 전체 / 오프라인 / 실패·취소·환불 */
@@ -28,8 +29,11 @@ const ACTIONS: Record<TxVariant, string[]> = {
  */
 export function useTransactions(variant: TxVariant) {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useLeaderPageData('/api/leader/transactions', data, {
+    variant,
+  })
 
-  const stats: StatCardData[] = (data.stats as StatRaw[]).map((s) => ({
+  const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -86,7 +90,9 @@ export function useTransactions(variant: TxVariant) {
     tableTitle: t(`tx.tableTitle.${variant}`),
     stats,
     columns: columnsByVariant[variant],
-    rows: data[variant].rows as Array<Record<string, string>>,
+    rows: pageData[variant].rows as Array<Record<string, string>>,
     actions: ACTIONS[variant],
+    isLoading,
+    error,
   }
 }

@@ -1,4 +1,5 @@
 import { useTranslation } from '../../../i18n'
+import { usePartnerPageData } from '../../../hooks/usePartnerPageData'
 import data from './partnerProfileData.json'
 
 /** 상단 상태 칩(라벨 + 색 알약 값) */
@@ -33,8 +34,9 @@ interface FieldRaw {
  */
 export function usePartnerProfile() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = usePartnerPageData('/api/partner/profile', data)
 
-  const statusItems: StatusItem[] = (data.statusItems as StatusRaw[]).map((s) => ({
+  const statusItems: StatusItem[] = (pageData.statusItems as StatusRaw[]).map((s) => ({
     label: t(s.labelKey),
     value: s.value,
     chip: s.chip,
@@ -45,8 +47,10 @@ export function usePartnerProfile() {
 
   return {
     statusItems,
-    code: data.code,
-    accountFields: toFields(data.accountFields as FieldRaw[]),
-    basicFields: toFields(data.basicFields as FieldRaw[]),
+    code: pageData.code,
+    accountFields: toFields(pageData.accountFields as FieldRaw[]),
+    basicFields: toFields(pageData.basicFields as FieldRaw[]),
+    isLoading,
+    error,
   }
 }

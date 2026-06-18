@@ -8,6 +8,7 @@ import {
   type LeaderDashboardApiResponse,
   type LeaderPartnerApiResponse,
 } from '../../services/korionChongApi'
+import { sessionCountryScopes } from '../../services/authSession'
 import data from './dashboardData.json'
 
 type CountryScope = {
@@ -197,8 +198,17 @@ export function useDashboardData(period = currentYearMonth(), requestedCountrySc
   const [error, setError] = useState<string | null>(null)
   const sourceData = remoteData ?? apiData
   const leaderProfile = sourceData.leaderProfile
-  const allowedScopes = new Set(leaderProfile.countryScopes.map((scope) => scope.code))
-  const fallbackScope = leaderProfile.defaultCountryScope
+  const sessionScopes = sessionCountryScopes()
+  const sessionCountryScopeItems = sessionScopes.map((code) => ({ code, label: code }))
+  const countryScopes =
+    sessionCountryScopeItems.length > 0 ? sessionCountryScopeItems : leaderProfile.countryScopes
+  const allowedScopes = new Set(countryScopes.map((scope) => scope.code))
+  const fallbackScope = countryScopes[0]?.code ?? leaderProfile.defaultCountryScope
+  const scopedLeaderProfile = {
+    ...leaderProfile,
+    countryScopes,
+    defaultCountryScope: fallbackScope,
+  }
   const selectedCountryScope =
     requestedCountryScope && allowedScopes.has(requestedCountryScope)
       ? requestedCountryScope
@@ -228,7 +238,10 @@ export function useDashboardData(period = currentYearMonth(), requestedCountrySc
     }
   }, [period, selectedCountryScope])
 
-  const countryData = sourceData.countries[selectedCountryScope] ?? sourceData.countries[fallbackScope]
+  const countryData =
+    sourceData.countries[selectedCountryScope] ??
+    sourceData.countries[fallbackScope] ??
+    apiData.countries[apiData.leaderProfile.defaultCountryScope]
   const periodData = countryData.periods[period] ?? countryData.periods['30D']
 
   const kpis: KpiCardData[] = useMemo(
@@ -246,7 +259,7 @@ export function useDashboardData(period = currentYearMonth(), requestedCountrySc
 
   return {
     kpis,
-    leaderProfile,
+    leaderProfile: scopedLeaderProfile,
     selectedCountryScope,
     invalidScope,
     organizationSummary: periodData.organizationSummary,

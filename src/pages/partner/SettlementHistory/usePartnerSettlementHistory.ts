@@ -1,5 +1,6 @@
 import { useTranslation } from '../../../i18n'
 import type { Column } from '../../../components/organisms/DataTable'
+import { usePartnerPageData } from '../../../hooks/usePartnerPageData'
 import data from './partnerSettlementHistoryData.json'
 
 /** 파트너 정산 내역 행 (리더와 달리 '리더 신청금액' 열이 없음) */
@@ -22,6 +23,7 @@ export interface PartnerSettlementHistoryRow {
  */
 export function usePartnerSettlementHistory() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = usePartnerPageData('/api/partner/settlements', data)
 
   const columns: Column[] = [
     { key: 'no', label: t('settle.hist.col.no'), width: '1.4fr' },
@@ -43,10 +45,12 @@ export function usePartnerSettlementHistory() {
   ]
 
   return {
-    lastSettleDate: data.lastSettleDate,
-    thisRequestAmount: data.thisRequestAmount,
+    lastSettleDate: pageData.lastSettleDate,
+    thisRequestAmount: pageData.thisRequestAmount,
     tabs,
     columns,
-    rows: data.rows as PartnerSettlementHistoryRow[],
+    rows: pageData.rows as PartnerSettlementHistoryRow[],
+    isLoading,
+    error,
   }
 }

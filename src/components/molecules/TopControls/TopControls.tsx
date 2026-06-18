@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from '../../../i18n'
+import { clearAuthSession } from '../../../services/authSession'
 import styles from './TopControls.module.css'
 
 /*
@@ -12,13 +13,17 @@ import styles from './TopControls.module.css'
 export default function TopControls() {
   const { t, toggleLang } = useTranslation()
   const navigate = useNavigate()
+  const logout = () => {
+    clearAuthSession()
+    navigate('/login')
+  }
 
   return (
     <div className={styles.controls}>
       <button type="button" className={styles.button} onClick={toggleLang}>
         {t('common.langCurrent')}
       </button>
-      <button type="button" className={styles.button} onClick={() => navigate('/login')}>
+      <button type="button" className={styles.button} onClick={logout}>
         {t('common.logout')}
       </button>
     </div>
