@@ -38,6 +38,10 @@ import type { NavGroup } from './types'
  * 구현된 화면의 "상대 경로(basePath 기준) → 컴포넌트" 매핑.
  * 역할별로 따로 둔다. 매핑에 없는 메뉴는 Placeholder("구현 예정")로 라우팅된다.
  */
+
+// 본사어드민 화면 — 단계별(Phase)로 하나씩 채운다(나머지는 Placeholder).
+const HQ_PAGES: Record<string, JSX.Element> = {}
+
 const LEADER_PAGES: Record<string, JSX.Element> = {
   dashboard: <Dashboard />,
   'requests/partner': <RequestsPartner />,
@@ -120,6 +124,12 @@ export default function App() {
       <Route path="/login" element={<AuthMain />} />
       <Route path="/login/:role" element={<RoleLogin />} />
       <Route path="/signup/:role" element={<RoleSignup />} />
+
+      {/* 본사 어드민 — 로그인 허브에 카드를 노출하지 않음(URL 직접 접근만). 화면은 단계적으로 구현. */}
+      <Route path={ROLES.hq.basePath} element={<AdminLayout role="hq" />}>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        {navRoutes(ROLES.hq.nav, HQ_PAGES)}
+      </Route>
 
       {/* 리더 어드민 */}
       <Route path={ROLES.leader.basePath} element={<AdminLayout role="leader" />}>

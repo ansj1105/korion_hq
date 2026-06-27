@@ -1,7 +1,7 @@
 import type { NavGroup } from '../types'
 
 /** 어드민 역할 — 추후 로그인 시 이 값으로 진입 어드민을 분기한다. */
-export type Role = 'leader' | 'partner' | 'merchant'
+export type Role = 'hq' | 'leader' | 'partner' | 'merchant'
 
 /**
  * 사이드바 프로필 카드의 한 줄.

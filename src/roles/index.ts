@@ -1,4 +1,5 @@
 import type { Role, RoleConfig } from './types'
+import { HQ_NAV } from './hqNav'
 import { LEADER_NAV } from './leaderNav'
 import { PARTNER_NAV } from './partnerNav'
 import { MERCHANT_NAV } from './merchantNav'
@@ -11,6 +12,15 @@ import { MERCHANT_NAV } from './merchantNav'
  * 프로필 줄은 Figma 샘플 데이터라 리터럴로 둔다(번역 대상 아님).
  */
 export const ROLES: Record<Role, RoleConfig> = {
+  hq: {
+    basePath: '/hq',
+    roleLabelKey: 'common.role.hq',
+    profileLines: [
+      { text: 'KORION PAY 본사', variant: 'title' },
+      { text: '코드: HQ-ADMIN-001', variant: 'muted' },
+    ],
+    nav: HQ_NAV,
+  },
   leader: {
     basePath: '/leader',
     roleLabelKey: 'common.role.leader',
@@ -43,6 +53,7 @@ export const ROLES: Record<Role, RoleConfig> = {
 }
 
 export type { Role, RoleConfig } from './types'
+export { HQ_NAV } from './hqNav'
 export { LEADER_NAV } from './leaderNav'
 export { PARTNER_NAV } from './partnerNav'
 export { MERCHANT_NAV } from './merchantNav'
