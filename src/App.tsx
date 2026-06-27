@@ -31,6 +31,12 @@ import RoleLogin from './pages/auth/RoleLogin'
 import RoleSignup from './pages/auth/RoleSignup'
 import PartnerSettlementHistory from './pages/partner/SettlementHistory'
 import PartnerSettlementDetail from './pages/partner/SettlementDetail'
+import HqLeaders from './pages/hq/Leaders'
+import HqPartners from './pages/hq/Partners'
+import HqMerchants from './pages/hq/Merchants'
+import HqLeaderSales from './pages/hq/LeaderSales'
+import HqPartnerSales from './pages/hq/PartnerSales'
+import HqMerchantSales from './pages/hq/MerchantSales'
 import { ROLES } from './roles'
 import type { NavGroup } from './types'
 
@@ -40,7 +46,15 @@ import type { NavGroup } from './types'
  */
 
 // 본사어드민 화면 — 단계별(Phase)로 하나씩 채운다(나머지는 Placeholder).
-const HQ_PAGES: Record<string, JSX.Element> = {}
+// Phase 1: 국가 리더/파트너/가맹점 "전체 목록"(목록형, 기존 템플릿 100% 재사용).
+const HQ_PAGES: Record<string, JSX.Element> = {
+  leaders: <HqLeaders />,
+  'leaders/sales': <HqLeaderSales />,
+  partners: <HqPartners />,
+  'partners/sales': <HqPartnerSales />,
+  merchants: <HqMerchants />,
+  'merchants/sales': <HqMerchantSales />,
+}
 
 const LEADER_PAGES: Record<string, JSX.Element> = {
   dashboard: <Dashboard />,

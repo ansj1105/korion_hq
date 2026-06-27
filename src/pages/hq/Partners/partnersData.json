@@ -1,0 +1,79 @@
+{
+  "stats": [
+    { "id": "totalPartners", "labelKey": "hqPartnerList.kpi.totalPartners", "value": "170" },
+    { "id": "activePartners", "labelKey": "hqPartnerList.kpi.activePartners", "value": "150" },
+    { "id": "approvedPartners", "labelKey": "hqPartnerList.kpi.approvedPartners", "value": "160" },
+    { "id": "suspendedPartners", "labelKey": "hqPartnerList.kpi.suspendedPartners", "value": "10" },
+    { "id": "directPartners", "labelKey": "hqPartnerList.kpi.directPartners", "value": "10" },
+    { "id": "leaderPartners", "labelKey": "hqPartnerList.kpi.leaderPartners", "value": "990" },
+    { "id": "subMerchants", "labelKey": "hqPartnerList.kpi.subMerchants", "value": "1,000" },
+    { "id": "unsettledFee", "labelKey": "hqPartnerList.kpi.unsettledFee", "value": "1,000,000" }
+  ],
+  "rows": [
+    {
+      "no": "APP-2401",
+      "appliedAt": "2026.06.13",
+      "leaderCode": "NG-LEAD-0001",
+      "partnerCode": "NG-PART-0001",
+      "country": "나이지리아",
+      "partnerName": "Nova",
+      "subMerchantCount": "50",
+      "monthVolume": "250 KORI",
+      "monthTxCount": "150",
+      "unsettledFee": "100,000",
+      "actions": ["승인", "정지", "상세"]
+    },
+    {
+      "no": "APP-2399",
+      "appliedAt": "2026.06.13",
+      "leaderCode": "NG-LEAD-0001",
+      "partnerCode": "NG-PART-0002",
+      "country": "나이지리아",
+      "partnerName": "Grace",
+      "subMerchantCount": "30",
+      "monthVolume": "180 KORI",
+      "monthTxCount": "90",
+      "unsettledFee": "60,000",
+      "actions": ["승인", "정지", "상세"]
+    },
+    {
+      "no": "APP-2398",
+      "appliedAt": "2026.06.13",
+      "leaderCode": "KR-LEAD-0001",
+      "partnerCode": "KR-PART-0001",
+      "country": "대한민국",
+      "partnerName": "Minjun",
+      "subMerchantCount": "20",
+      "monthVolume": "120 KORI",
+      "monthTxCount": "60",
+      "unsettledFee": "40,000",
+      "actions": ["거절", "상세"]
+    },
+    {
+      "no": "APP-2397",
+      "appliedAt": "2026.06.12",
+      "leaderCode": "IT-LEAD-0001",
+      "partnerCode": "IT-PART-0001",
+      "country": "이탈리아",
+      "partnerName": "Luca",
+      "subMerchantCount": "15",
+      "monthVolume": "90 KORI",
+      "monthTxCount": "45",
+      "unsettledFee": "30,000",
+      "actions": ["승인", "정지", "상세"]
+    },
+    {
+      "no": "APP-2396",
+      "appliedAt": "2026.06.12",
+      "leaderCode": "NG-LEAD-0002",
+      "partnerCode": "NG-PART-0003",
+      "country": "나이지리아",
+      "partnerName": "Amara",
+      "subMerchantCount": "25",
+      "monthVolume": "150 KORI",
+      "monthTxCount": "75",
+      "unsettledFee": "50,000",
+      "actions": ["승인", "정지", "상세"]
+    }
+  ]
+}

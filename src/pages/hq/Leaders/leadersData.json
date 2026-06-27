@@ -1,0 +1,75 @@
+{
+  "stats": [
+    { "id": "countries", "labelKey": "hqLeaderList.kpi.countries", "value": "150" },
+    { "id": "totalLeaders", "labelKey": "hqLeaderList.kpi.totalLeaders", "value": "170" },
+    { "id": "approvedLeaders", "labelKey": "hqLeaderList.kpi.approvedLeaders", "value": "160" },
+    { "id": "suspendedLeaders", "labelKey": "hqLeaderList.kpi.suspendedLeaders", "value": "10" }
+  ],
+  "rows": [
+    {
+      "no": "APP-2401",
+      "appliedAt": "2026.06.13",
+      "leaderCode": "NG-LEAD-0001",
+      "country": "나이지리아",
+      "partnerName": "Nova",
+      "subPartnerCount": "50",
+      "subMerchantCount": "50",
+      "monthVolume": "250 KORI",
+      "monthTxCount": "150",
+      "unsettledFee": "100,000",
+      "actions": ["승인", "정지", "상세"]
+    },
+    {
+      "no": "APP-2399",
+      "appliedAt": "2026.06.13",
+      "leaderCode": "NG-LEAD-0002",
+      "country": "나이지리아",
+      "partnerName": "Nova",
+      "subPartnerCount": "50",
+      "subMerchantCount": "50",
+      "monthVolume": "250 KORI",
+      "monthTxCount": "150",
+      "unsettledFee": "100,000",
+      "actions": ["승인", "정지", "상세"]
+    },
+    {
+      "no": "APP-2398",
+      "appliedAt": "2026.06.13",
+      "leaderCode": "KR-LEAD-0001",
+      "country": "대한민국",
+      "partnerName": "Nova",
+      "subPartnerCount": "50",
+      "subMerchantCount": "50",
+      "monthVolume": "250 KORI",
+      "monthTxCount": "150",
+      "unsettledFee": "100,000",
+      "actions": ["거절", "상세"]
+    },
+    {
+      "no": "APP-2397",
+      "appliedAt": "2026.06.12",
+      "leaderCode": "IT-LEAD-0001",
+      "country": "이탈리아",
+      "partnerName": "Nova",
+      "subPartnerCount": "50",
+      "subMerchantCount": "50",
+      "monthVolume": "250 KORI",
+      "monthTxCount": "150",
+      "unsettledFee": "100,000",
+      "actions": ["승인", "정지", "상세"]
+    },
+    {
+      "no": "APP-2396",
+      "appliedAt": "2026.06.12",
+      "leaderCode": "NG-LEAD-0003",
+      "country": "나이지리아",
+      "partnerName": "Nova",
+      "subPartnerCount": "50",
+      "subMerchantCount": "50",
+      "monthVolume": "250 KORI",
+      "monthTxCount": "150",
+      "unsettledFee": "100,000",
+      "actions": ["승인", "정지", "상세"]
+    }
+  ]
+}
