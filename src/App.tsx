@@ -31,12 +31,20 @@ import RoleLogin from './pages/auth/RoleLogin'
 import RoleSignup from './pages/auth/RoleSignup'
 import PartnerSettlementHistory from './pages/partner/SettlementHistory'
 import PartnerSettlementDetail from './pages/partner/SettlementDetail'
+import HqDashboard from './pages/hq/Dashboard'
+import HqCountryDashboard from './pages/hq/CountryDashboard'
+import HqApplications from './pages/hq/Applications'
+import HqRequestsLeader from './pages/hq/RequestsLeader'
 import HqLeaders from './pages/hq/Leaders'
 import HqPartners from './pages/hq/Partners'
 import HqMerchants from './pages/hq/Merchants'
 import HqLeaderSales from './pages/hq/LeaderSales'
 import HqPartnerSales from './pages/hq/PartnerSales'
 import HqMerchantSales from './pages/hq/MerchantSales'
+import HqPaymentLog from './pages/hq/PaymentLog'
+import HqSettlementRequest from './pages/hq/SettlementRequest'
+import HqSettlementRequestDetail from './pages/hq/SettlementRequestDetail'
+import HqSettlementHistory from './pages/hq/SettlementHistory'
 import { ROLES } from './roles'
 import type { NavGroup } from './types'
 
@@ -48,12 +56,19 @@ import type { NavGroup } from './types'
 // 본사어드민 화면 — 단계별(Phase)로 하나씩 채운다(나머지는 Placeholder).
 // Phase 1: 국가 리더/파트너/가맹점 "전체 목록"(목록형, 기존 템플릿 100% 재사용).
 const HQ_PAGES: Record<string, JSX.Element> = {
+  dashboard: <HqDashboard />,
+  'dashboard/by-country': <HqCountryDashboard />,
+  applications: <HqApplications />,
+  'requests/leader': <HqRequestsLeader />,
   leaders: <HqLeaders />,
   'leaders/sales': <HqLeaderSales />,
   partners: <HqPartners />,
   'partners/sales': <HqPartnerSales />,
   merchants: <HqMerchants />,
   'merchants/sales': <HqMerchantSales />,
+  'payments/logs': <HqPaymentLog />,
+  'settlement/request': <HqSettlementRequest />,
+  'settlement/history': <HqSettlementHistory />,
 }
 
 const LEADER_PAGES: Record<string, JSX.Element> = {
@@ -143,6 +158,8 @@ export default function App() {
       <Route path={ROLES.hq.basePath} element={<AdminLayout role="hq" />}>
         <Route index element={<Navigate to="dashboard" replace />} />
         {navRoutes(ROLES.hq.nav, HQ_PAGES)}
+        {/* 사이드바엔 없는 상세 화면 (정산 신청의 "상세"에서 진입) */}
+        <Route path="settlement/request/detail" element={<HqSettlementRequestDetail />} />
       </Route>
 
       {/* 리더 어드민 */}

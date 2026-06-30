@@ -1,0 +1,375 @@
+/* Dashboard(본사어드민 · 전체 운영 대시보드) 페이지 레이아웃 */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* Figma 콘텐츠 세로 간격 18 — 리더 Dashboard와 동일 컨벤션 */
+}
+
+/* 헤더 아래 "전체 국가 / 오늘" 필터칩 — 동작 없는 표시용 */
+.filterChips {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.chip {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--color-accent-cyan) 45%, transparent);
+  background: color-mix(in srgb, var(--color-accent-cyan) 12%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-bold);
+}
+
+/*
+ * 전체 운영 KPI 그리드 — Figma 실측은 5열 고정폭(206.8px)이지만, 그 값 그대로
+ * 박으면 과거 4열 그리드에서 겪은 "넓은 화면에서 열 수가 의도와 달라지는" 문제가
+ * 똑같이 재발할 수 있어(CHANGELOG "KPI 4열 강제 고정" 항목 참고) 폭은 1fr로 풀고
+ * 열 개수만 5로 고정한다 — 콘텐츠 영역(--content-max-width)이 이미 폭을 제한해 줌.
+ */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px 12px;
+}
+
+/* 대시보드 요약 패널(나라별/파트너별/가맹점별 순위) — 리더 Dashboard의 panelGrid와 동일 패턴 */
+.rankingGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+
+/*
+ * 미니 통계 박스 그리드 — Figma 실측은 236px 고정폭이지만, 화면 폭이 바뀌어도
+ * 절대 단위로 잘려 스크롤되는 대신 같은 비율로 늘어나고 줄어들게 fr 단위로 구성.
+ * 열 개수만 4로 고정(좁은 화면은 아래 미디어쿼리에서 2→1열로 축소).
+ */
+.miniStatGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: var(--space-3);
+}
+
+/* 오프라인 결제 진행 단계 스텝퍼 — 가운데 정렬, 각 단계별 색상 구분 */
+.flowStepper {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 전체 스텝퍼를 패널 중앙에 배치 */
+  gap: var(--space-2);
+}
+
+.flowStep {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  /* flex: 1 제거 → 내용 폭만큼만 차지해 justify-content: center가 동작하게 함 */
+}
+
+.flowStepLabel {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+  /* 기본값(fallback) — 개별 nth-child로 덮어씀 */
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 62%, transparent);
+  background: color-mix(in srgb, var(--color-bg-elevated) 84%, transparent);
+}
+
+/* 각 단계별 색상: 데이터 흐름 의미(생성→블록→검증→정산)에 맞춰 accent 색 구분 */
+.flowStepper .flowStep:nth-child(1) .flowStepLabel {
+  border-color: color-mix(in srgb, var(--color-accent-cyan) 70%, transparent);
+  background: color-mix(in srgb, var(--color-accent-cyan) 15%, transparent);
+  color: var(--color-accent-cyan);
+}
+.flowStepper .flowStep:nth-child(2) .flowStepLabel {
+  border-color: color-mix(in srgb, var(--color-accent-purple) 70%, transparent);
+  background: color-mix(in srgb, var(--color-accent-purple) 15%, transparent);
+  color: var(--color-accent-purple);
+}
+.flowStepper .flowStep:nth-child(3) .flowStepLabel {
+  border-color: color-mix(in srgb, var(--color-accent-amber) 70%, transparent);
+  background: color-mix(in srgb, var(--color-accent-amber) 15%, transparent);
+  color: var(--color-accent-amber);
+}
+.flowStepper .flowStep:nth-child(4) .flowStepLabel {
+  border-color: color-mix(in srgb, var(--color-accent-green) 70%, transparent);
+  background: color-mix(in srgb, var(--color-accent-green) 15%, transparent);
+  color: var(--color-accent-green);
+}
+
+.flowConnector {
+  width: 40px; /* flex: 1 제거 후 고정 최소폭으로 화살표 라인 유지 */
+  height: 2px;
+  background: color-mix(in srgb, var(--color-border-accent) 50%, transparent);
+}
+
+/*
+ * 표 + 보조 박스(히트맵/차트/순위 리스트)가 나란히 배치되는 섹션 공용 레이아웃.
+ * Figma는 화면마다 비율이 조금씩 다르지만(2:1 ~ 1:1), 고정 픽셀로 박으면
+ * 이식 시 다른 화면 폭에서 깨지기 쉬워 2:1 비율 + 줄바꿈 허용으로 일반화했다.
+ */
+.sideBySide {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+.sideBySide > *:first-child {
+  flex: 2;
+  min-width: 280px;
+}
+
+/*
+ * evenSplit — 좌우 1:1 배치(차트 박스 ↔ 상위 TOP5 박스).
+ * Figma 실측 480:512 ≈ 1:1. 두 박스 높이도 같게(stretch).
+ */
+.evenSplit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: stretch;
+}
+.evenSplit > * {
+  flex: 1 1 0;
+  min-width: 280px;
+}
+
+/*
+ * countryOpsLayout — 국가별 운영 표(좌) + 히트맵(우, 고정폭).
+ * 표는 fluid(min-width:0)로 남은 폭을 모두 채우며 줄어들어 가로 스크롤이 안 생긴다.
+ */
+.countryOpsLayout {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+.countryOpsLayout > *:first-child {
+  flex: 1;
+  min-width: 0; /* fluid 표가 컨테이너 폭에 맞춰 줄어들 수 있게 */
+}
+.countryOpsLayout > *:last-child {
+  flex: 0 0 320px; /* 히트맵 우측 고정폭(Figma 342) */
+}
+/* 반응형: 좁은 화면(<900px)에선 히트맵을 표 아래로 내려 표가 전체 폭을 쓰게 한다 */
+@media (max-width: 900px) {
+  .countryOpsLayout {
+    flex-direction: column;
+  }
+  .countryOpsLayout > *:last-child {
+    flex: none;
+    width: 100%;
+  }
+}
+
+.heatmapBox,
+.chartBox,
+.topListBox,
+.donutBox {
+  flex: 1;
+  min-width: 240px;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-bg-elevated) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 45%, transparent);
+}
+
+.subBoxTitle {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-bold);
+}
+
+/* 히트맵 원 4열 그리드 — Figma는 4×2(총 7개) 배치 */
+.heatmapGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 44px);
+  gap: var(--space-3);
+}
+
+/*
+ * Figma 실측: 44px 원, 테두리는 전부 시안 40%, 배경만 국가별로 시안/초록/보라/주황 순환(24%).
+ * 배경색은 사용처(JSX)에서 인라인으로 주입한다(테두리는 여기서 시안 고정).
+ */
+.heatmapDot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--color-accent-cyan) 40%, transparent);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-bold);
+}
+
+/* 증가 추이 — 동작 없는 정적 막대그래프(막대 높이는 Figma 실측 px) */
+.barChart {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  height: 70px;
+}
+
+/* Figma 실측: 막대는 시안색(82% 채움) + 라운드 8 */
+.bar {
+  flex: 1;
+  min-width: 24px;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: color-mix(in srgb, var(--color-accent-cyan) 82%, transparent);
+}
+
+.topList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-12);
+  color: var(--color-text-muted);
+}
+
+/*
+ * 결제수단 비율 — Figma 실측: 좌측에 시안 링(원), 우측에 결제수단별 범례.
+ * 범례 각 줄 = "라벨 %" 텍스트 + 비율만큼 길이가 다른 가로 막대(결제수단별 색).
+ * 제목("결제수단 비율")은 박스 하단에 위치한다.
+ */
+.donutBody {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+/* 시안 링 — 다크 네이비 중앙 + 시안 80% 테두리 */
+.donutRing {
+  flex-shrink: 0;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--color-accent-cyan) 80%, transparent);
+  background: color-mix(in srgb, var(--color-bg) 55%, transparent);
+}
+
+.donutLegend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.donutLegendItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--font-size-11);
+  color: var(--color-text);
+}
+
+/* 비율 막대 — 폭은 퍼센트에 비례(34% ≈ 84px, 인라인 width로 주입), 결제수단별 색 */
+.donutBar {
+  height: 7px;
+  border-radius: 4px;
+}
+
+/* 제목을 하단에 두기 위한 변형(기본 subBoxTitle은 상단 여백) */
+.donutTitleBottom {
+  margin: 0;
+}
+
+/* KORION AI Operation Insight — 2열 카드 그리드 */
+.insightGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.insightCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-bg-elevated) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 45%, transparent);
+}
+
+/*
+ * 심각도 배지(High/Medium/Low) — 라벨 길이가 달라도 가로폭을 통일해
+ * 카드마다 메시지 시작 위치가 들쭉날쭉하지 않게 한다(Figma 실측 70×24·12px).
+ * insightCard의 첫 자식이 Badge(span)이다.
+ */
+.insightCard > span:first-child {
+  min-width: 70px;
+  justify-content: center;
+  font-size: var(--font-size-12);
+}
+
+.insightMessage {
+  flex: 1;
+  margin: 0;
+  font-size: var(--font-size-12);
+  color: var(--color-text);
+}
+
+/* 인사이트 액션 버튼(리스크 확인/로그 보기) — Figma 실측 82×34, 12px */
+.insightButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 82px;
+  height: 34px;
+  padding: 0 var(--space-3); /* 높이를 34로 고정하므로 세로 패딩 제거 */
+}
+
+/* Quick Action Center — 4열 버튼 그리드 */
+.quickActionGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+
+.quickActionButton {
+  width: 100%;
+}
+
+/* 반응형: 좁은 화면에서 열 수 축소 (CLAUDE.md 반응형 주석 규칙) */
+@media (max-width: 1024px) {
+  .kpiGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .rankingGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .insightGrid,
+  .quickActionGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .miniStatGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .rankingGrid,
+  .insightGrid,
+  .quickActionGrid,
+  .miniStatGrid {
+    grid-template-columns: 1fr;
+  }
+  .sideBySide > *:first-child {
+    min-width: 100%;
+  }
+}

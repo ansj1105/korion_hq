@@ -1,0 +1,35 @@
+{
+  "kpis": [
+    { "id": "activeCountries", "labelKey": "hqDashboard.kpi.activeCountries.label", "value": "나이지리아", "dense": true, "alignTop": true },
+    { "id": "collateralHolders", "labelKey": "hqDashboard.kpi.collateralHolders.label", "value": "1,550 명", "noteKey": "hqDashboard.kpi.collateralHolders.note", "dense": true },
+    { "id": "countryLeaders", "labelKey": "hqDashboard.kpi.countryLeaders.label", "value": "42", "noteKey": "hqDashboard.kpi.delta5", "dense": true },
+    { "id": "salesPartners", "labelKey": "hqDashboard.kpi.salesPartners.label", "value": "1,284", "noteKey": "hqDashboard.kpi.delta5", "dense": true },
+    { "id": "merchants", "labelKey": "hqDashboard.kpi.merchants.label", "value": "9,842", "noteKey": "hqDashboard.kpi.merchants.note", "dense": true },
+    { "id": "collateralBalance", "labelKey": "hqDashboard.kpi.collateralBalance.label", "value": "52,480 KORI", "noteKey": "hqDashboard.kpi.collateralBalance.note", "labelTone": "green", "dense": true },
+    { "id": "collateralTopup", "labelKey": "hqDashboard.kpi.collateralTopup.label", "value": "50,000 KORI", "noteKey": "hqDashboard.kpi.delta15pct", "labelTone": "green", "dense": true },
+    { "id": "collateralTopupCount", "labelKey": "hqDashboard.kpi.collateralTopupCount.label", "value": "184K", "noteKey": "hqDashboard.kpi.delta5", "labelTone": "green", "dense": true },
+    { "id": "collateralRelease", "labelKey": "hqDashboard.kpi.collateralRelease.label", "value": "48,200 KORI", "noteKey": "hqDashboard.kpi.delta15pct", "labelTone": "green", "dense": true },
+    { "id": "newApplicationsToday", "labelKey": "hqDashboard.kpi.newApplicationsToday.label", "value": "126", "noteKey": "hqDashboard.kpi.newApplicationsToday.note", "labelTone": "green", "dense": true },
+    { "id": "todayPaymentCount", "labelKey": "hqDashboard.kpi.todayPaymentCount.label", "value": "6,482", "noteKey": "hqDashboard.kpi.todayPaymentCount.note", "labelTone": "amber", "dense": true },
+    { "id": "todayPaymentAmount", "labelKey": "hqDashboard.kpi.todayPaymentAmount.label", "value": "85,000 KORI", "noteKey": "hqDashboard.kpi.todayPaymentAmount.note", "labelTone": "amber", "dense": true },
+    { "id": "todayFee", "labelKey": "hqDashboard.kpi.todayFee.label", "value": "50,000 KORI", "noteKey": "hqDashboard.kpi.delta15pct", "labelTone": "amber", "dense": true },
+    { "id": "settlementRequests", "labelKey": "hqDashboard.kpi.settlementRequests.label", "value": "38건", "noteKey": "hqDashboard.kpi.delta5", "labelTone": "amber", "dense": true },
+    { "id": "settlementPendingAmount", "labelKey": "hqDashboard.kpi.settlementPendingAmount.label", "value": "25,000 KORI", "noteKey": "hqDashboard.kpi.settlementPendingAmount.note", "labelTone": "amber", "dense": true },
+    { "id": "unsettledMemberPayout", "labelKey": "hqDashboard.kpi.unsettledMemberPayout.label", "value": "18,940 KORI", "noteKey": "hqDashboard.kpi.unsettledMemberPayout.note", "labelTone": "amber", "dense": true },
+    { "id": "verificationQueue", "labelKey": "hqDashboard.kpi.verificationQueue.label", "value": "200 / 300", "noteKey": "hqDashboard.kpi.verificationQueue.note", "deltaTone": "red", "dense": true },
+    { "id": "riskHoldAmount", "labelKey": "hqDashboard.kpi.riskHoldAmount.label", "value": "50,000 KORI", "noteKey": "hqDashboard.kpi.riskHoldAmount.note", "deltaTone": "red", "dense": true },
+    { "id": "riskAlerts", "labelKey": "hqDashboard.kpi.riskAlerts.label", "value": "17건", "noteKey": "hqDashboard.kpi.riskAlerts.note", "deltaTone": "red", "dense": true }
+  ],
+  "rankingPanels": [
+    { "id": "byCountry", "titleKey": "hqDashboard.ranking.byCountry" },
+    { "id": "byPartner", "titleKey": "hqDashboard.ranking.byPartner" },
+    { "id": "byMerchant", "titleKey": "hqDashboard.ranking.byMerchant" }
+  ],
+  "countryRanking": {
+    "rows": [
+      { "id": "ng", "country": "나이지리아", "countryCode": "NG", "totalMembers": "1,200", "leaders": "8", "partners": "420", "merchants": "2,840", "monthlyAmount": "$1.28M", "monthlyCount": "$1.28M", "status": "위험" },
+      { "id": "kr", "country": "대한민국", "countryCode": "KR", "totalMembers": "600", "leaders": "8", "partners": "420", "merchants": "2,840", "monthlyAmount": "$1.28M", "monthlyCount": "$1.28M", "status": "위험" },
+      { "id": "vn", "country": "베트남", "countryCode": "VN", "totalMembers": "300", "leaders": "8", "partners": "420", "merchants": "2,840", "monthlyAmount": "$1.28M", "monthlyCount": "$1.28M", "status": "위험" }
+    ]
+  }
+}

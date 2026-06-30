@@ -10,6 +10,8 @@ interface FilterTabsProps {
   activeIndex?: number
   /** controlled 모드에서 탭 클릭 시 호출 */
   onChange?: (index: number) => void
+  /** 'outline'이면 선택 탭을 보라 채움 대신 시안 테두리로 표시(본사어드민 거래내역 탭). 없으면 기존 보라 채움 */
+  variant?: 'outline'
 }
 
 /*
@@ -20,7 +22,7 @@ interface FilterTabsProps {
  * 본사어드민의 "거래내역" 화면처럼 탭마다 보여줄 내용이 달라지는 경우엔
  * activeIndex/onChange를 넘겨 controlled로 쓴다.
  */
-export default function FilterTabs({ labels, defaultIndex = 0, activeIndex, onChange }: FilterTabsProps) {
+export default function FilterTabs({ labels, defaultIndex = 0, activeIndex, onChange, variant }: FilterTabsProps) {
   const [internalActive, setInternalActive] = useState(defaultIndex)
   const isControlled = activeIndex !== undefined
   const active = isControlled ? activeIndex : internalActive
@@ -33,6 +35,9 @@ export default function FilterTabs({ labels, defaultIndex = 0, activeIndex, onCh
     }
   }
 
+  const base = variant === 'outline' ? `${styles.tab} ${styles.tabOutline}` : styles.tab
+  const activeClass = variant === 'outline' ? styles.tabActiveOutline : styles.tabActive
+
   return (
     <div className={styles.tabs} role="tablist">
       {labels.map((label, i) => (
@@ -41,7 +46,7 @@ export default function FilterTabs({ labels, defaultIndex = 0, activeIndex, onCh
           type="button"
           role="tab"
           aria-selected={i === active}
-          className={i === active ? `${styles.tab} ${styles.tabActive}` : styles.tab}
+          className={i === active ? `${base} ${activeClass}` : base}
           onClick={() => handleClick(i)}
         >
           {label}

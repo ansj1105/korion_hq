@@ -11,6 +11,13 @@ interface ActionBadgesProps {
    * "승인=초록/정지·거절=빨강/나머지=중립" 식으로 색이 라벨마다 다른 화면에서 사용.
    */
   accentByLabel?: Record<string, AccentKey>
+  /** 배지 크기. 안 주면 기존처럼 'sm'(65% 진한 틴트). 거래 로그 표는 'xs'(17% 옅은 틴트) */
+  size?: 'sm' | 'xs'
+  /**
+   * true면 틴트 없이 색을 100% 채운다(신청서 관리처럼 활성 상태 하나만 색이 있고
+   * 나머지는 중립으로 진하게 깔리는 화면용). 안 주면 기존처럼 옅은 틴트.
+   */
+  solid?: boolean
 }
 
 /*
@@ -18,11 +25,11 @@ interface ActionBadgesProps {
  * ------------------------------------------------------------------
  * 테이블 액션 컬럼에 들어가는 작은 배지 묶음. 동작 없는 UI(표시 전용).
  */
-export default function ActionBadges({ labels, accentByLabel }: ActionBadgesProps) {
+export default function ActionBadges({ labels, accentByLabel, size = 'sm', solid }: ActionBadgesProps) {
   return (
     <div className={styles.actions}>
       {labels.map((label) => (
-        <Badge key={label} accent={accentByLabel ? accentByLabel[label] : 'cyan'} size="sm">
+        <Badge key={label} accent={accentByLabel ? accentByLabel[label] : 'cyan'} size={size} solid={solid}>
           {label}
         </Badge>
       ))}

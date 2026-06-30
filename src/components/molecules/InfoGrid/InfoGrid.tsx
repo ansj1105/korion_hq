@@ -6,6 +6,8 @@ export interface InfoItem {
   value: string
   /** 값 색 (강조 항목만 지정 — 예: 청록 #24e6b8). 없으면 기본 흰색 */
   valueColor?: string
+  /** 값 옆 작은 액션 배지 (예: "변경", "초기화" — 계정정보의 이메일/비밀번호 칸). 없으면 미표시 */
+  actionLabel?: string
 }
 
 /*
@@ -19,8 +21,11 @@ export default function InfoGrid({ items }: { items: InfoItem[] }) {
       {items.map((it) => (
         <div key={it.label} className={styles.item}>
           <span className={styles.label}>{it.label}</span>
-          <span className={styles.value} style={it.valueColor ? { color: it.valueColor } : undefined}>
-            {it.value}
+          <span className={styles.valueRow}>
+            <span className={styles.value} style={it.valueColor ? { color: it.valueColor } : undefined}>
+              {it.value}
+            </span>
+            {it.actionLabel && <span className={styles.actionBadge}>{it.actionLabel}</span>}
           </span>
         </div>
       ))}

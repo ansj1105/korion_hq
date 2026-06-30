@@ -22,3 +22,10 @@
   background-color: rgba(33, 27, 61, 0.92); /* #211b3d */
   border-color: #6b62a4;
 }
+
+/* 위험/삭제 CTA — 빨강 솔리드 + 보조 버튼과 같은 흐린 보라 테두리 (Figma "삭제" 버튼 값) */
+.danger {
+  background-color: var(--color-accent-red);
+  border-color: #6b62a4;
+  color: #ffffff;
+}

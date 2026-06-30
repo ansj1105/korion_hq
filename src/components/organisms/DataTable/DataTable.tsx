@@ -34,6 +34,23 @@ interface DataTableProps {
   bare?: boolean
   /** 행 클릭 콜백 — 지정하면 행 전체가 클릭 가능(커서/호버) 해지고 클릭 시 row.id를 넘긴다 */
   onRowClick?: (id: string) => void
+  /** true면 제목 우측에 툴바가 바로 붙는다(기본은 제목↔툴바 양끝 정렬) */
+  inlineToolbar?: boolean
+  /** true면 제목/헤더/셀 글자 크기·색을 본사어드민 Figma 정확값(18px 제목, 11px 헤더·셀, 흐린 셀 색)으로 적용 */
+  mutedText?: boolean
+  /** true면 글자색은 그대로 두고 크기만 키운다(16px 제목, 11px 헤더·셀) — 거래 로그 표처럼 흰 글씨 유지 + 크기만 다른 화면 */
+  largeText?: boolean
+  /** true면 본사어드민 대시보드 전용 남색 지브라 + 헤더 배경을 적용(mutedText의 보라빛 지브라와 다른 색) */
+  navyZebra?: boolean
+  /** true면 글자 크기/색은 기본값(흰 글씨) 그대로 두고 행 배경만 한 줄씩 번갈아 표시 — mutedText는 글자색까지 흐려져서 안 맞는 화면(국가별 대시보드 표 등)용 */
+  zebra?: boolean
+  /** true면 행 최소폭(880px)·가로 스크롤을 없애 부모 폭에 맞춰 fr 비율대로 줄어든다 — 패널 안에서 표+보조박스가 나란히 놓여 좌우 스크롤이 생기면 안 되는 화면용 */
+  fluid?: boolean
+  /**
+   * true면 셀 내용을 말줄임(…) 대신 다음 줄로 줄바꿈한다(행 높이가 늘어남).
+   * 컬럼이 많아 가로폭은 컨테이너에 고정하되 긴 값은 잘리지 않고 끝까지 보여야 하는 표(예: 전체 결제 로그)용.
+   */
+  wrapCells?: boolean
 }
 
 /*
@@ -44,19 +61,30 @@ interface DataTableProps {
  * - 액션 버튼·상태 배지 등은 행 데이터의 셀에 React 노드로 직접 넣어 유연하게 표현.
  * - 정렬/검색/필터 등 동작은 작업 범위 밖(정적 표시).
  */
-export default function DataTable({ columns, rows, title, titleRight, toolbar, fill, bare, onRowClick }: DataTableProps) {
+export default function DataTable({ columns, rows, title, titleRight, toolbar, fill, bare, onRowClick, inlineToolbar, mutedText, largeText, navyZebra, zebra, fluid, wrapCells }: DataTableProps) {
   // 컬럼 폭을 모아 grid-template-columns 값을 만든다
   const cols = columns.map((c) => c.width ?? '1fr').join(' ')
   const gridStyle = { '--cols': cols } as CSSProperties
 
-  const wrapClass = [styles.wrap, fill && styles.fill, bare && styles.bare]
+  const wrapClass = [
+    styles.wrap,
+    fill && styles.fill,
+    bare && styles.bare,
+    mutedText && styles.mutedText,
+    largeText && styles.largeText,
+    navyZebra && styles.navyZebra,
+    fluid && styles.fluid,
+    wrapCells && styles.wrapCells,
+    // mutedText는 이미 자체 지브라를 포함하므로 중복 적용해도 색이 같아 영향 없음
+    (zebra || mutedText) && styles.zebra,
+  ]
     .filter(Boolean)
     .join(' ')
 
   return (
     <div className={wrapClass}>
       {(title || toolbar) && (
-        <div className={styles.tableHead}>
+        <div className={inlineToolbar ? `${styles.tableHead} ${styles.tableHeadInline}` : styles.tableHead}>
           {/* 제목 + (선택) 제목 우측 부가요소 */}
           <div className={styles.titleCluster}>
             {title && <h3 className={styles.tableTitle}>{title}</h3>}

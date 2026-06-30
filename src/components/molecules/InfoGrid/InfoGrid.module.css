@@ -17,10 +17,28 @@
   color: #8c86b5;
 }
 
+.valueRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .value {
   font-size: var(--font-size-14);
   font-weight: var(--font-weight-bold);
   color: #ffffff;
+}
+
+/* 값 옆 작은 액션 배지(변경/초기화) — Figma: 보라 24%/32% 틴트, 8px */
+.actionBadge {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: 8px;
+  font-weight: var(--font-weight-semibold);
+  color: #ffffff;
+  background-color: rgba(124, 92, 255, 0.24);
+  border: 1px solid rgba(124, 92, 255, 0.32);
+  white-space: nowrap;
 }
 
 /* 반응형: 좁은 화면에서 열 수 축소 */

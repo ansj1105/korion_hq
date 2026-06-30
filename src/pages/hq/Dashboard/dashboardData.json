@@ -1,0 +1,175 @@
+{
+  "kpis": [
+    { "id": "activeCountries", "labelKey": "hqDashboard.kpi.activeCountries.label", "value": "18 개국", "noteKey": "hqDashboard.kpi.activeCountries.note" },
+    { "id": "collateralHolders", "labelKey": "hqDashboard.kpi.collateralHolders.label", "value": "1,550 명", "noteKey": "hqDashboard.kpi.collateralHolders.note" },
+    { "id": "countryLeaders", "labelKey": "hqDashboard.kpi.countryLeaders.label", "value": "42", "noteKey": "hqDashboard.kpi.delta5" },
+    { "id": "salesPartners", "labelKey": "hqDashboard.kpi.salesPartners.label", "value": "1,284", "noteKey": "hqDashboard.kpi.delta5" },
+    { "id": "merchants", "labelKey": "hqDashboard.kpi.merchants.label", "value": "9,842", "noteKey": "hqDashboard.kpi.merchants.note" },
+    { "id": "collateralBalance", "labelKey": "hqDashboard.kpi.collateralBalance.label", "value": "52,480 KORI", "noteKey": "hqDashboard.kpi.collateralBalance.note", "labelTone": "green" },
+    { "id": "collateralTopup", "labelKey": "hqDashboard.kpi.collateralTopup.label", "value": "50,000 KORI", "noteKey": "hqDashboard.kpi.delta15pct", "labelTone": "green" },
+    { "id": "collateralTopupCount", "labelKey": "hqDashboard.kpi.collateralTopupCount.label", "value": "184K", "noteKey": "hqDashboard.kpi.delta5", "labelTone": "green" },
+    { "id": "collateralRelease", "labelKey": "hqDashboard.kpi.collateralRelease.label", "value": "48,200 KORI", "noteKey": "hqDashboard.kpi.delta15pct", "labelTone": "green" },
+    { "id": "newApplicationsToday", "labelKey": "hqDashboard.kpi.newApplicationsToday.label", "value": "126", "noteKey": "hqDashboard.kpi.newApplicationsToday.note", "labelTone": "green" },
+    { "id": "todayPaymentCount", "labelKey": "hqDashboard.kpi.todayPaymentCount.label", "value": "6,482", "noteKey": "hqDashboard.kpi.todayPaymentCount.note", "labelTone": "amber" },
+    { "id": "todayPaymentAmount", "labelKey": "hqDashboard.kpi.todayPaymentAmount.label", "value": "85,000 KORI", "noteKey": "hqDashboard.kpi.todayPaymentAmount.note", "labelTone": "amber" },
+    { "id": "todayFee", "labelKey": "hqDashboard.kpi.todayFee.label", "value": "50,000 KORI", "noteKey": "hqDashboard.kpi.delta15pct", "labelTone": "amber" },
+    { "id": "settlementRequests", "labelKey": "hqDashboard.kpi.settlementRequests.label", "value": "38건", "noteKey": "hqDashboard.kpi.delta5", "labelTone": "amber" },
+    { "id": "settlementPendingAmount", "labelKey": "hqDashboard.kpi.settlementPendingAmount.label", "value": "25,000 KORI", "noteKey": "hqDashboard.kpi.settlementPendingAmount.note", "labelTone": "amber" },
+    { "id": "unsettledMemberPayout", "labelKey": "hqDashboard.kpi.unsettledMemberPayout.label", "value": "18,940 KORI", "noteKey": "hqDashboard.kpi.unsettledMemberPayout.note", "labelTone": "amber" },
+    { "id": "verificationQueue", "labelKey": "hqDashboard.kpi.verificationQueue.label", "value": "200 / 300", "noteKey": "hqDashboard.kpi.verificationQueue.note", "deltaTone": "red" },
+    { "id": "riskHoldAmount", "labelKey": "hqDashboard.kpi.riskHoldAmount.label", "value": "50,000 KORI", "noteKey": "hqDashboard.kpi.riskHoldAmount.note", "deltaTone": "red" },
+    { "id": "riskAlerts", "labelKey": "hqDashboard.kpi.riskAlerts.label", "value": "17건", "noteKey": "hqDashboard.kpi.riskAlerts.note", "deltaTone": "red" }
+  ],
+  "rankingPanels": [
+    { "id": "byCountry", "titleKey": "hqDashboard.ranking.byCountry" },
+    { "id": "byPartner", "titleKey": "hqDashboard.ranking.byPartner" },
+    { "id": "byMerchant", "titleKey": "hqDashboard.ranking.byMerchant" }
+  ],
+  "realtimePayments": {
+    "rows": [
+      { "id": "KP-20260612-001", "country": "Nigeria", "merchant": "Lagos Mart", "method": "BLE", "connection": "OFFLINE", "amount": "₩42,000", "status": "PENDING", "statusAccent": "blue", "sync": "Sync 대기", "syncAccent": "blue", "verify": "검증 전" },
+      { "id": "KP-20260612-002", "country": "Korea", "merchant": "Seoul Cafe", "method": "QR", "connection": "ONLINE", "amount": "₩18,500", "status": "SETTLED", "statusAccent": "green", "sync": "완료", "verify": "성공" },
+      { "id": "KP-20260612-003", "country": "Philippines", "merchant": "Manila Shop", "method": "NFC", "connection": "OFFLINE", "amount": "₩31,000", "status": "COMPLETED", "statusAccent": "purple", "sync": "업로드", "verify": "검증중" },
+      { "id": "KP-20260612-004", "country": "Ghana", "merchant": "Accra Store", "method": "BLE", "connection": "OFFLINE", "amount": "₩76,000", "status": "FAILED", "statusAccent": "red", "sync": "실패", "verify": "서명 오류" },
+      { "id": "KP-20260612-005", "country": "Vietnam", "merchant": "HCMC Market", "method": "QR", "connection": "ONLINE", "amount": "₩9,800", "status": "SETTLED", "statusAccent": "green", "sync": "완료", "verify": "성공" }
+    ]
+  },
+  "offlinePay": {
+    "miniStats": [
+      { "id": "createdTx", "labelKey": "hqDashboard.offlinePay.createdTx", "value": "328건", "accent": "cyan" },
+      { "id": "uploadPending", "labelKey": "hqDashboard.offlinePay.uploadPending", "value": "42건", "accent": "orange" },
+      { "id": "syncFailed", "labelKey": "hqDashboard.offlinePay.syncFailed", "value": "7건", "accent": "red" },
+      { "id": "longUnsynced", "labelKey": "hqDashboard.offlinePay.longUnsynced", "value": "3건", "accent": "purple" },
+      { "id": "senderProofOnly", "labelKey": "hqDashboard.offlinePay.senderProofOnly", "value": "5건", "accent": "cyan" },
+      { "id": "receiverEvidenceOnly", "labelKey": "hqDashboard.offlinePay.receiverEvidenceOnly", "value": "2건", "accent": "orange" },
+      { "id": "matchRate", "labelKey": "hqDashboard.offlinePay.matchRate", "value": "94.7%", "accent": "green" },
+      { "id": "avgSyncTime", "labelKey": "hqDashboard.offlinePay.avgSyncTime", "value": "38초", "accent": "purple" }
+    ],
+    "flowSteps": ["hqDashboard.offlinePay.step.proof", "hqDashboard.offlinePay.step.localBlock", "hqDashboard.offlinePay.step.serverVerify", "hqDashboard.offlinePay.step.settlement"]
+  },
+  "settlement": {
+    "stats": [
+      { "id": "totalPending", "labelKey": "hqDashboard.settlement.totalPending", "value": "₩8.42M", "accent": "cyan" },
+      { "id": "completed", "labelKey": "hqDashboard.settlement.completed", "value": "₩31.25M", "accent": "green" },
+      { "id": "onHold", "labelKey": "hqDashboard.settlement.onHold", "value": "₩2.11M", "accent": "orange" },
+      { "id": "memberCollateral", "labelKey": "hqDashboard.settlement.memberCollateral", "value": "₩14.7M", "accent": "purple" }
+    ],
+    "rows": [
+      { "id": "s1", "type": "Leader", "name": "JOEL", "country": "Nigeria", "requested": "₩1,250,000", "held": "₩0", "payable": "₩1,250,000", "status": "정산대기", "statusAccent": "blue", "action": "승인", "actionAccent": "cyan" },
+      { "id": "s2", "type": "Partner", "name": "Michael", "country": "Ghana", "requested": "₩420,000", "held": "₩80,000", "payable": "₩340,000", "status": "일부보류", "statusAccent": "orange", "action": "상세", "actionAccent": "cyan" },
+      { "id": "s3", "type": "Merchant", "name": "Seoul Cafe", "country": "Korea", "requested": "₩870,000", "held": "₩0", "payable": "₩870,000", "status": "지급가능", "action": "지급", "actionAccent": "green" },
+      { "id": "s4", "type": "Member", "name": "Wallet TQ...Ez1r", "country": "Nigeria", "requested": "₩0", "held": "₩650,000", "payable": "₩0", "status": "리스크보류", "statusAccent": "orange", "action": "검토", "actionAccent": "cyan" }
+    ]
+  },
+  "risk": {
+    "stats": [
+      { "id": "abnormalWithdrawal", "labelKey": "hqDashboard.risk.abnormalWithdrawal", "value": "19건", "accent": "red" },
+      { "id": "bugSuspect", "labelKey": "hqDashboard.risk.bugSuspect", "value": "4개", "accent": "orange" },
+      { "id": "duplicateWallet", "labelKey": "hqDashboard.risk.duplicateWallet", "value": "8건", "accent": "purple" },
+      { "id": "settlementHoldTarget", "labelKey": "hqDashboard.risk.settlementHoldTarget", "value": "14건", "accent": "cyan" }
+    ],
+    "rows": [
+      { "id": "r1", "type": "서명 불일치", "targetId": "TX-004", "wallet": "TQ9x...Ez1r", "country": "Ghana", "relatedTx": "5", "score": "Critical", "scoreAccent": "red", "held": "₩760,000", "action": "차단", "actionAccent": "red" },
+      { "id": "r2", "type": "중복 지갑", "targetId": "Wallet-88", "wallet": "TA10...77Md", "country": "Nigeria", "relatedTx": "8", "score": "High", "scoreAccent": "orange", "held": "₩420,000", "action": "보류", "actionAccent": "orange" },
+      { "id": "r3", "type": "담보 부족", "targetId": "USR-2043", "wallet": "TV66...12Pg", "country": "Korea", "relatedTx": "11", "score": "Medium", "held": "₩650,000", "action": "검토", "actionAccent": "cyan" },
+      { "id": "r4", "type": "허위 가맹점", "targetId": "MER-044", "wallet": "TR55...02Aa", "country": "Vietnam", "relatedTx": "3", "score": "High", "scoreAccent": "orange", "held": "₩280,000", "action": "조사", "actionAccent": "cyan" }
+    ]
+  },
+  "countryOps": {
+    "rows": [
+      { "id": "Nigeria", "leaders": "4", "partners": "86", "merchants": "312", "members": "18,240", "amount": "₩8.2M", "syncFail": "2.8%", "growth": "+18%" },
+      { "id": "Korea", "leaders": "2", "partners": "42", "merchants": "188", "members": "11,050", "amount": "₩5.7M", "syncFail": "1.1%", "growth": "+12%" },
+      { "id": "Philippines", "leaders": "2", "partners": "33", "merchants": "126", "members": "7,820", "amount": "₩3.4M", "syncFail": "3.6%", "growth": "+22%" },
+      { "id": "Vietnam", "leaders": "1", "partners": "29", "merchants": "141", "members": "8,720", "amount": "₩4.2M", "syncFail": "1.8%", "growth": "+21%" },
+      { "id": "Ghana", "leaders": "1", "partners": "16", "merchants": "74", "members": "4,200", "amount": "₩1.8M", "syncFail": "4.9%", "growth": "+9%" }
+    ],
+    "heatmap": [
+      { "code": "NG", "accent": "cyan" },
+      { "code": "KR", "accent": "green" },
+      { "code": "PH", "accent": "purple" },
+      { "code": "VN", "accent": "orange" },
+      { "code": "GH", "accent": "cyan" },
+      { "code": "ID", "accent": "green" },
+      { "code": "TH", "accent": "purple" }
+    ]
+  },
+  "approvalQueue": {
+    "stats": [
+      { "id": "receivedToday", "labelKey": "hqDashboard.approvalQueue.receivedToday", "value": "37건", "accent": "cyan" },
+      { "id": "pending", "labelKey": "hqDashboard.approvalQueue.pending", "value": "21건", "accent": "orange" },
+      { "id": "docsRequested", "labelKey": "hqDashboard.approvalQueue.docsRequested", "value": "6건", "accent": "purple" },
+      { "id": "approvedToday", "labelKey": "hqDashboard.approvalQueue.approvedToday", "value": "4건", "accent": "green" }
+    ],
+    "rows": [
+      { "id": "a1", "type": "리더", "name": "JOEL", "country": "Nigeria", "contact": "+234 000", "wallet": "TQ9x...", "time": "10:42", "risk": "Low", "status": "승인대기", "statusAccent": "blue" },
+      { "id": "a2", "type": "파트너", "name": "Michael", "country": "Ghana", "contact": "@michael", "wallet": "TA10...", "time": "10:21", "risk": "Medium", "status": "자료요청", "statusAccent": "amber" },
+      { "id": "a3", "type": "가맹점", "name": "Seoul Cafe", "country": "Korea", "contact": "cafe@kr", "wallet": "TR55...", "time": "09:58", "risk": "Low", "status": "승인", "statusAccent": "cyan" },
+      { "id": "a4", "type": "가맹점", "name": "Accra Store", "country": "Ghana", "contact": "+233 100", "wallet": "TV66...", "time": "09:44", "risk": "High", "riskAccent": "orange", "status": "보류", "statusAccent": "orange" }
+    ]
+  },
+  "networkGrowth": {
+    "stats": [
+      { "id": "totalLeaders", "labelKey": "hqDashboard.networkGrowth.totalLeaders", "value": "18명", "accent": "cyan" },
+      { "id": "totalPartners", "labelKey": "hqDashboard.networkGrowth.totalPartners", "value": "412명", "accent": "purple" },
+      { "id": "totalMerchants", "labelKey": "hqDashboard.networkGrowth.totalMerchants", "value": "1,284개", "accent": "green" },
+      { "id": "problemPartners", "labelKey": "hqDashboard.networkGrowth.problemPartners", "value": "9명", "accent": "red" }
+    ],
+    "trendBars": [
+      { "height": 24.5, "accent": "cyan" },
+      { "height": 36.4, "accent": "purple" },
+      { "height": 33.6, "accent": "green" },
+      { "height": 52.5, "accent": "cyan" },
+      { "height": 43.4, "accent": "purple" },
+      { "height": 61.6, "accent": "green" },
+      { "height": 51.8, "accent": "cyan" }
+    ],
+    "topPartners": [
+      { "id": "t1", "name": "Samuel O.", "amount": "₩620K" },
+      { "id": "t2", "name": "Lagos Team", "amount": "₩540K" },
+      { "id": "t3", "name": "Minh Tran", "amount": "₩410K" },
+      { "id": "t4", "name": "Seoul Direct", "amount": "₩390K" }
+    ]
+  },
+  "paymentMethod": {
+    "rows": [
+      { "id": "QR", "count": "420건", "successRate": "98.2%", "failRate": "1.8%", "avgApprove": "1.4초", "sync": "정상", "failReason": "사용자 취소" },
+      { "id": "BLE", "count": "310건", "successRate": "95.7%", "failRate": "4.3%", "avgApprove": "2.8초", "sync": "일부 대기", "syncAccent": "blue", "failReason": "연결 끊김" },
+      { "id": "NFC", "count": "188건", "successRate": "97.1%", "failRate": "2.9%", "avgApprove": "1.9초", "sync": "정상", "failReason": "태그 실패" },
+      { "id": "Offline", "count": "328건", "successRate": "93.4%", "failRate": "6.6%", "avgApprove": "Sync 후", "sync": "검증중", "failReason": "증거 불일치" }
+    ],
+    "donut": [
+      { "id": "QR", "labelKey": "hqDashboard.paymentMethod.donut.qr", "pct": 34, "accent": "cyan" },
+      { "id": "BLE", "labelKey": "hqDashboard.paymentMethod.donut.ble", "pct": 25, "accent": "purple" },
+      { "id": "NFC", "labelKey": "hqDashboard.paymentMethod.donut.nfc", "pct": 15, "accent": "green" },
+      { "id": "OFF", "labelKey": "hqDashboard.paymentMethod.donut.off", "pct": 26, "accent": "orange" }
+    ]
+  },
+  "activityLogs": {
+    "rows": [
+      { "id": "l1", "admin": "HQ Mina", "menu": "파트너 승인", "action": "승인 처리", "targetId": "Partner-003", "time": "10:42", "ip": "121.xxx.10", "result": "성공", "riskLevel": "Low", "riskAccent": "blue" },
+      { "id": "l2", "admin": "HQ Admin", "menu": "정산 보류", "menuAccent": "orange", "action": "보류 처리", "actionAccent": "orange", "targetId": "Wallet TQ...", "time": "10:37", "ip": "121.xxx.11", "result": "성공", "riskLevel": "High", "riskAccent": "orange" },
+      { "id": "l3", "admin": "Security Admin", "menu": "지갑 차단", "action": "리스크 차단", "targetId": "Wallet TS...", "time": "10:21", "ip": "121.xxx.12", "result": "성공", "riskLevel": "Critical", "riskAccent": "red" },
+      { "id": "l4", "admin": "Ops Lee", "menu": "Sync 재시도", "action": "수동 처리", "targetId": "KP-001", "time": "10:12", "ip": "121.xxx.13", "result": "성공", "riskLevel": "Medium", "riskAccent": "amber" }
+    ]
+  },
+  "aiInsight": {
+    "items": [
+      { "id": "i1", "severity": "High", "severityAccent": "orange", "messageKey": "hqDashboard.aiInsight.msg1", "actionKey": "hqDashboard.aiInsight.action.checkRisk" },
+      { "id": "i2", "severity": "Medium", "severityAccent": "amber", "messageKey": "hqDashboard.aiInsight.msg2", "actionKey": "hqDashboard.aiInsight.action.viewLog" },
+      { "id": "i3", "severity": "Low", "severityAccent": "cyan", "messageKey": "hqDashboard.aiInsight.msg3", "actionKey": "hqDashboard.aiInsight.action.checkRisk" },
+      { "id": "i4", "severity": "High", "severityAccent": "orange", "messageKey": "hqDashboard.aiInsight.msg4", "actionKey": "hqDashboard.aiInsight.action.viewLog" },
+      { "id": "i5", "severity": "Medium", "severityAccent": "amber", "messageKey": "hqDashboard.aiInsight.msg5", "actionKey": "hqDashboard.aiInsight.action.checkRisk" },
+      { "id": "i6", "severity": "Low", "severityAccent": "cyan", "messageKey": "hqDashboard.aiInsight.msg6", "actionKey": "hqDashboard.aiInsight.action.viewLog" }
+    ]
+  },
+  "quickActions": [
+    "hqDashboard.quickActions.reviewApplications",
+    "hqDashboard.quickActions.approveSettlement",
+    "hqDashboard.quickActions.retrySyncFailures",
+    "hqDashboard.quickActions.addBlacklist",
+    "hqDashboard.quickActions.sendNotice",
+    "hqDashboard.quickActions.maintenanceMode",
+    "hqDashboard.quickActions.viewAdminLogs",
+    "hqDashboard.quickActions.exportReport"
+  ]
+}
