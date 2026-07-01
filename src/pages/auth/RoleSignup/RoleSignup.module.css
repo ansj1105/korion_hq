@@ -53,6 +53,17 @@
   filter: none;
   transform: translateY(-1px);
 }
+.modeCardInactive {
+  background-color: color-mix(in srgb, #0b0915 86%, transparent);
+  border-color: color-mix(in srgb, #7b5cff 12%, transparent);
+}
+.modeCardInactive .modeBadge,
+.modeCardInactive .modeDescription,
+.modeCardInactive .referralCodeInput,
+.modeCardInactive .referralCodeCheckButton,
+.modeCardInactive .hqReviewBadge {
+  opacity: 0.62;
+}
 .modeBadge {
   padding: 4px var(--space-4);
   border-radius: var(--radius-pill);
@@ -103,6 +114,7 @@
 .modeCard:not(.modeCardActive) .referralCodeInput {
   background-color: color-mix(in srgb, #090715 86%, transparent);
   color: color-mix(in srgb, var(--color-text-muted) 82%, transparent);
+  pointer-events: none;
 }
 .referralCodeInput::placeholder {
   color: #8c86b5;
@@ -120,10 +132,14 @@
   font-size: var(--font-size-12);
   font-weight: var(--font-weight-semibold);
 }
+.codeCheckBtn {
+  justify-content: center;
+}
 .modeCard:not(.modeCardActive) .referralCodeCheckButton,
 .modeCard:not(.modeCardActive) .hqReviewBadge {
   opacity: 0.72;
   filter: saturate(0.7);
+  pointer-events: none;
 }
 /* 확인 완료 — 청록 솔리드 상태 배지 (입력란 안 우측에 겹쳐 표시) */
 .referralCodeConfirmedBadge {

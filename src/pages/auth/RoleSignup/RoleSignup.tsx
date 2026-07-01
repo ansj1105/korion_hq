@@ -23,7 +23,6 @@ interface ModeDef {
   labelKey: string
   descKey: string
   type: 'code' | 'hq'
-  codePlaceholder?: string
   codePlaceholderKey?: string
   confirmed?: string
 }
@@ -36,7 +35,6 @@ const CFG = data as Record<
 interface FieldDef {
   name: keyof SignupForm
   labelKey: string
-  placeholder: string
   placeholderKey?: string
   type?: string
   buttonKey?: string
@@ -74,33 +72,38 @@ interface AlertModalState {
   message: string
 }
 
+interface VerifiedReferralCodeState {
+  modeKey: string
+  code: string
+}
+
 /* A. 계정 정보 */
 const ACCOUNT_FIELDS: FieldDef[] = [
-  { name: 'loginId', labelKey: 'auth.signup.f.id', placeholder: '영문/숫자 20자 이내', placeholderKey: 'auth.signup.placeholder.loginId', buttonKey: 'auth.signup.btn.dupCheck', action: 'availability', availabilityField: 'loginId' },
-  { name: 'email', labelKey: 'auth.signup.f.email', placeholder: 'example@email.com', placeholderKey: 'auth.signup.placeholder.email', buttonKey: 'auth.signup.btn.sendCode', action: 'sendEmail' },
-  { name: 'emailCode', labelKey: 'auth.signup.f.emailCode', placeholder: '인증번호', placeholderKey: 'auth.signup.placeholder.emailCode', buttonKey: 'auth.signup.btn.verify', action: 'confirmEmail' },
-  { name: 'password', labelKey: 'auth.signup.f.pw', placeholder: '8자 이상', placeholderKey: 'auth.signup.placeholder.password', type: 'password' },
-  { name: 'passwordConfirm', labelKey: 'auth.signup.f.pwConfirm', placeholder: '8자 이상', placeholderKey: 'auth.signup.placeholder.password', type: 'password' },
-  { name: 'telegram', labelKey: 'auth.signup.f.telegram', placeholder: '@telegram_id', placeholderKey: 'auth.signup.placeholder.telegram', buttonKey: 'auth.signup.btn.dupCheck', action: 'availability', availabilityField: 'telegram' },
-  { name: 'whatsapp', labelKey: 'auth.signup.f.phone', placeholder: '+234 000 000 0000', placeholderKey: 'auth.signup.placeholder.phone', buttonKey: 'auth.signup.btn.dupCheck', action: 'availability', availabilityField: 'phone' },
-  { name: 'twitter', labelKey: 'auth.signup.f.twitter', placeholder: '선택 입력', placeholderKey: 'auth.signup.placeholder.twitter' },
+  { name: 'loginId', labelKey: 'auth.signup.f.id', placeholderKey: 'auth.signup.placeholder.loginId', buttonKey: 'auth.signup.btn.dupCheck', action: 'availability', availabilityField: 'loginId' },
+  { name: 'email', labelKey: 'auth.signup.f.email', placeholderKey: 'auth.signup.placeholder.email', buttonKey: 'auth.signup.btn.sendCode', action: 'sendEmail' },
+  { name: 'emailCode', labelKey: 'auth.signup.f.emailCode', placeholderKey: 'auth.signup.placeholder.emailCode', buttonKey: 'auth.signup.btn.verify', action: 'confirmEmail' },
+  { name: 'password', labelKey: 'auth.signup.f.pw', placeholderKey: 'auth.signup.placeholder.password', type: 'password' },
+  { name: 'passwordConfirm', labelKey: 'auth.signup.f.pwConfirm', placeholderKey: 'auth.signup.placeholder.password', type: 'password' },
+  { name: 'telegram', labelKey: 'auth.signup.f.telegram', placeholderKey: 'auth.signup.placeholder.telegram', buttonKey: 'auth.signup.btn.dupCheck', action: 'availability', availabilityField: 'telegram' },
+  { name: 'whatsapp', labelKey: 'auth.signup.f.phone', placeholderKey: 'auth.signup.placeholder.phone', buttonKey: 'auth.signup.btn.dupCheck', action: 'availability', availabilityField: 'phone' },
+  { name: 'twitter', labelKey: 'auth.signup.f.twitter', placeholderKey: 'auth.signup.placeholder.twitter' },
 ]
 
 /* B. 기본 / 소속 정보 */
 const BASIC_FIELDS: FieldDef[] = [
-  { name: 'companyName', labelKey: 'auth.signup.f.name', placeholder: '예: Samuel O.', placeholderKey: 'auth.signup.placeholder.companyName' },
-  { name: 'country', labelKey: 'auth.signup.f.country', placeholder: 'NG', placeholderKey: 'auth.signup.placeholder.country' },
-  { name: 'region', labelKey: 'auth.signup.f.region', placeholder: 'Lagos Island, Ikeja', placeholderKey: 'auth.signup.placeholder.region' },
-  { name: 'language', labelKey: 'auth.signup.f.language', placeholder: 'English, Local Language', placeholderKey: 'auth.signup.placeholder.language' },
-  { name: 'integrationPlan', labelKey: 'auth.signup.f.hqReason', placeholder: '선택 시 필수', placeholderKey: 'auth.signup.placeholder.hqReason', wide: true },
+  { name: 'companyName', labelKey: 'auth.signup.f.name', placeholderKey: 'auth.signup.placeholder.companyName' },
+  { name: 'country', labelKey: 'auth.signup.f.country', placeholderKey: 'auth.signup.placeholder.country' },
+  { name: 'region', labelKey: 'auth.signup.f.region', placeholderKey: 'auth.signup.placeholder.region' },
+  { name: 'language', labelKey: 'auth.signup.f.language', placeholderKey: 'auth.signup.placeholder.language' },
+  { name: 'integrationPlan', labelKey: 'auth.signup.f.hqReason', placeholderKey: 'auth.signup.placeholder.hqReason', wide: true },
 ]
 
 /* D. 매장 기본 정보 (가맹점만) */
 const STORE_FIELDS: FieldDef[] = [
-  { name: 'storeName', labelKey: 'auth.signup.f.storeName', placeholder: 'Kori Cafe Lagos', placeholderKey: 'auth.signup.placeholder.storeName' },
-  { name: 'ownerName', labelKey: 'auth.signup.f.owner', placeholder: '대표자명', placeholderKey: 'auth.signup.placeholder.ownerName' },
-  { name: 'address', labelKey: 'auth.signup.f.address', placeholder: '주소 입력', placeholderKey: 'auth.signup.placeholder.address' },
-  { name: 'industry', labelKey: 'auth.signup.f.industry', placeholder: '카페 / 리테일', placeholderKey: 'auth.signup.placeholder.industry' },
+  { name: 'storeName', labelKey: 'auth.signup.f.storeName', placeholderKey: 'auth.signup.placeholder.storeName' },
+  { name: 'ownerName', labelKey: 'auth.signup.f.owner', placeholderKey: 'auth.signup.placeholder.ownerName' },
+  { name: 'address', labelKey: 'auth.signup.f.address', placeholderKey: 'auth.signup.placeholder.address' },
+  { name: 'industry', labelKey: 'auth.signup.f.industry', placeholderKey: 'auth.signup.placeholder.industry' },
 ]
 
 const SIGNUP_COUNTRY_FALLBACK_OPTIONS: SignupCountryOptionApiResponse[] = [
@@ -112,6 +115,7 @@ const AGREEMENTS = ['1', '2', '3', '4', '5', '6']
 const EMAIL_VERIFICATION_TTL_SECONDS = 300
 const LEADER_CODE_PATTERN = /^[A-Z]{2}-LEAD-[0-9]{3}$/
 const PARTNER_CODE_PATTERN = /^[A-Z]{2}-SP-[0-9]{3}$/
+const LOGIN_ID_PATTERN = /^[A-Za-z0-9]{1,20}$/
 const EMAIL_ADDRESS_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const PASSWORD_NUMBER_PATTERN = /\d/
 const PASSWORD_SPECIAL_PATTERN = /[^A-Za-z0-9]/
@@ -121,7 +125,7 @@ const TWITTER_PROFILE_PATTERN = /^@?[A-Za-z0-9_]{1,30}$/
 const normalizeReferralCode = (value: string) => value.trim().toUpperCase()
 const isValidEmailAddress = (value: string) => EMAIL_ADDRESS_PATTERN.test(value.trim())
 const hasPasswordNumberAndSpecial = (value: string) =>
-  PASSWORD_NUMBER_PATTERN.test(value) && PASSWORD_SPECIAL_PATTERN.test(value)
+  value.length >= 8 && PASSWORD_NUMBER_PATTERN.test(value) && PASSWORD_SPECIAL_PATTERN.test(value)
 const isValidPhoneNumber = (value: string) => {
   const trimmed = value.trim()
   const digitCount = trimmed.replace(/\D/g, '').length
@@ -130,6 +134,7 @@ const isValidPhoneNumber = (value: string) => {
 const textValidationMessageKey = (name: keyof SignupForm, value: string) => {
   const trimmed = value.trim()
   if (!trimmed) return ''
+  if (name === 'loginId' && !LOGIN_ID_PATTERN.test(trimmed)) return 'auth.signup.validation.loginIdInvalid'
   if (name === 'whatsapp' && !isValidPhoneNumber(trimmed)) return 'auth.signup.validation.phoneInvalid'
   if (name === 'twitter' && !TWITTER_PROFILE_PATTERN.test(trimmed)) return 'auth.signup.validation.twitterInvalid'
   return ''
@@ -145,9 +150,9 @@ const referralPatternForMode = (modeKey: string) => (
 const referralExampleForMode = (modeKey: string) => (
   modeKey === 'partner' ? 'NG-SP-004' : 'NG-LEAD-001'
 )
-const alertReferralCodeApiResponse = (response: ReferralCodeValidationApiResponse) => {
+const alertReferralCodeApiResponse = (response: ReferralCodeValidationApiResponse, title: string) => {
   if (typeof window === 'undefined') return
-  window.alert(`코드확인 API 응답\n${JSON.stringify(response, null, 2)}`)
+  window.alert(`${title}\n${JSON.stringify(response, null, 2)}`)
 }
 
 /*
@@ -160,7 +165,7 @@ const alertReferralCodeApiResponse = (response: ReferralCodeValidationApiRespons
 export default function RoleSignup() {
   const { role } = useParams<{ role: string }>()
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { lang, t } = useTranslation()
 
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [done, setDone] = useState(false)
@@ -172,6 +177,7 @@ export default function RoleSignup() {
   const [emailVerificationSent, setEmailVerificationSent] = useState(false)
   const [emailVerificationExpiresAtMs, setEmailVerificationExpiresAtMs] = useState<number | null>(null)
   const [emailVerificationRemainingSeconds, setEmailVerificationRemainingSeconds] = useState(0)
+  const [verifiedReferralCode, setVerifiedReferralCode] = useState<VerifiedReferralCodeState | null>(null)
   const [checks, setChecks] = useState({
     loginId: false,
     emailVerified: false,
@@ -245,6 +251,12 @@ export default function RoleSignup() {
   const passwordMismatch = Boolean(form.password && form.passwordConfirm && form.password !== form.passwordConfirm)
   const passwordCompositionInvalid = Boolean(form.password && !hasPasswordNumberAndSpecial(form.password))
   const allAgreementsChecked = AGREEMENTS.every((key) => agreements[key])
+  const isReferralCodeConfirmedForMode = (modeKey: string) => (
+    checks.referralCode
+    && verifiedReferralCode?.modeKey === modeKey
+    && verifiedReferralCode.code === normalizeReferralCode(form.referralCode)
+  )
+  const activeReferralCodeConfirmed = isReferralCodeConfirmedForMode(mode)
 
   const updateField = (name: keyof SignupForm, value: string) => {
     setForm((current) => ({ ...current, [name]: value }))
@@ -258,7 +270,10 @@ export default function RoleSignup() {
     if (name === 'telegram') setChecks((current) => ({ ...current, telegramVerified: false }))
     if (name === 'whatsapp') setChecks((current) => ({ ...current, whatsapp: false }))
     if (name === 'walletAddress') setChecks((current) => ({ ...current, walletAddress: false }))
-    if (name === 'referralCode') setChecks((current) => ({ ...current, referralCode: false }))
+    if (name === 'referralCode') {
+      setChecks((current) => ({ ...current, referralCode: false }))
+      setVerifiedReferralCode(null)
+    }
   }
 
   const runAction = async (field: FieldDef) => {
@@ -267,7 +282,10 @@ export default function RoleSignup() {
     try {
       if (field.action === 'availability' && field.availabilityField) {
         const value = form[field.name]
-        if (!value.trim()) throw new Error('값을 입력한 뒤 확인하세요.')
+        if (!value.trim()) throw new Error(t('auth.signup.validation.valueRequiredBeforeCheck'))
+        if (field.availabilityField === 'loginId' && !LOGIN_ID_PATTERN.test(value.trim())) {
+          throw new Error(t('auth.signup.validation.loginIdInvalid'))
+        }
         if ((field.availabilityField === 'phone' || field.availabilityField === 'whatsapp')
           && !isValidPhoneNumber(value)) {
           throw new Error(t('auth.signup.validation.phoneInvalid'))
@@ -326,6 +344,10 @@ export default function RoleSignup() {
         setEmailVerificationExpiresAtMs(expiresAtMs)
         setEmailVerificationRemainingSeconds(Math.max(0, Math.ceil((expiresAtMs - Date.now()) / 1000)))
         setStatusMessage(t('auth.signup.email.sent'))
+        setAlertModal({
+          title: t('auth.signup.email.verifyTitle'),
+          message: t('auth.signup.email.sent'),
+        })
       }
       if (field.action === 'confirmEmail') {
         if (!form.email.trim() || !form.emailCode.trim()) throw new Error(t('auth.signup.email.codeRequired'))
@@ -338,11 +360,23 @@ export default function RoleSignup() {
             title: t('auth.signup.email.verifyTitle'),
             message: t('auth.signup.email.verifiedAlert'),
           })
+          setStatusMessage(t('auth.signup.email.verified'))
+        } else {
+          setAlertModal({
+            title: t('auth.signup.email.verifyTitle'),
+            message: t('auth.signup.email.invalidCodeAlert'),
+          })
+          setStatusMessage(t('auth.signup.email.invalidCodeAlert'))
         }
-        setStatusMessage(t('auth.signup.email.verified'))
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : '요청 처리 중 오류가 발생했습니다.'
+      const message = error instanceof Error ? error.message : t('auth.signup.requestFailed')
+      if (field.action === 'sendEmail') {
+        setAlertModal({
+          title: t('auth.signup.email.verifyTitle'),
+          message,
+        })
+      }
       if (field.action === 'confirmEmail') {
         setChecks((current) => ({ ...current, emailVerified: false }))
         setAlertModal({
@@ -367,6 +401,13 @@ export default function RoleSignup() {
           message,
         })
       }
+      if (field.action === 'availability' && field.availabilityField === 'telegram') {
+        setChecks((current) => ({ ...current, telegramVerified: false }))
+        setAlertModal({
+          title: t('auth.signup.availability.telegramTitle'),
+          message,
+        })
+      }
       setStatusMessage(message)
     } finally {
       setBusy(false)
@@ -378,25 +419,30 @@ export default function RoleSignup() {
     setStatusMessage('')
     if (!normalizedCode) {
       setChecks((current) => ({ ...current, referralCode: false }))
-      setStatusMessage(`코드를 입력하세요. 예: ${referralExampleForMode(mode)}`)
+      setVerifiedReferralCode(null)
+      setStatusMessage(t('auth.signup.referral.required').replace('{example}', referralExampleForMode(mode)))
       return
     }
     if (!referralPatternForMode(mode).test(normalizedCode)) {
       setChecks((current) => ({ ...current, referralCode: false }))
-      setStatusMessage(`코드 형식은 ${referralExampleForMode(mode)} 입니다.`)
+      setVerifiedReferralCode(null)
+      setStatusMessage(t('auth.signup.referral.invalidFormat').replace('{example}', referralExampleForMode(mode)))
       return
     }
     setForm((current) => ({ ...current, referralCode: normalizedCode }))
     setBusy(true)
     try {
       const result = await validateReferralCode(normalizedCode)
-      alertReferralCodeApiResponse(result)
+      alertReferralCodeApiResponse(result, t('auth.signup.referral.apiResponseTitle'))
       setChecks((current) => ({ ...current, referralCode: result.valid }))
-      setStatusMessage(result.valid ? '유효한 소속 코드입니다.' : 'DB에 등록되지 않았거나 비활성화된 코드입니다.')
+      setVerifiedReferralCode(result.valid ? { modeKey: mode, code: normalizedCode } : null)
+      setStatusMessage(result.valid ? t('auth.signup.referral.valid') : t('auth.signup.referral.invalid'))
     } catch (error) {
-      const message = error instanceof Error ? error.message : '코드 확인 중 오류가 발생했습니다.'
+      const message = error instanceof Error ? error.message : t('auth.signup.referral.apiError')
+      setChecks((current) => ({ ...current, referralCode: false }))
+      setVerifiedReferralCode(null)
       if (typeof window !== 'undefined') {
-        window.alert(`코드확인 API 오류\n${message}`)
+        window.alert(`${t('auth.signup.referral.apiErrorTitle')}\n${message}`)
       }
       setStatusMessage(message)
     } finally {
@@ -417,6 +463,9 @@ export default function RoleSignup() {
         requestId,
       )
       setChecks((current) => ({ ...current, walletAddress: result.verified }))
+      if (!result.verified) {
+        throw new Error(t('auth.signup.wallet.invalidAlert'))
+      }
       setAlertModal({
         title: t('auth.signup.wallet.verifyTitle'),
         message: t('auth.signup.wallet.verifiedAlert'),
@@ -446,6 +495,10 @@ export default function RoleSignup() {
     setStatusMessage('')
     setBusy(true)
     try {
+      const validationError = validateBeforeConfirm()
+      if (validationError) {
+        throw new Error(validationError)
+      }
       const applicantType = role === 'merchant' ? 'MERCHANT' : 'PARTNER'
       const companyName = applicantType === 'MERCHANT'
         ? form.storeName.trim()
@@ -465,6 +518,9 @@ export default function RoleSignup() {
       }
       if (mode === 'hq' && !directContractReason) {
         throw new Error(t('auth.signup.validation.hqReasonRequired'))
+      }
+      if (mode !== 'hq' && !activeReferralCodeConfirmed) {
+        throw new Error(t('auth.signup.validation.referralRequired'))
       }
       const response = await createSignupApplication({
         applicantType,
@@ -577,7 +633,7 @@ export default function RoleSignup() {
     if (!form.walletAddress.trim() || !checks.walletAddress) {
       return t('auth.signup.wallet.requiredCheck')
     }
-    if (mode !== 'hq' && (!form.referralCode.trim() || !checks.referralCode)) {
+    if (mode !== 'hq' && (!form.referralCode.trim() || !activeReferralCodeConfirmed)) {
       return t('auth.signup.validation.referralRequired')
     }
     if (mode === 'hq' && !form.integrationPlan.trim()) {
@@ -625,8 +681,12 @@ export default function RoleSignup() {
     setAgreements(Object.fromEntries(AGREEMENTS.map((key) => [key, checked])))
   }
 
-  const countryOptionLabel = (option: SignupCountryOptionApiResponse) =>
-    [option.flag, option.code, option.nameKo || option.nameEn].filter(Boolean).join(' · ')
+  const countryOptionLabel = (option: SignupCountryOptionApiResponse) => {
+    const countryName = lang === 'en'
+      ? option.nameEn || option.nameKo
+      : option.nameKo || option.nameEn
+    return [option.flag, option.code, countryName].filter(Boolean).join(' · ')
+  }
 
   const renderFields = (fields: FieldDef[]) =>
     fields.map((f) => {
@@ -671,7 +731,7 @@ export default function RoleSignup() {
               <input
                 className={`${styles.fieldControl} ${hasFieldError ? styles.fieldControlError : ''}`}
                 type={f.type ?? 'text'}
-                placeholder={f.placeholderKey ? t(f.placeholderKey) : f.placeholder}
+                placeholder={f.placeholderKey ? t(f.placeholderKey) : ''}
                 value={form[f.name]}
                 onChange={(e) => updateField(f.name, e.target.value)}
                 aria-label={t(f.labelKey)}
@@ -717,11 +777,13 @@ export default function RoleSignup() {
               <button
                 key={m.key}
                 type="button"
-                className={`${styles.modeCard} ${selected ? styles.modeCardActive : ''}`}
+                className={`${styles.modeCard} ${selected ? styles.modeCardActive : styles.modeCardInactive}`}
+                aria-pressed={selected}
                 onClick={() => {
                   if (m.key !== mode) {
                     setForm((current) => ({ ...current, referralCode: '' }))
                     setChecks((current) => ({ ...current, referralCode: false }))
+                    setVerifiedReferralCode(null)
                   }
                   setMode(m.key)
                 }}
@@ -737,19 +799,43 @@ export default function RoleSignup() {
                       <input
                         className={styles.referralCodeInput}
                         type="text"
-                        placeholder={m.confirmed ?? (m.codePlaceholderKey ? t(m.codePlaceholderKey) : m.codePlaceholder)}
+                        placeholder={m.confirmed ?? (m.codePlaceholderKey ? t(m.codePlaceholderKey) : '')}
                         value={selected ? form.referralCode : ''}
-                        onClick={(e) => e.stopPropagation()}
-                        onChange={(e) => updateField('referralCode', e.target.value)}
+                        readOnly={!selected}
+                        tabIndex={selected ? 0 : -1}
+                        aria-disabled={!selected}
+                        onClick={(e) => {
+                          if (selected) e.stopPropagation()
+                        }}
+                        onChange={(e) => {
+                          if (selected) updateField('referralCode', e.target.value)
+                        }}
                       />
-                      {selected && checks.referralCode && (
+                      {selected && isReferralCodeConfirmedForMode(m.key) && (
                         <span className={styles.referralCodeConfirmedBadge}>{t('auth.signup.codeConfirmed')}</span>
                       )}
                     </div>
-                    <span className={styles.referralCodeCheckButton} onClick={(e) => {
-                      e.stopPropagation()
-                      checkReferral(form.referralCode)
-                    }}>{t('auth.signup.btn.codeCheck')}</span>
+                    <span
+                      className={`${styles.referralCodeCheckButton} ${styles.codeCheckBtn}`}
+                      role="button"
+                      tabIndex={selected ? 0 : -1}
+                      aria-disabled={!selected}
+                      onClick={(e) => {
+                        if (!selected) return
+                        e.stopPropagation()
+                        checkReferral(form.referralCode)
+                      }}
+                      onKeyDown={(e) => {
+                        if (!selected) return
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          checkReferral(form.referralCode)
+                        }
+                      }}
+                    >
+                      {t('auth.signup.btn.codeCheck')}
+                    </span>
                   </div>
                 ) : (
                   // 본사 직접 계약: 본사 검토 필요 배지
