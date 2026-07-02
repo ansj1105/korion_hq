@@ -259,8 +259,17 @@ export interface WalletLinkVerifyApiResponse {
 export interface WalletAddressValidateApiResponse {
   verified: boolean
   walletNetwork: 'TRON' | 'BTC' | 'EVM'
+  authStatus: 'PENDING'
+  resultCode: 'WALLET_VERIFICATION_SENT'
+  messageKey: string
+  expiresAt: string
+}
+
+export interface WalletAddressConfirmApiResponse {
+  verified: boolean
+  walletNetwork: 'TRON' | 'BTC' | 'EVM'
   authStatus: 'VERIFIED'
-  resultCode: 'WALLET_ADDRESS_VERIFIED'
+  resultCode: 'WALLET_VERIFIED'
   messageKey: string
 }
 
@@ -344,11 +353,29 @@ export function validateWalletAddress(
   email: string,
   walletAddress: string,
   requestId?: string,
+  locale?: 'ko' | 'en',
 ) {
   return postJson<WalletAddressValidateApiResponse>('/api/auth/wallet-addresses/validate', {
     applicantType,
     email,
     walletAddress,
+    requestId,
+    locale,
+  })
+}
+
+export function confirmWalletAddress(
+  applicantType: 'PARTNER' | 'MERCHANT',
+  email: string,
+  walletAddress: string,
+  code: string,
+  requestId?: string,
+) {
+  return postJson<WalletAddressConfirmApiResponse>('/api/auth/wallet-addresses/confirm', {
+    applicantType,
+    email,
+    walletAddress,
+    code,
     requestId,
   })
 }

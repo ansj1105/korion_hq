@@ -10,6 +10,7 @@ import {
   sendEmailVerification,
   validateReferralCode,
   confirmEmailVerification,
+  confirmWalletAddress,
   validateWalletAddress,
   type SignupCountryOptionApiResponse,
   type SignupAvailabilityField,
@@ -63,12 +64,14 @@ interface SignupForm {
   industry: string
   evidenceNote: string
   walletAddress: string
+  walletCode: string
   referralCode: string
 }
 
 interface AlertModalState {
   title: string
   message: string
+  redirectTo?: string
 }
 
 interface VerifiedReferralCodeState {
@@ -196,6 +199,10 @@ export default function RoleSignup() {
   const [emailVerificationModalOpen, setEmailVerificationModalOpen] = useState(false)
   const [emailVerificationExpiresAtMs, setEmailVerificationExpiresAtMs] = useState<number | null>(null)
   const [emailVerificationRemainingSeconds, setEmailVerificationRemainingSeconds] = useState(0)
+  const [walletVerificationSent, setWalletVerificationSent] = useState(false)
+  const [walletVerificationModalOpen, setWalletVerificationModalOpen] = useState(false)
+  const [walletVerificationExpiresAtMs, setWalletVerificationExpiresAtMs] = useState<number | null>(null)
+  const [walletVerificationRemainingSeconds, setWalletVerificationRemainingSeconds] = useState(0)
   const [verifiedReferralCode, setVerifiedReferralCode] = useState<VerifiedReferralCodeState | null>(null)
   const [evidencePreviewUrl, setEvidencePreviewUrl] = useState('')
   const [checks, setChecks] = useState({
@@ -228,6 +235,7 @@ export default function RoleSignup() {
     industry: '',
     evidenceNote: '',
     walletAddress: '',
+    walletCode: '',
     referralCode: '',
   })
 
@@ -263,6 +271,23 @@ export default function RoleSignup() {
     return () => window.clearInterval(intervalId)
   }, [checks.emailVerified, emailVerificationExpiresAtMs])
 
+  useEffect(() => {
+    if (!walletVerificationExpiresAtMs || checks.walletAddress) {
+      setWalletVerificationRemainingSeconds(0)
+      return
+    }
+    const refreshRemainingSeconds = () => {
+      const nextSeconds = Math.max(0, Math.ceil((walletVerificationExpiresAtMs - Date.now()) / 1000))
+      setWalletVerificationRemainingSeconds(nextSeconds)
+      if (nextSeconds === 0) {
+        setWalletVerificationExpiresAtMs(null)
+      }
+    }
+    refreshRemainingSeconds()
+    const intervalId = window.setInterval(refreshRemainingSeconds, 1000)
+    return () => window.clearInterval(intervalId)
+  }, [checks.walletAddress, walletVerificationExpiresAtMs])
+
   useEffect(() => () => {
     if (evidencePreviewObjectUrlRef.current) {
       URL.revokeObjectURL(evidencePreviewObjectUrlRef.current)
@@ -280,10 +305,15 @@ export default function RoleSignup() {
   )
   const activeReferralCodeConfirmed = isReferralCodeConfirmedForMode(mode)
   const emailCodeVisible = emailVerificationModalOpen && emailVerificationSent && !checks.emailVerified
+  const walletCodeVisible = walletVerificationModalOpen && walletVerificationSent && !checks.walletAddress
   const showFormStatusNotice = Boolean(walletStatusMessage)
 
   const updateField = (name: keyof SignupForm, value: string) => {
-    setForm((current) => ({ ...current, [name]: value }))
+    setForm((current) => ({
+      ...current,
+      [name]: value,
+      ...(name === 'walletAddress' ? { walletCode: '' } : {}),
+    }))
     if (name === 'loginId') setChecks((current) => ({ ...current, loginId: false }))
     if (name === 'email') {
       setChecks((current) => ({ ...current, emailVerified: false }))
@@ -296,6 +326,10 @@ export default function RoleSignup() {
       setChecks((current) => ({ ...current, walletAddress: false }))
       setStatusMessage('')
       setWalletStatusMessage('')
+      setWalletVerificationSent(false)
+      setWalletVerificationModalOpen(false)
+      setWalletVerificationExpiresAtMs(null)
+      setWalletVerificationRemainingSeconds(0)
     }
     if (name === 'referralCode') {
       setChecks((current) => ({ ...current, referralCode: false }))
@@ -465,29 +499,80 @@ export default function RoleSignup() {
     setBusy(true)
     try {
       if (!form.walletAddress.trim()) throw new Error(t('auth.signup.wallet.required'))
+      if (!form.email.trim()) throw new Error(t('auth.signup.email.required'))
+      if (!isValidEmailAddress(form.email)) throw new Error(t('auth.signup.email.invalid'))
       const applicantType = role === 'merchant' ? 'MERCHANT' : 'PARTNER'
       const result = await validateWalletAddress(
         applicantType,
         form.email.trim(),
         form.walletAddress.trim(),
         requestId,
+        lang,
       )
-      setChecks((current) => ({ ...current, walletAddress: result.verified }))
-      if (!result.verified) {
-        throw new Error(t('auth.signup.wallet.invalidAlert'))
-      }
-      setAlertModal({
-        title: t('auth.signup.wallet.verifyTitle'),
-        message: t('auth.signup.wallet.verifiedAlert'),
-      })
-      setStatusMessage(t('auth.signup.wallet.verifiedAlert'))
-      setWalletStatusMessage(t('auth.signup.wallet.verifiedAlert'))
+      const parsedExpiresAt = Date.parse(result.expiresAt)
+      const expiresAtMs = Number.isFinite(parsedExpiresAt)
+        ? parsedExpiresAt
+        : Date.now() + EMAIL_VERIFICATION_TTL_SECONDS * 1000
+      setChecks((current) => ({ ...current, walletAddress: false }))
+      setWalletVerificationSent(true)
+      setWalletVerificationExpiresAtMs(expiresAtMs)
+      setWalletVerificationRemainingSeconds(Math.max(0, Math.ceil((expiresAtMs - Date.now()) / 1000)))
+      setWalletVerificationModalOpen(true)
+      setWalletStatusMessage(t('auth.signup.wallet.sent'))
+      setStatusMessage('')
     } catch (error) {
       setChecks((current) => ({ ...current, walletAddress: false }))
       setWalletStatusMessage('')
-      const message = error instanceof Error && error.message === t('auth.signup.wallet.required')
+      const validationMessages = [
+        t('auth.signup.wallet.required'),
+        t('auth.signup.email.required'),
+        t('auth.signup.email.invalid'),
+      ]
+      const message = error instanceof Error && validationMessages.includes(error.message)
         ? error.message
         : t('auth.signup.wallet.invalidAlert')
+      setAlertModal({
+        title: t('auth.signup.wallet.verifyTitle'),
+        message,
+      })
+      setStatusMessage(message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const confirmWalletCode = async () => {
+    setStatusMessage('')
+    setBusy(true)
+    try {
+      if (!form.walletAddress.trim() || !form.walletCode.trim()) {
+        throw new Error(t('auth.signup.wallet.codeRequired'))
+      }
+      const applicantType = role === 'merchant' ? 'MERCHANT' : 'PARTNER'
+      const response = await confirmWalletAddress(
+        applicantType,
+        form.email.trim(),
+        form.walletAddress.trim(),
+        form.walletCode.trim(),
+        requestId,
+      )
+      setChecks((current) => ({ ...current, walletAddress: response.verified }))
+      if (response.verified) {
+        setWalletVerificationExpiresAtMs(null)
+        setWalletVerificationRemainingSeconds(0)
+        setWalletVerificationModalOpen(false)
+        setAlertModal({
+          title: t('auth.signup.wallet.verifyTitle'),
+          message: t('auth.signup.wallet.verifiedAlert'),
+        })
+        setStatusMessage(t('auth.signup.wallet.verifiedAlert'))
+        setWalletStatusMessage(t('auth.signup.wallet.verifiedAlert'))
+      }
+    } catch (error) {
+      setChecks((current) => ({ ...current, walletAddress: false }))
+      const message = error instanceof Error && error.message === t('auth.signup.wallet.codeRequired')
+        ? error.message
+        : t('auth.signup.wallet.invalidCodeAlert')
       setAlertModal({
         title: t('auth.signup.wallet.verifyTitle'),
         message,
@@ -560,6 +645,7 @@ export default function RoleSignup() {
       setAlertModal({
         title: t('auth.signup.submitCompleteTitle'),
         message: t('auth.signup.submitCompleteMessage'),
+        redirectTo: `/login/${role}`,
       })
       setStatusMessage(`${t('auth.signup.submitCompleteMessage')} (${response.status})`)
     } catch (error) {
@@ -720,6 +806,9 @@ export default function RoleSignup() {
     if (name === 'walletAddress' && (!form.walletAddress.trim() || !checks.walletAddress)) {
       return 'auth.signup.wallet.requiredCheck'
     }
+    if (name === 'walletCode' && walletCodeVisible && !form.walletCode.trim()) {
+      return 'auth.signup.wallet.codeRequired'
+    }
     return ''
   }
 
@@ -771,6 +860,14 @@ export default function RoleSignup() {
       return
     }
     navigate('/login')
+  }
+
+  const closeAlertModal = () => {
+    const redirectTo = alertModal?.redirectTo
+    setAlertModal(null)
+    if (redirectTo) {
+      navigate(redirectTo, { replace: true })
+    }
   }
 
   const toggleAgreement = (key: string, checked: boolean) => {
@@ -865,6 +962,9 @@ export default function RoleSignup() {
   const evidenceDisplayUrl = evidencePreviewUrl || (
     isPreviewableImageUrl(form.evidenceNote) ? form.evidenceNote.trim() : ''
   )
+  const visibleBasicFields = mode === 'hq'
+    ? BASIC_FIELDS
+    : BASIC_FIELDS.filter((field) => field.name !== 'integrationPlan')
   const evidenceValidationKey = fieldValidationMessageKey('evidenceNote')
   const evidenceErrorId = 'evidenceNote-error'
   const evidenceHintId = 'evidenceNote-hint'
@@ -938,8 +1038,7 @@ export default function RoleSignup() {
                       <span className={styles.modeFieldError}>{referralValidationMessage()}</span>
                     )}
                   </>
-                ) : (
-                  // 본사 직접 계약: 본사 검토 필요 배지
+                ) : selected ? (
                   <span
                     className={styles.hqReviewBadge}
                     role="button"
@@ -960,6 +1059,8 @@ export default function RoleSignup() {
                   >
                     {t('auth.signup.hqReview')}
                   </span>
+                ) : (
+                  null
                 )}
               </button>
             )
@@ -972,7 +1073,7 @@ export default function RoleSignup() {
 
         {/* B. 기본 / 소속 정보 */}
         <h3 className={styles.sectionTitle}>{t('auth.signup.sec.basic')}</h3>
-        <div className={styles.formFieldGrid}>{renderFields(BASIC_FIELDS)}</div>
+        <div className={styles.formFieldGrid}>{renderFields(visibleBasicFields)}</div>
 
         {/* C. KORION Wallet 연결 */}
         <h3 className={styles.sectionTitle}>{t('auth.signup.sec.wallet')}</h3>
@@ -1175,8 +1276,58 @@ export default function RoleSignup() {
         </div>
       )}
 
+      {walletCodeVisible && (
+        <div className={styles.dialogOverlay} onClick={() => setWalletVerificationModalOpen(false)}>
+          <div
+            className={styles.dialogPanel}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="signup-wallet-code-title"
+          >
+            <h3 id="signup-wallet-code-title" className={styles.dialogTitle}>{t('auth.signup.wallet.verifyTitle')}</h3>
+            <p className={styles.dialogDescription}>{t('auth.signup.wallet.sent')}</p>
+            <label className={styles.dialogField} htmlFor="signup-wallet-code">
+              <span className={styles.fieldLabel}>{t('auth.signup.wallet.codeLabel')}</span>
+              <input
+                id="signup-wallet-code"
+                className={`${styles.emailCodeFieldControl} ${fieldValidationMessageKey('walletCode') ? styles.fieldControlError : ''}`}
+                type="text"
+                inputMode="numeric"
+                placeholder={t('auth.signup.wallet.codePlaceholder')}
+                value={form.walletCode}
+                onChange={(e) => updateField('walletCode', e.target.value)}
+                aria-invalid={Boolean(fieldValidationMessageKey('walletCode')) || undefined}
+                aria-describedby={fieldValidationMessageKey('walletCode') ? 'signup-wallet-code-error' : undefined}
+              />
+            </label>
+            {fieldValidationMessageKey('walletCode') && (
+              <span id="signup-wallet-code-error" className={styles.fieldError}>
+                {t(fieldValidationMessageKey('walletCode'))}
+              </span>
+            )}
+            {walletVerificationRemainingSeconds > 0 && (
+              <span className={`${styles.fieldHint} ${styles.emailCountdownHint}`} aria-live="polite">
+                {t('auth.signup.email.remaining')} {formatRemainingTime(walletVerificationRemainingSeconds)}
+              </span>
+            )}
+            <div className={styles.dialogActions}>
+              <Button variant="secondary" className={styles.signupButton} onClick={() => setWalletVerificationModalOpen(false)}>
+                {t('auth.signup.cancel')}
+              </Button>
+              <Button variant="secondary" className={styles.signupButton} disabled={busy} onClick={checkWalletAddress}>
+                {t('auth.signup.btn.resendCode')}
+              </Button>
+              <Button variant="primary" className={styles.signupButton} disabled={busy} onClick={confirmWalletCode}>
+                {t('auth.signup.btn.verify')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {alertModal && (
-        <div className={styles.dialogOverlay} onClick={() => setAlertModal(null)}>
+        <div className={styles.dialogOverlay} onClick={closeAlertModal}>
           <div
             className={styles.dialogPanel}
             onClick={(e) => e.stopPropagation()}
@@ -1187,7 +1338,7 @@ export default function RoleSignup() {
             <h3 id="signup-alert-title" className={styles.dialogTitle}>{alertModal.title}</h3>
             <p className={styles.dialogDescription}>{alertModal.message}</p>
             <div className={styles.dialogActions}>
-              <Button variant="primary" className={styles.signupButton} onClick={() => setAlertModal(null)}>
+              <Button variant="primary" className={styles.signupButton} onClick={closeAlertModal}>
                 {t('auth.signup.alert.confirm')}
               </Button>
             </div>
