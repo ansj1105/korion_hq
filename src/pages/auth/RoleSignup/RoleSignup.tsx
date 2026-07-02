@@ -77,9 +77,16 @@ interface VerifiedReferralCodeState {
 }
 
 /* A. 계정 정보 */
+const EMAIL_SEND_FIELD: FieldDef = {
+  name: 'email',
+  labelKey: 'auth.signup.f.email',
+  placeholderKey: 'auth.signup.placeholder.email',
+  buttonKey: 'auth.signup.btn.sendCode',
+  action: 'sendEmail',
+}
 const ACCOUNT_FIELDS: FieldDef[] = [
   { name: 'loginId', labelKey: 'auth.signup.f.id', placeholderKey: 'auth.signup.placeholder.loginId', buttonKey: 'auth.signup.btn.dupCheck', action: 'availability', availabilityField: 'loginId' },
-  { name: 'email', labelKey: 'auth.signup.f.email', placeholderKey: 'auth.signup.placeholder.email', buttonKey: 'auth.signup.btn.sendCode', action: 'sendEmail' },
+  EMAIL_SEND_FIELD,
   // Screenshot target: keep the email verification code input out of the initial form.
   // It is rendered only after a code is sent.
   // { name: 'emailCode', labelKey: 'auth.signup.f.emailCode', placeholderKey: 'auth.signup.placeholder.emailCode', buttonKey: 'auth.signup.btn.verify', action: 'confirmEmail' },
@@ -180,6 +187,7 @@ export default function RoleSignup() {
   const [alertModal, setAlertModal] = useState<AlertModalState | null>(null)
   const [countryOptions, setCountryOptions] = useState<SignupCountryOptionApiResponse[]>(SIGNUP_COUNTRY_FALLBACK_OPTIONS)
   const [emailVerificationSent, setEmailVerificationSent] = useState(false)
+  const [emailVerificationModalOpen, setEmailVerificationModalOpen] = useState(false)
   const [emailVerificationExpiresAtMs, setEmailVerificationExpiresAtMs] = useState<number | null>(null)
   const [emailVerificationRemainingSeconds, setEmailVerificationRemainingSeconds] = useState(0)
   const [verifiedReferralCode, setVerifiedReferralCode] = useState<VerifiedReferralCodeState | null>(null)
@@ -258,7 +266,10 @@ export default function RoleSignup() {
     && verifiedReferralCode.code === normalizeReferralCode(form.referralCode)
   )
   const activeReferralCodeConfirmed = isReferralCodeConfirmedForMode(mode)
-  const emailCodeVisible = emailVerificationSent && !checks.emailVerified
+  const emailCodeVisible = emailVerificationModalOpen && emailVerificationSent && !checks.emailVerified
+  const showFormStatusNotice = statusMessage === t('auth.signup.email.verified')
+    || statusMessage === t('auth.signup.wallet.verifiedAlert')
+    || statusMessage.startsWith(t('auth.signup.submitCompleteMessage'))
 
   const updateField = (name: keyof SignupForm, value: string) => {
     setForm((current) => ({ ...current, [name]: value }))
@@ -266,10 +277,14 @@ export default function RoleSignup() {
     if (name === 'email') {
       setChecks((current) => ({ ...current, emailVerified: false }))
       setEmailVerificationSent(false)
+      setEmailVerificationModalOpen(false)
       setEmailVerificationExpiresAtMs(null)
       setEmailVerificationRemainingSeconds(0)
     }
-    if (name === 'walletAddress') setChecks((current) => ({ ...current, walletAddress: false }))
+    if (name === 'walletAddress') {
+      setChecks((current) => ({ ...current, walletAddress: false }))
+      setStatusMessage('')
+    }
     if (name === 'referralCode') {
       setChecks((current) => ({ ...current, referralCode: false }))
       setVerifiedReferralCode(null)
@@ -312,11 +327,8 @@ export default function RoleSignup() {
         setEmailVerificationSent(true)
         setEmailVerificationExpiresAtMs(expiresAtMs)
         setEmailVerificationRemainingSeconds(Math.max(0, Math.ceil((expiresAtMs - Date.now()) / 1000)))
-        setStatusMessage(t('auth.signup.email.sent'))
-        setAlertModal({
-          title: t('auth.signup.email.verifyTitle'),
-          message: t('auth.signup.email.sent'),
-        })
+        setEmailVerificationModalOpen(true)
+        setStatusMessage('')
       }
       if (field.action === 'confirmEmail') {
         if (!form.email.trim() || !form.emailCode.trim()) throw new Error(t('auth.signup.email.codeRequired'))
@@ -325,6 +337,7 @@ export default function RoleSignup() {
         if (response.verified) {
           setEmailVerificationExpiresAtMs(null)
           setEmailVerificationRemainingSeconds(0)
+          setEmailVerificationModalOpen(false)
           setAlertModal({
             title: t('auth.signup.email.verifyTitle'),
             message: t('auth.signup.email.verifiedAlert'),
@@ -912,10 +925,7 @@ export default function RoleSignup() {
 
         {/* A. 계정 정보 */}
         <h3 className={styles.sectionTitle}>{t('auth.signup.sec.account')}</h3>
-        <div className={styles.formFieldGrid}>
-          {renderFields(ACCOUNT_FIELDS)}
-          {emailCodeVisible && renderFields([EMAIL_CODE_FIELD])}
-        </div>
+        <div className={styles.formFieldGrid}>{renderFields(ACCOUNT_FIELDS)}</div>
 
         {/* B. 기본 / 소속 정보 */}
         <h3 className={styles.sectionTitle}>{t('auth.signup.sec.basic')}</h3>
@@ -925,7 +935,7 @@ export default function RoleSignup() {
         <h3 className={styles.sectionTitle}>{t('auth.signup.sec.wallet')}</h3>
         <div className={styles.formField}>
           <span className={styles.fieldLabel}>{t('auth.signup.f.wallet')}</span>
-          <div className={styles.fieldControlRow}>
+          <div className={`${styles.fieldControlRow} ${styles.walletControlRow}`}>
             <input
               className={`${styles.fieldControl} ${fieldValidationMessageKey('walletAddress') ? styles.fieldControlError : ''}`}
               type="text"
@@ -946,7 +956,7 @@ export default function RoleSignup() {
           )}
         </div>
 
-        {statusMessage && <div className={styles.formStatusNotice}>{statusMessage}</div>}
+        {showFormStatusNotice && <div className={styles.formStatusNotice}>{statusMessage}</div>}
 
         {/* D. 매장 기본 정보 (가맹점만) */}
         {cfg.store && (
@@ -1033,6 +1043,56 @@ export default function RoleSignup() {
                 onClick={submitApplication}
               >
                 {t('auth.signup.submit')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {emailCodeVisible && (
+        <div className={styles.dialogOverlay} onClick={() => setEmailVerificationModalOpen(false)}>
+          <div
+            className={styles.dialogPanel}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="signup-email-code-title"
+          >
+            <h3 id="signup-email-code-title" className={styles.dialogTitle}>{t('auth.signup.email.verifyTitle')}</h3>
+            <p className={styles.dialogDescription}>{t('auth.signup.email.sent')}</p>
+            <label className={styles.dialogField} htmlFor="signup-email-code">
+              <span className={styles.fieldLabel}>{t('auth.signup.f.emailCode')}</span>
+              <input
+                id="signup-email-code"
+                className={`${styles.fieldControl} ${fieldValidationMessageKey('emailCode') ? styles.fieldControlError : ''}`}
+                type="text"
+                inputMode="numeric"
+                placeholder={t('auth.signup.placeholder.emailCode')}
+                value={form.emailCode}
+                onChange={(e) => updateField('emailCode', e.target.value)}
+                aria-invalid={Boolean(fieldValidationMessageKey('emailCode')) || undefined}
+                aria-describedby={fieldValidationMessageKey('emailCode') ? 'signup-email-code-error' : undefined}
+              />
+            </label>
+            {fieldValidationMessageKey('emailCode') && (
+              <span id="signup-email-code-error" className={styles.fieldError}>
+                {t(fieldValidationMessageKey('emailCode'))}
+              </span>
+            )}
+            {emailVerificationRemainingSeconds > 0 && (
+              <span className={styles.fieldHint} aria-live="polite">
+                {t('auth.signup.email.remaining')} {formatRemainingTime(emailVerificationRemainingSeconds)}
+              </span>
+            )}
+            <div className={styles.dialogActions}>
+              <Button variant="secondary" onClick={() => setEmailVerificationModalOpen(false)}>
+                {t('auth.signup.cancel')}
+              </Button>
+              <Button variant="secondary" disabled={busy} onClick={() => runAction(EMAIL_SEND_FIELD)}>
+                {t('auth.signup.btn.resendCode')}
+              </Button>
+              <Button variant="primary" disabled={busy} onClick={() => runAction(EMAIL_CODE_FIELD)}>
+                {t('auth.signup.btn.verify')}
               </Button>
             </div>
           </div>

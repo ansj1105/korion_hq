@@ -206,6 +206,9 @@
   display: flex;
   gap: var(--space-2);
 }
+.walletControlRow {
+  width: min(100%, 620px);
+}
 .fieldControl {
   flex: 1;
   min-width: 0;
@@ -343,8 +346,15 @@
   line-height: 1.6;
   color: #bdb7e7;
 }
+.dialogField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
 .dialogActions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--space-3);
   margin-top: var(--space-2);
@@ -374,5 +384,8 @@
   }
   .formFieldWide {
     grid-column: span 1;
+  }
+  .walletControlRow {
+    width: 100%;
   }
 }
