@@ -518,6 +518,7 @@ export default function RoleSignup() {
       setWalletVerificationExpiresAtMs(expiresAtMs)
       setWalletVerificationRemainingSeconds(Math.max(0, Math.ceil((expiresAtMs - Date.now()) / 1000)))
       setWalletVerificationModalOpen(true)
+      setAlertModal(null)
       setWalletStatusMessage(t('auth.signup.wallet.sent'))
       setStatusMessage('')
     } catch (error) {
@@ -885,6 +886,86 @@ export default function RoleSignup() {
     return [option.flag, countryName].filter(Boolean).join(' · ')
   }
 
+  const renderVerificationCodeDialog = ({
+    visible,
+    onClose,
+    titleId,
+    title,
+    description,
+    fieldId,
+    fieldName,
+    label,
+    placeholder,
+    remainingSeconds,
+    onResend,
+    onVerify,
+  }: {
+    visible: boolean
+    onClose: () => void
+    titleId: string
+    title: string
+    description: string
+    fieldId: string
+    fieldName: 'emailCode' | 'walletCode'
+    label: string
+    placeholder: string
+    remainingSeconds: number
+    onResend: () => void
+    onVerify: () => void
+  }) => {
+    if (!visible) return null
+    const errorKey = fieldValidationMessageKey(fieldName)
+    return (
+      <div className={styles.dialogOverlay} onClick={onClose}>
+        <div
+          className={styles.dialogPanel}
+          onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+        >
+          <h3 id={titleId} className={styles.dialogTitle}>{title}</h3>
+          <p className={styles.dialogDescription}>{description}</p>
+          <label className={styles.dialogField} htmlFor={fieldId}>
+            <span className={styles.fieldLabel}>{label}</span>
+            <input
+              id={fieldId}
+              className={`${styles.emailCodeFieldControl} ${errorKey ? styles.fieldControlError : ''}`}
+              type="text"
+              inputMode="numeric"
+              placeholder={placeholder}
+              value={form[fieldName]}
+              onChange={(e) => updateField(fieldName, e.target.value)}
+              aria-invalid={Boolean(errorKey) || undefined}
+              aria-describedby={errorKey ? `${fieldId}-error` : undefined}
+            />
+          </label>
+          {errorKey && (
+            <span id={`${fieldId}-error`} className={styles.fieldError}>
+              {t(errorKey)}
+            </span>
+          )}
+          {remainingSeconds > 0 && (
+            <span className={`${styles.fieldHint} ${styles.emailCountdownHint}`} aria-live="polite">
+              {t('auth.signup.email.remaining')} {formatRemainingTime(remainingSeconds)}
+            </span>
+          )}
+          <div className={styles.dialogActions}>
+            <Button variant="secondary" className={styles.signupButton} onClick={onClose}>
+              {t('auth.signup.cancel')}
+            </Button>
+            <Button variant="secondary" className={styles.signupButton} disabled={busy} onClick={onResend}>
+              {t('auth.signup.btn.resendCode')}
+            </Button>
+            <Button variant="primary" className={styles.signupButton} disabled={busy} onClick={onVerify}>
+              {t('auth.signup.btn.verify')}
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const renderFields = (fields: FieldDef[]) =>
     fields.map((f) => {
       const isCountry = f.name === 'country'
@@ -1226,105 +1307,35 @@ export default function RoleSignup() {
         </div>
       )}
 
-      {emailCodeVisible && (
-        <div className={styles.dialogOverlay} onClick={() => setEmailVerificationModalOpen(false)}>
-          <div
-            className={styles.dialogPanel}
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="signup-email-code-title"
-          >
-            <h3 id="signup-email-code-title" className={styles.dialogTitle}>{t('auth.signup.email.verifyTitle')}</h3>
-            <p className={styles.dialogDescription}>{t('auth.signup.email.sent')}</p>
-            <label className={styles.dialogField} htmlFor="signup-email-code">
-              <span className={styles.fieldLabel}>{t('auth.signup.f.emailCode')}</span>
-              <input
-                id="signup-email-code"
-                className={`${styles.emailCodeFieldControl} ${fieldValidationMessageKey('emailCode') ? styles.fieldControlError : ''}`}
-                type="text"
-                inputMode="numeric"
-                placeholder={t('auth.signup.placeholder.emailCode')}
-                value={form.emailCode}
-                onChange={(e) => updateField('emailCode', e.target.value)}
-                aria-invalid={Boolean(fieldValidationMessageKey('emailCode')) || undefined}
-                aria-describedby={fieldValidationMessageKey('emailCode') ? 'signup-email-code-error' : undefined}
-              />
-            </label>
-            {fieldValidationMessageKey('emailCode') && (
-              <span id="signup-email-code-error" className={styles.fieldError}>
-                {t(fieldValidationMessageKey('emailCode'))}
-              </span>
-            )}
-            {emailVerificationRemainingSeconds > 0 && (
-              <span className={`${styles.fieldHint} ${styles.emailCountdownHint}`} aria-live="polite">
-                {t('auth.signup.email.remaining')} {formatRemainingTime(emailVerificationRemainingSeconds)}
-              </span>
-            )}
-            <div className={styles.dialogActions}>
-              <Button variant="secondary" className={styles.signupButton} onClick={() => setEmailVerificationModalOpen(false)}>
-                {t('auth.signup.cancel')}
-              </Button>
-              <Button variant="secondary" className={styles.signupButton} disabled={busy} onClick={() => runAction(EMAIL_SEND_FIELD)}>
-                {t('auth.signup.btn.resendCode')}
-              </Button>
-              <Button variant="primary" className={styles.signupButton} disabled={busy} onClick={() => runAction(EMAIL_CODE_FIELD)}>
-                {t('auth.signup.btn.verify')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {renderVerificationCodeDialog({
+        visible: emailCodeVisible,
+        onClose: () => setEmailVerificationModalOpen(false),
+        titleId: 'signup-email-code-title',
+        title: t('auth.signup.email.verifyTitle'),
+        description: t('auth.signup.email.sent'),
+        fieldId: 'signup-email-code',
+        fieldName: 'emailCode',
+        label: t('auth.signup.f.emailCode'),
+        placeholder: t('auth.signup.placeholder.emailCode'),
+        remainingSeconds: emailVerificationRemainingSeconds,
+        onResend: () => runAction(EMAIL_SEND_FIELD),
+        onVerify: () => runAction(EMAIL_CODE_FIELD),
+      })}
 
-      {walletCodeVisible && (
-        <div className={styles.dialogOverlay} onClick={() => setWalletVerificationModalOpen(false)}>
-          <div
-            className={styles.dialogPanel}
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="signup-wallet-code-title"
-          >
-            <h3 id="signup-wallet-code-title" className={styles.dialogTitle}>{t('auth.signup.wallet.verifyTitle')}</h3>
-            <p className={styles.dialogDescription}>{t('auth.signup.wallet.sent')}</p>
-            <label className={styles.dialogField} htmlFor="signup-wallet-code">
-              <span className={styles.fieldLabel}>{t('auth.signup.wallet.codeLabel')}</span>
-              <input
-                id="signup-wallet-code"
-                className={`${styles.emailCodeFieldControl} ${fieldValidationMessageKey('walletCode') ? styles.fieldControlError : ''}`}
-                type="text"
-                inputMode="numeric"
-                placeholder={t('auth.signup.wallet.codePlaceholder')}
-                value={form.walletCode}
-                onChange={(e) => updateField('walletCode', e.target.value)}
-                aria-invalid={Boolean(fieldValidationMessageKey('walletCode')) || undefined}
-                aria-describedby={fieldValidationMessageKey('walletCode') ? 'signup-wallet-code-error' : undefined}
-              />
-            </label>
-            {fieldValidationMessageKey('walletCode') && (
-              <span id="signup-wallet-code-error" className={styles.fieldError}>
-                {t(fieldValidationMessageKey('walletCode'))}
-              </span>
-            )}
-            {walletVerificationRemainingSeconds > 0 && (
-              <span className={`${styles.fieldHint} ${styles.emailCountdownHint}`} aria-live="polite">
-                {t('auth.signup.email.remaining')} {formatRemainingTime(walletVerificationRemainingSeconds)}
-              </span>
-            )}
-            <div className={styles.dialogActions}>
-              <Button variant="secondary" className={styles.signupButton} onClick={() => setWalletVerificationModalOpen(false)}>
-                {t('auth.signup.cancel')}
-              </Button>
-              <Button variant="secondary" className={styles.signupButton} disabled={busy} onClick={checkWalletAddress}>
-                {t('auth.signup.btn.resendCode')}
-              </Button>
-              <Button variant="primary" className={styles.signupButton} disabled={busy} onClick={confirmWalletCode}>
-                {t('auth.signup.btn.verify')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {renderVerificationCodeDialog({
+        visible: walletCodeVisible,
+        onClose: () => setWalletVerificationModalOpen(false),
+        titleId: 'signup-wallet-code-title',
+        title: t('auth.signup.wallet.verifyTitle'),
+        description: t('auth.signup.wallet.sent'),
+        fieldId: 'signup-wallet-code',
+        fieldName: 'walletCode',
+        label: t('auth.signup.wallet.codeLabel'),
+        placeholder: t('auth.signup.wallet.codePlaceholder'),
+        remainingSeconds: walletVerificationRemainingSeconds,
+        onResend: checkWalletAddress,
+        onVerify: confirmWalletCode,
+      })}
 
       {alertModal && (
         <div className={styles.dialogOverlay} onClick={closeAlertModal}>
