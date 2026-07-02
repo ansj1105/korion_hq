@@ -188,7 +188,8 @@ export default function RoleSignup() {
   const [submitAttempted, setSubmitAttempted] = useState(false)
   const [mode, setMode] = useState('leader')
   const [busy, setBusy] = useState(false)
-  const [statusMessage, setStatusMessage] = useState('')
+  const [, setStatusMessage] = useState('')
+  const [walletStatusMessage, setWalletStatusMessage] = useState('')
   const [alertModal, setAlertModal] = useState<AlertModalState | null>(null)
   const [countryOptions, setCountryOptions] = useState<SignupCountryOptionApiResponse[]>(SIGNUP_COUNTRY_FALLBACK_OPTIONS)
   const [emailVerificationSent, setEmailVerificationSent] = useState(false)
@@ -279,9 +280,7 @@ export default function RoleSignup() {
   )
   const activeReferralCodeConfirmed = isReferralCodeConfirmedForMode(mode)
   const emailCodeVisible = emailVerificationModalOpen && emailVerificationSent && !checks.emailVerified
-  const showFormStatusNotice = statusMessage === t('auth.signup.email.verified')
-    || statusMessage === t('auth.signup.wallet.verifiedAlert')
-    || statusMessage.startsWith(t('auth.signup.submitCompleteMessage'))
+  const showFormStatusNotice = Boolean(walletStatusMessage)
 
   const updateField = (name: keyof SignupForm, value: string) => {
     setForm((current) => ({ ...current, [name]: value }))
@@ -296,6 +295,7 @@ export default function RoleSignup() {
     if (name === 'walletAddress') {
       setChecks((current) => ({ ...current, walletAddress: false }))
       setStatusMessage('')
+      setWalletStatusMessage('')
     }
     if (name === 'referralCode') {
       setChecks((current) => ({ ...current, referralCode: false }))
@@ -481,8 +481,10 @@ export default function RoleSignup() {
         message: t('auth.signup.wallet.verifiedAlert'),
       })
       setStatusMessage(t('auth.signup.wallet.verifiedAlert'))
+      setWalletStatusMessage(t('auth.signup.wallet.verifiedAlert'))
     } catch (error) {
       setChecks((current) => ({ ...current, walletAddress: false }))
+      setWalletStatusMessage('')
       const message = error instanceof Error && error.message === t('auth.signup.wallet.required')
         ? error.message
         : t('auth.signup.wallet.invalidAlert')
@@ -997,7 +999,7 @@ export default function RoleSignup() {
           )}
         </div>
 
-        {showFormStatusNotice && <div className={styles.formStatusNotice}>{statusMessage}</div>}
+        {showFormStatusNotice && <div className={styles.formStatusNotice}>{walletStatusMessage}</div>}
 
         {/* D. 매장 기본 정보 (가맹점만) */}
         {cfg.store && (
