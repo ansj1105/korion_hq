@@ -407,10 +407,23 @@
   gap: var(--space-2);
   margin-top: var(--space-2);
 }
-.emailCodeInput {
+.emailCodeFieldControl {
+  display: block;
+  width: 100%;
+  height: 56px;
+  min-height: 56px;
+  padding: 0 var(--space-4);
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, #7b5cff 34%, transparent);
+  background-color: color-mix(in srgb, #0c0a1e 88%, transparent);
+  color: var(--color-text);
+  font: inherit;
   font-size: var(--font-size-16);
   font-weight: var(--font-weight-semibold);
   letter-spacing: 0.08em;
+}
+.emailCodeFieldControl::placeholder {
+  color: #8c86b5;
 }
 .emailCountdownHint {
   color: #ffb347;

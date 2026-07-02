@@ -353,7 +353,7 @@ export default function RoleSignup() {
         if (!form.email.trim()) throw new Error(t('auth.signup.email.required'))
         if (!isValidEmailAddress(form.email)) throw new Error(t('auth.signup.email.invalid'))
         setChecks((current) => ({ ...current, emailVerified: false }))
-        const response = await sendEmailVerification(form.email.trim(), requestId)
+        const response = await sendEmailVerification(form.email.trim(), requestId, lang)
         const parsedExpiresAt = Date.parse(response.expiresAt)
         const expiresAtMs = Number.isFinite(parsedExpiresAt)
           ? parsedExpiresAt
@@ -1140,7 +1140,7 @@ export default function RoleSignup() {
               <span className={styles.fieldLabel}>{t('auth.signup.f.emailCode')}</span>
               <input
                 id="signup-email-code"
-                className={`${styles.fieldControl} ${styles.emailCodeInput} ${fieldValidationMessageKey('emailCode') ? styles.fieldControlError : ''}`}
+                className={`${styles.emailCodeFieldControl} ${fieldValidationMessageKey('emailCode') ? styles.fieldControlError : ''}`}
                 type="text"
                 inputMode="numeric"
                 placeholder={t('auth.signup.placeholder.emailCode')}

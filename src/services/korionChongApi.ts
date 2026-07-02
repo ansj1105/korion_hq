@@ -305,10 +305,11 @@ export function fetchSignupOptions() {
   return getJson<SignupOptionsApiResponse>('/api/auth/signup-options')
 }
 
-export function sendEmailVerification(email: string, requestId?: string) {
+export function sendEmailVerification(email: string, requestId?: string, locale?: 'ko' | 'en') {
   return postJson<EmailVerificationSendApiResponse>('/api/auth/email-verifications/send', {
     email,
     requestId,
+    locale,
   })
 }
 
