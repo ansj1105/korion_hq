@@ -28,6 +28,24 @@ export interface StatCardData {
   alignTop?: boolean
 }
 
+const STATUS_BADGE_ACCENTS: Array<{ pattern: RegExp; accent: AccentKey }> = [
+  { pattern: /운영|active|running/i, accent: 'green' },
+  { pattern: /검토|review|pending/i, accent: 'orange' },
+  { pattern: /제한|정지|위험|risk|restricted|suspend/i, accent: 'red' },
+]
+
+function parseDeltaBadges(delta?: string) {
+  if (!delta?.includes('·')) return null
+  return delta
+    .split('·')
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => ({
+      text: part,
+      accent: STATUS_BADGE_ACCENTS.find(({ pattern }) => pattern.test(part))?.accent ?? 'cyan',
+    }))
+}
+
 /*
  * StatCard (molecule)
  * ------------------------------------------------------------------
@@ -53,6 +71,7 @@ export default function StatCard({
   const labelToneClass = labelTone === 'amber' ? styles.labelAmber : labelTone === 'green' ? styles.labelGreen : ''
   const labelClassName = labelToneClass ? `${styles.label} ${labelToneClass}` : styles.label
   const deltaClassName = deltaTone === 'red' ? `${styles.delta} ${styles.deltaRed}` : styles.delta
+  const deltaBadges = parseDeltaBadges(delta)
   return (
     <article className={className}>
       {/* 라벨 + (부가설명)을 한 줄에 인라인으로 표시 (Figma에선 한 텍스트 한 줄) */}
@@ -64,7 +83,17 @@ export default function StatCard({
         <span className={styles.value}>{value}</span>
         {tag && <Badge accent={tagAccent}>{tag}</Badge>}
       </div>
-      {delta && <span className={deltaClassName}>{delta}</span>}
+      {deltaBadges ? (
+        <div className={styles.deltaBadges}>
+          {deltaBadges.map((item) => (
+            <Badge key={item.text} accent={item.accent} size="md" shape="rect">
+              {item.text}
+            </Badge>
+          ))}
+        </div>
+      ) : (
+        delta && <span className={deltaClassName}>{delta}</span>
+      )}
     </article>
   )
 }

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import PageHeader from '../../../components/organisms/PageHeader'
 import Panel from '../../../components/molecules/Panel'
 import StatCard from '../../../components/molecules/StatCard'
@@ -9,6 +10,7 @@ import Button from '../../../components/atoms/Button'
 import type { AccentKey } from '../../../types'
 import { useTranslation } from '../../../i18n'
 import { useDashboard } from './useDashboard'
+import type { HqDashboardRange } from './useDashboard'
 import styles from './Dashboard.module.css'
 
 /*
@@ -26,10 +28,12 @@ import styles from './Dashboard.module.css'
  */
 export default function Dashboard() {
   const { t } = useTranslation()
+  const [countryScope, setCountryScope] = useState('all')
+  const [range, setRange] = useState<HqDashboardRange>('1D')
   const {
+    filters,
     kpis,
     rankingPanels,
-    realtimePayments,
     offlinePay,
     settlement,
     risk,
@@ -40,7 +44,7 @@ export default function Dashboard() {
     activityLogs,
     aiInsight,
     quickActions,
-  } = useDashboard()
+  } = useDashboard({ countryScope, range })
 
   /*
    * Figma 실측: 상태/액션 류 셀은 "항상 배지"가 아니라 진행 중·이례적인 값만 배지로
@@ -55,26 +59,6 @@ export default function Dashboard() {
     ) : (
       text
     )
-
-  const realtimePaymentRows: TableRow[] = realtimePayments.rows.map((r) => ({
-    id: r.id,
-    cells: {
-      id: r.id,
-      country: r.country,
-      merchant: r.merchant,
-      method: r.method,
-      connection: r.connection,
-      amount: r.amount,
-      status: badgeOrText(r.status, r.statusAccent),
-      sync: badgeOrText(r.sync, r.syncAccent),
-      verify: r.verify,
-      detail: (
-        <Badge accent="cyan" size="cell">
-          {t('common.detail')}
-        </Badge>
-      ),
-    },
-  }))
 
   const settlementRows: TableRow[] = settlement.rows.map((r) => ({
     id: r.id,
@@ -175,10 +159,27 @@ export default function Dashboard() {
   return (
     <div className={styles.page}>
       <PageHeader title={t('hqDashboard.title')}>
-        {/* Figma의 국가/날짜 필터칩 — 동작 없는 UI 표시만 (CLAUDE.md 1번 규칙: 인터랙션은 협의 전까지 보류) */}
-        <div className={styles.filterChips}>
-          <span className={styles.chip}>{t('hqDashboard.filter.allCountries')}</span>
-          <span className={styles.chip}>{t('hqDashboard.filter.today')}</span>
+        <div className={styles.filterControls} aria-label={t('hqDashboard.filter.label')}>
+          <label className={styles.filterField}>
+            <span>{t('hqDashboard.filter.country')}</span>
+            <select className={styles.filterSelect} value={filters.selectedCountry} onChange={(event) => setCountryScope(event.target.value)}>
+              {filters.countryOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={styles.filterField}>
+            <span>{t('hqDashboard.filter.period')}</span>
+            <select className={styles.filterSelect} value={filters.selectedRange} onChange={(event) => setRange(event.target.value as HqDashboardRange)}>
+              {filters.rangeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </PageHeader>
 
@@ -189,17 +190,26 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* 대시보드 요약 패널 — Figma상 제목만 있고 내용 미정의. 빈 채로 두고 자리만 확보(Panel 컨벤션과 동일) */}
+      {/* 매출 순위 패널 — 날짜 필터 기준으로 API에서 받은 국가/리더/파트너/가맹점 순위를 표시 */}
       <div className={styles.rankingGrid}>
         {rankingPanels.map((panel) => (
-          <Panel key={panel.id} title={panel.title} />
+          <Panel key={panel.id} title={panel.title}>
+            <ol className={styles.rankList}>
+              {panel.rows.map((row) => (
+                <li key={`${panel.id}-${row.rank}-${row.meta}`} className={styles.rankItem}>
+                  <span className={styles.rankNo}>{row.rank}</span>
+                  <span className={styles.rankMain}>
+                    <strong className={styles.rankName}>{row.name}</strong>
+                    <span className={styles.rankMeta}>{row.meta}</span>
+                  </span>
+                  <span className={styles.rankAmount}>{row.amount}</span>
+                </li>
+              ))}
+              {panel.rows.length === 0 && <li className={styles.rankEmpty}>{t('common.noData')}</li>}
+            </ol>
+          </Panel>
         ))}
       </div>
-
-      {/* bare: Panel 자체가 카드 박스이므로 DataTable의 중복 박스 제거 */}
-      <Panel title={t('hqDashboard.realtimePayments.title')} subtitle={t('hqDashboard.realtimePayments.desc')}>
-        <DataTable columns={realtimePayments.columns} rows={realtimePaymentRows} largeText navyZebra bare />
-      </Panel>
 
       <Panel title={t('hqDashboard.offlinePay.title')} subtitle={t('hqDashboard.offlinePay.desc')}>
         <div className={styles.miniStatGrid}>

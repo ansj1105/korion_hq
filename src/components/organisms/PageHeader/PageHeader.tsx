@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import TopControls from '../../molecules/TopControls'
 import styles from './PageHeader.module.css'
 
 interface PageHeaderProps {
@@ -12,7 +11,7 @@ interface PageHeaderProps {
 /*
  * PageHeader (organism)
  * ------------------------------------------------------------------
- * 모든 화면이 공유하는 상단 헤더: [제목 | 언어/로그아웃] + (옵션) 아래 영역.
+ * 모든 화면이 공유하는 페이지 헤더: [제목] + (옵션) 아래 영역.
  * children 슬롯으로 화면별 추가 컨트롤(기간 탭 등)을 끼워 넣는다.
  */
 export default function PageHeader({ title, children }: PageHeaderProps) {
@@ -20,7 +19,6 @@ export default function PageHeader({ title, children }: PageHeaderProps) {
     <header className={styles.header}>
       <div className={styles.topRow}>
         <h1 className={styles.title}>{title}</h1>
-        <TopControls />
       </div>
       {children}
     </header>

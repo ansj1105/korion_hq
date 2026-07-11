@@ -22,6 +22,7 @@
   ],
   "rankingPanels": [
     { "id": "byCountry", "titleKey": "hqDashboard.ranking.byCountry" },
+    { "id": "byLeader", "titleKey": "hqDashboard.ranking.byLeader" },
     { "id": "byPartner", "titleKey": "hqDashboard.ranking.byPartner" },
     { "id": "byMerchant", "titleKey": "hqDashboard.ranking.byMerchant" }
   ],
@@ -36,14 +37,14 @@
   },
   "offlinePay": {
     "miniStats": [
-      { "id": "createdTx", "labelKey": "hqDashboard.offlinePay.createdTx", "value": "328건", "accent": "cyan" },
-      { "id": "uploadPending", "labelKey": "hqDashboard.offlinePay.uploadPending", "value": "42건", "accent": "orange" },
-      { "id": "syncFailed", "labelKey": "hqDashboard.offlinePay.syncFailed", "value": "7건", "accent": "red" },
-      { "id": "longUnsynced", "labelKey": "hqDashboard.offlinePay.longUnsynced", "value": "3건", "accent": "purple" },
-      { "id": "senderProofOnly", "labelKey": "hqDashboard.offlinePay.senderProofOnly", "value": "5건", "accent": "cyan" },
-      { "id": "receiverEvidenceOnly", "labelKey": "hqDashboard.offlinePay.receiverEvidenceOnly", "value": "2건", "accent": "orange" },
-      { "id": "matchRate", "labelKey": "hqDashboard.offlinePay.matchRate", "value": "94.7%", "accent": "green" },
-      { "id": "avgSyncTime", "labelKey": "hqDashboard.offlinePay.avgSyncTime", "value": "38초", "accent": "purple" }
+      { "id": "createdTx", "labelKey": "hqDashboard.offlinePay.createdTx", "noteKey": "hqDashboard.offlinePay.createdTx.note", "value": "328건", "accent": "cyan" },
+      { "id": "uploadPending", "labelKey": "hqDashboard.offlinePay.uploadPending", "noteKey": "hqDashboard.offlinePay.uploadPending.note", "value": "42건", "accent": "orange" },
+      { "id": "syncFailed", "labelKey": "hqDashboard.offlinePay.syncFailed", "noteKey": "hqDashboard.offlinePay.syncFailed.note", "value": "7건", "accent": "red" },
+      { "id": "longUnsynced", "labelKey": "hqDashboard.offlinePay.longUnsynced", "noteKey": "hqDashboard.offlinePay.longUnsynced.note", "value": "3건", "accent": "purple" },
+      { "id": "senderProofOnly", "labelKey": "hqDashboard.offlinePay.senderProofOnly", "noteKey": "hqDashboard.offlinePay.senderProofOnly.note", "value": "5건", "accent": "cyan" },
+      { "id": "receiverEvidenceOnly", "labelKey": "hqDashboard.offlinePay.receiverEvidenceOnly", "noteKey": "hqDashboard.offlinePay.receiverEvidenceOnly.note", "value": "2건", "accent": "orange" },
+      { "id": "matchRate", "labelKey": "hqDashboard.offlinePay.matchRate", "noteKey": "hqDashboard.offlinePay.matchRate.note", "value": "94.7%", "accent": "green" },
+      { "id": "avgSyncTime", "labelKey": "hqDashboard.offlinePay.avgSyncTime", "noteKey": "hqDashboard.offlinePay.avgSyncTime.note", "value": "38초", "accent": "purple" }
     ],
     "flowSteps": ["hqDashboard.offlinePay.step.proof", "hqDashboard.offlinePay.step.localBlock", "hqDashboard.offlinePay.step.serverVerify", "hqDashboard.offlinePay.step.settlement"]
   },

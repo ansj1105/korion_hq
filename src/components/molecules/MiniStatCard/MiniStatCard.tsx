@@ -11,6 +11,8 @@ export interface MiniStatCardData {
   label: string
   /** 큰 값 (예: "328건") — Figma 표기 그대로 */
   value: string
+  /** 값 아래 보조 설명. 없으면 미표시 */
+  note?: string
   /** 테두리 강조색. 지정하지 않으면 기본(보라) 테두리 */
   accent?: AccentKey
 }
@@ -22,13 +24,14 @@ export interface MiniStatCardData {
  * 본사어드민 "전체 운영 대시보드"의 실시간 모니터링/정산/리스크 등
  * 여러 섹션에서 4~8장씩 반복되는 미니 KPI에 쓰인다(StatCard보다 더 단순 — 태그/증감줄 없음).
  */
-export default function MiniStatCard({ label, value, accent }: MiniStatCardData) {
+export default function MiniStatCard({ label, value, note, accent }: MiniStatCardData) {
   const style = accent ? ({ '--accent': ACCENT_VAR[accent] } as CSSProperties) : undefined
 
   return (
     <article className={styles.card} style={style}>
       <span className={styles.label}>{label}</span>
       <span className={styles.value}>{value}</span>
+      {note && <span className={styles.note}>{note}</span>}
     </article>
   )
 }

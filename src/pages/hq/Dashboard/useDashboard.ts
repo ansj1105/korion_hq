@@ -1,15 +1,25 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { MiniStatCardData } from '../../../components/molecules/MiniStatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import type { AccentKey } from '../../../types'
+import { fetchHqPageData } from '../../../services/korionChongApi'
 import data from './dashboardData.json'
+
+export type HqDashboardRange = '1D' | '7D' | '14D' | '30D' | '90D' | '180D' | '365D'
+
+interface UseDashboardFilters {
+  countryScope?: string
+  range?: HqDashboardRange
+}
 
 interface KpiRaw {
   id: string
   labelKey: string
   value: string
   noteKey: string
+  note?: string
   labelTone?: 'default' | 'amber' | 'green'
   deltaTone?: 'cyan' | 'red'
 }
@@ -17,6 +27,8 @@ interface KpiRaw {
 interface MiniStatRaw {
   id: string
   labelKey: string
+  noteKey?: string
+  note?: string
   value: string
   accent: AccentKey
 }
@@ -109,6 +121,19 @@ interface ActivityLogRow {
   riskAccent: AccentKey
 }
 
+interface RankingRowRaw {
+  rank: number
+  name: string
+  meta: string
+  amount: string
+}
+
+interface RankingPanelRaw {
+  id: string
+  titleKey: string
+  rows?: RankingRowRaw[]
+}
+
 interface AiInsightRaw {
   id: string
   severity: string
@@ -117,26 +142,160 @@ interface AiInsightRaw {
   actionKey: string
 }
 
+const ALL_COUNTRIES = 'all'
+const RANGE_DAYS: Record<HqDashboardRange, number> = {
+  '1D': 1,
+  '7D': 7,
+  '14D': 14,
+  '30D': 30,
+  '90D': 90,
+  '180D': 180,
+  '365D': 365,
+}
+
+const COUNTRY_CODE_BY_NAME: Record<string, string> = {
+  Nigeria: 'NG',
+  Korea: 'KR',
+  Philippines: 'PH',
+  Vietnam: 'VN',
+  Ghana: 'GH',
+}
+
+const RANGE_SENSITIVE_KPIS = new Set([
+  'collateralTopup',
+  'collateralTopupCount',
+  'collateralRelease',
+  'newApplicationsToday',
+  'todayPaymentCount',
+  'todayPaymentAmount',
+  'todayFee',
+  'settlementRequests',
+  'settlementPendingAmount',
+  'unsettledMemberPayout',
+  'verificationQueue',
+  'riskHoldAmount',
+  'riskAlerts',
+])
+
+const RANGE_SENSITIVE_MINI_STATS = new Set([
+  'createdTx',
+  'uploadPending',
+  'syncFailed',
+  'longUnsynced',
+  'senderProofOnly',
+  'receiverEvidenceOnly',
+  'totalPending',
+  'completed',
+  'onHold',
+  'memberCollateral',
+  'abnormalWithdrawal',
+  'bugSuspect',
+  'duplicateWallet',
+  'settlementHoldTarget',
+  'receivedToday',
+  'pending',
+  'docsRequested',
+  'approvedToday',
+])
+
+function formatScaledNumber(value: number, hasDecimals: boolean) {
+  const maximumFractionDigits = hasDecimals ? 2 : 0
+  return new Intl.NumberFormat('en-US', {
+    maximumFractionDigits,
+    minimumFractionDigits: hasDecimals ? Math.min(1, maximumFractionDigits) : 0,
+  }).format(value)
+}
+
+function scaleDisplayValue(value: string, multiplier: number) {
+  if (multiplier === 1 || value.includes('%') || value.includes('초')) return value
+
+  return value.replace(/([₩$]?)(\d[\d,]*(?:\.\d+)?)([KM]?)/g, (_match, currency: string, raw: string, suffix: string) => {
+    const numeric = Number(raw.replace(/,/g, ''))
+    if (!Number.isFinite(numeric)) return `${currency}${raw}${suffix}`
+    const scaled = numeric * multiplier
+    return `${currency}${formatScaledNumber(scaled, raw.includes('.'))}${suffix}`
+  })
+}
+
+function countryMatches(rowCountry: string, countryScope: string) {
+  return countryScope === ALL_COUNTRIES || rowCountry === countryScope
+}
+
+function scaleMiniStats(stats: MiniStatRaw[], multiplier: number): MiniStatRaw[] {
+  return stats.map((stat) =>
+    RANGE_SENSITIVE_MINI_STATS.has(stat.id)
+      ? {
+          ...stat,
+          value: scaleDisplayValue(stat.value, multiplier),
+        }
+      : stat,
+  )
+}
+
 /*
  * useDashboard — 본사어드민 "전체 운영 대시보드" 데이터 훅
  * ------------------------------------------------------------------
- * dashboardData.json(더미)을 읽어 UI 라벨(지표명/컬럼명)은 번역해 반환한다.
- * 행 데이터(국가명/지갑주소/금액 등)는 CLAUDE.md 11번 규칙상 번역하지 않고 그대로 통과.
- * 추후 실 연동 시 이 훅 내부만 API 호출로 교체하면 Dashboard.tsx는 그대로 동작한다.
+ * /api/hq/dashboard를 우선 사용하고 실패 시 dashboardData.json을 fallback으로 쓴다.
+ * UI 라벨(지표명/컬럼명)은 번역해 반환하고, 행 데이터(국가코드/금액/상태)는 API 값을 그대로 통과한다.
  */
-export function useDashboard() {
+export function useDashboard(filters: UseDashboardFilters = {}) {
   const { t } = useTranslation()
+  const range = filters.range ?? '1D'
+  const [source, setSource] = useState(data)
 
-  const kpis: StatCardData[] = (data.kpis as KpiRaw[]).map((k) => ({
+  useEffect(() => {
+    let alive = true
+    fetchHqPageData<typeof data>('/api/hq/dashboard', {
+      countryScope: filters.countryScope ?? ALL_COUNTRIES,
+      range,
+    })
+      .then((payload) => {
+        if (alive) setSource(payload)
+      })
+      .catch(() => {
+        if (alive) setSource(data)
+      })
+    return () => {
+      alive = false
+    }
+  }, [filters.countryScope, range])
+
+  const rangeMultiplier = source === data ? RANGE_DAYS[range] : 1
+  const countryRows = source.countryOps.rows
+  const countryOptions = [
+    { value: ALL_COUNTRIES, label: t('hqDashboard.filter.allCountries') },
+    ...countryRows.map((row) => ({ value: row.id, label: row.id })),
+  ]
+  const selectedCountry = countryOptions.some((option) => option.value === filters.countryScope) ? filters.countryScope ?? ALL_COUNTRIES : ALL_COUNTRIES
+  const selectedCountryRow = countryRows.find((row) => row.id === selectedCountry)
+
+  const kpis: StatCardData[] = (source.kpis as KpiRaw[]).map((k) => ({
     id: k.id,
     label: t(k.labelKey),
-    value: k.value,
-    delta: t(k.noteKey),
+    value:
+      selectedCountryRow && k.id === 'activeCountries'
+        ? `1 ${t('hqDashboard.filter.countryUnit')}`
+        : selectedCountryRow && k.id === 'collateralHolders'
+          ? selectedCountryRow.members
+          : selectedCountryRow && k.id === 'countryLeaders'
+            ? selectedCountryRow.leaders
+            : selectedCountryRow && k.id === 'salesPartners'
+              ? selectedCountryRow.partners
+              : selectedCountryRow && k.id === 'merchants'
+                ? selectedCountryRow.merchants
+                : RANGE_SENSITIVE_KPIS.has(k.id)
+                  ? scaleDisplayValue(k.value, rangeMultiplier)
+                  : k.value,
+    delta: k.note ?? (k.noteKey ? t(k.noteKey) : ''),
     labelTone: k.labelTone,
     deltaTone: k.deltaTone,
   }))
 
-  const rankingPanels = data.rankingPanels.map((p) => ({ id: p.id, title: t(p.titleKey) }))
+  const rankingPanels = (source.rankingPanels as RankingPanelRaw[]).map((p) => ({
+    id: p.id,
+    title: t(p.titleKey),
+    rows: p.rows ?? [],
+  }))
 
   // Figma 실측(80:310 그룹): 헤더 10개 컬럼이 x=64부터 99.2px 등간격으로 균등 배치된다.
   // → 컬럼 폭을 전부 동일(1fr)로 둬 피그마 비율을 그대로 재현한다(좁은 화면은 DataTable이 가로 스크롤 처리).
@@ -153,15 +312,16 @@ export function useDashboard() {
     { key: 'detail', label: t('hqDashboard.realtimePayments.col.detail'), width: '1fr' },
   ]
 
-  const offlinePayMiniStats: MiniStatCardData[] = (data.offlinePay.miniStats as MiniStatRaw[]).map((s) => ({
+  const offlinePayMiniStats: MiniStatCardData[] = scaleMiniStats(source.offlinePay.miniStats as MiniStatRaw[], rangeMultiplier).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
+    note: s.note ?? (s.noteKey ? t(s.noteKey) : undefined),
     value: s.value,
     accent: s.accent,
   }))
-  const offlinePayFlowSteps = data.offlinePay.flowSteps.map((key) => t(key))
+  const offlinePayFlowSteps = source.offlinePay.flowSteps.map((key) => t(key))
 
-  const settlementStats: MiniStatCardData[] = (data.settlement.stats as MiniStatRaw[]).map((s) => ({
+  const settlementStats: MiniStatCardData[] = scaleMiniStats(source.settlement.stats as MiniStatRaw[], rangeMultiplier).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -179,7 +339,7 @@ export function useDashboard() {
     { key: 'action', label: t('hqDashboard.settlement.col.action'), width: '1fr' },
   ]
 
-  const riskStats: MiniStatCardData[] = (data.risk.stats as MiniStatRaw[]).map((s) => ({
+  const riskStats: MiniStatCardData[] = scaleMiniStats(source.risk.stats as MiniStatRaw[], rangeMultiplier).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -211,7 +371,7 @@ export function useDashboard() {
     { key: 'growth', label: t('hqDashboard.countryOps.col.growth'), width: 'minmax(96px, 1fr)' },
   ]
 
-  const approvalQueueStats: MiniStatCardData[] = (data.approvalQueue.stats as MiniStatRaw[]).map((s) => ({
+  const approvalQueueStats: MiniStatCardData[] = scaleMiniStats(source.approvalQueue.stats as MiniStatRaw[], rangeMultiplier).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -229,7 +389,7 @@ export function useDashboard() {
     { key: 'status', label: t('hqDashboard.approvalQueue.col.status'), width: '1fr' },
   ]
 
-  const networkGrowthStats: MiniStatCardData[] = (data.networkGrowth.stats as MiniStatRaw[]).map((s) => ({
+  const networkGrowthStats: MiniStatCardData[] = (source.networkGrowth.stats as MiniStatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -245,7 +405,7 @@ export function useDashboard() {
     { key: 'sync', label: t('hqDashboard.paymentMethod.col.sync'), width: '0.8fr' },
     { key: 'failReason', label: t('hqDashboard.paymentMethod.col.failReason'), width: '1fr' },
   ]
-  const paymentMethodDonut = data.paymentMethod.donut.map((d) => ({ ...d, label: t(d.labelKey) }))
+  const paymentMethodDonut = source.paymentMethod.donut.map((d) => ({ ...d, label: t(d.labelKey) }))
 
   const activityLogColumns: Column[] = [
     { key: 'admin', label: t('hqDashboard.activityLogs.col.admin'), width: '1fr' },
@@ -258,26 +418,53 @@ export function useDashboard() {
     { key: 'riskLevel', label: t('hqDashboard.activityLogs.col.riskLevel'), width: '0.8fr' },
   ]
 
-  const aiInsightItems = (data.aiInsight.items as AiInsightRaw[]).map((i) => ({
+  const aiInsightItems = (source.aiInsight.items as AiInsightRaw[]).map((i) => ({
     ...i,
     message: t(i.messageKey),
     action: t(i.actionKey),
   }))
 
-  const quickActions = data.quickActions.map((key) => t(key))
+  const quickActions = source.quickActions.map((key) => t(key))
 
   return {
+    filters: {
+      countryOptions,
+      rangeOptions: Object.keys(RANGE_DAYS) as HqDashboardRange[],
+      selectedCountry,
+      selectedRange: range,
+    },
     kpis,
     rankingPanels,
-    realtimePayments: { columns: realtimePaymentColumns, rows: data.realtimePayments.rows as RealtimePaymentRow[] },
+    realtimePayments: {
+      columns: realtimePaymentColumns,
+      rows: (source.realtimePayments.rows as RealtimePaymentRow[]).filter((row) => countryMatches(row.country, selectedCountry)),
+    },
     offlinePay: { miniStats: offlinePayMiniStats, flowSteps: offlinePayFlowSteps },
-    settlement: { stats: settlementStats, columns: settlementColumns, rows: data.settlement.rows as SettlementRow[] },
-    risk: { stats: riskStats, columns: riskColumns, rows: data.risk.rows as RiskRow[] },
-    countryOps: { columns: countryOpsColumns, rows: data.countryOps.rows, heatmap: data.countryOps.heatmap },
-    approvalQueue: { stats: approvalQueueStats, columns: approvalQueueColumns, rows: data.approvalQueue.rows as ApprovalQueueRow[] },
-    networkGrowth: { stats: networkGrowthStats, trendBars: data.networkGrowth.trendBars, topPartners: data.networkGrowth.topPartners },
-    paymentMethod: { columns: paymentMethodColumns, rows: data.paymentMethod.rows as PaymentMethodRow[], donut: paymentMethodDonut },
-    activityLogs: { columns: activityLogColumns, rows: data.activityLogs.rows as ActivityLogRow[] },
+    settlement: {
+      stats: settlementStats,
+      columns: settlementColumns,
+      rows: (source.settlement.rows as SettlementRow[]).filter((row) => countryMatches(row.country, selectedCountry)),
+    },
+    risk: {
+      stats: riskStats,
+      columns: riskColumns,
+      rows: (source.risk.rows as RiskRow[]).filter((row) => countryMatches(row.country, selectedCountry)),
+    },
+    countryOps: {
+      columns: countryOpsColumns,
+      rows: selectedCountryRow ? [selectedCountryRow] : source.countryOps.rows,
+      heatmap: selectedCountryRow
+        ? source.countryOps.heatmap.filter((item) => item.code === (COUNTRY_CODE_BY_NAME[selectedCountryRow.id] ?? selectedCountryRow.id))
+        : source.countryOps.heatmap,
+    },
+    approvalQueue: {
+      stats: approvalQueueStats,
+      columns: approvalQueueColumns,
+      rows: (source.approvalQueue.rows as ApprovalQueueRow[]).filter((row) => countryMatches(row.country, selectedCountry)),
+    },
+    networkGrowth: { stats: networkGrowthStats, trendBars: source.networkGrowth.trendBars, topPartners: source.networkGrowth.topPartners },
+    paymentMethod: { columns: paymentMethodColumns, rows: source.paymentMethod.rows as PaymentMethodRow[], donut: paymentMethodDonut },
+    activityLogs: { columns: activityLogColumns, rows: source.activityLogs.rows as ActivityLogRow[] },
     aiInsight: aiInsightItems,
     quickActions,
   }

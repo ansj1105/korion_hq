@@ -40,13 +40,70 @@
   min-width: 0;               /* flex 자식 overflow 방지 */
   /* Figma 콘텐츠 안쪽 여백이 ~26px로 작다. 큰 화면에서 양옆이 과하게 비지 않도록
      좁은 패딩만 주고, 폭 제한(중앙정렬) 없이 남는 영역을 채운다. */
-  padding: var(--space-6);
+  padding: 0 var(--space-6) var(--space-6);
   /* 세로 방향 flex — 페이지가 콘텐츠 영역 높이를 채울 수 있도록 */
   display: flex;
   flex-direction: column;
   /* 콘텐츠만 세로 스크롤(사이드바는 고정되어 함께 스크롤되지 않음) */
   height: 100%;
   overflow-y: auto;
+}
+
+.mobileNavScrim {
+  display: none;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 64px;
+  margin: 0 calc(var(--space-6) * -1) var(--space-5);
+  padding: 0 var(--space-6);
+  background: color-mix(in srgb, var(--color-bg-elevated) 86%, transparent);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.topbarStart {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.topbarTitle {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobileMenuButton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(26, 209, 255, 0.28);
+  border-radius: var(--radius-sm);
+  background-color: rgba(255, 255, 255, 0.045);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.mobileMenuButton:hover,
+.mobileMenuButton:focus-visible {
+  border-color: rgba(26, 209, 255, 0.54);
+  background-color: rgba(26, 209, 255, 0.12);
+  outline: none;
 }
 
 /* 콘텐츠는 폭 제한 없이 채우고, 세로로도 남은 높이를 채운다 (페이지가 flex로 늘어날 수 있게) */
@@ -59,7 +116,50 @@
 
 /* 반응형: 좁은 화면에서 패딩 추가 축소 (CLAUDE.md 반응형 주석 규칙) */
 @media (max-width: 1024px) {
+  .layout {
+    display: block;
+  }
+
   .content {
-    padding: var(--space-4);
+    min-height: 100%;
+    padding: 0 var(--space-4) var(--space-4);
+  }
+
+  .topbar {
+    min-height: 58px;
+    margin: 0 calc(var(--space-4) * -1) var(--space-4);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .mobileMenuButton {
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  .mobileNavScrim {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: block;
+    padding: 0;
+    border: 0;
+    background: rgb(0 0 0 / 62%);
+  }
+}
+
+@media (max-width: 560px) {
+  .content {
+    padding: 0 var(--space-3) var(--space-3);
+  }
+
+  .topbar {
+    gap: var(--space-2);
+    margin: 0 calc(var(--space-3) * -1) var(--space-3);
+    padding: var(--space-3);
+  }
+
+  .topbarStart {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 }

@@ -1,5 +1,9 @@
-import { Navigate, Outlet } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Menu } from 'lucide-react'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import TopControls from '../../components/molecules/TopControls'
 import Sidebar from '../../components/organisms/Sidebar'
+import { useTranslation } from '../../i18n'
 import { ROLES, type Role } from '../../roles'
 import { readAuthSession } from '../../services/authSession'
 import styles from './AdminLayout.module.css'
@@ -17,8 +21,15 @@ interface AdminLayoutProps {
  * → 레이아웃·사이드바를 역할마다 따로 만들지 않고 하나로 재사용한다.
  */
 export default function AdminLayout({ role }: AdminLayoutProps) {
+  const { pathname } = useLocation()
+  const { t } = useTranslation()
   const session = readAuthSession()
   const { basePath, roleLabelKey, profileLines, nav } = ROLES[role]
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+
+  useEffect(() => {
+    setMobileNavOpen(false)
+  }, [pathname])
 
   if (!session) {
     return <Navigate to="/login" replace />
@@ -33,9 +44,33 @@ export default function AdminLayout({ role }: AdminLayoutProps) {
       {/* 배경 장식(네온 글로우) — 기능 없음 */}
       <div className={styles.glow} aria-hidden="true" />
 
-      <Sidebar basePath={basePath} roleLabelKey={roleLabelKey} profileLines={profileLines} nav={nav} />
+      {mobileNavOpen && <button type="button" className={styles.mobileNavScrim} aria-label={t('common.sidebar.closeMenu')} onClick={() => setMobileNavOpen(false)} />}
+
+      <Sidebar
+        basePath={basePath}
+        roleLabelKey={roleLabelKey}
+        profileLines={profileLines}
+        nav={nav}
+        mobileOpen={mobileNavOpen}
+        onMobileClose={() => setMobileNavOpen(false)}
+      />
 
       <main className={styles.content}>
+        <div className={styles.topbar}>
+          <div className={styles.topbarStart}>
+            <button
+              type="button"
+              className={styles.mobileMenuButton}
+              aria-label={t('common.sidebar.openMenu')}
+              aria-expanded={mobileNavOpen}
+              onClick={() => setMobileNavOpen(true)}
+            >
+              <Menu size={20} aria-hidden="true" />
+            </button>
+            <div className={styles.topbarTitle}>{t(roleLabelKey)}</div>
+          </div>
+          <TopControls />
+        </div>
         <div className={styles.contentInner}>
           {/* 현재 라우트에 해당하는 화면이 여기에 렌더링됨 */}
           <Outlet />

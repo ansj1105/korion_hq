@@ -41,6 +41,10 @@ function merchantHeaders() {
   return authHeaders()
 }
 
+function hqHeaders() {
+  return authHeaders()
+}
+
 export async function getJson<T>(path: string, query?: Record<string, string | number | undefined>, headers?: Headers) {
   const response = await fetch(buildUrl(path, query), {
     headers,
@@ -61,6 +65,10 @@ export function fetchPartnerPageData<T>(path: string, query?: Record<string, str
 
 export function fetchMerchantPageData<T>(path: string, query?: Record<string, string | number | undefined>) {
   return getJson<T>(path, query, merchantHeaders())
+}
+
+export function fetchHqPageData<T>(path: string, query?: Record<string, string | number | undefined>) {
+  return getJson<T>(path, query, hqHeaders())
 }
 
 async function postJson<T>(path: string, body: unknown) {

@@ -6,16 +6,12 @@
   /* 헤더와 다음 콘텐츠 사이 간격은 페이지의 flex gap(18)이 담당 → margin-bottom 두지 않음 */
 }
 
-/* 제목 줄: 좌측 제목 + 우측 컨트롤(언어/로그아웃)
-   Figma 타이틀 행 높이가 68px라 그 안에서 요소가 세로 가운데 정렬되며 위아래 여백이 생긴다.
-   이 행 높이를 재현해야 아래 영역(기간 드롭다운 등)과의 시각 간격이 디자인과 맞는다. */
+/* 제목 줄: 상단 공통 컨트롤은 AdminLayout topbar가 담당하므로 페이지 제목만 배치한다. */
 .topRow {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  min-height: 68px;
+  min-height: 44px;
   gap: var(--space-4);
-  flex-wrap: wrap;        /* 반응형: 좁으면 우측 컨트롤이 아래로 줄바꿈 */
 }
 
 .title {
