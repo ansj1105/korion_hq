@@ -1,0 +1,7 @@
+/* RequestsPartnerByLeader — 본사어드민 "파트너 요청 관리 - 파트너 승인 요청 (리더요청)" 페이지 레이아웃 */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* Figma 콘텐츠 세로 간격 18 (RequestListPage 템플릿과 동일 값) */
+  flex: 1;
+}

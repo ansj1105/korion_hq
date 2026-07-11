@@ -1,0 +1,15 @@
+{
+  "stats": [
+    { "id": "new", "labelKey": "hqRequestPartnerByLeader.kpi.new", "value": "5", "deltaKey": "hqRequestPartnerByLeader.kpi.delta5" },
+    { "id": "review", "labelKey": "hqRequestPartnerByLeader.kpi.review", "value": "5", "deltaKey": "hqRequestPartnerByLeader.kpi.delta5" },
+    { "id": "waiting", "labelKey": "hqRequestPartnerByLeader.kpi.waiting", "value": "2", "deltaKey": "hqRequestPartnerByLeader.kpi.delta5" }
+  ],
+  "rows": [
+    { "no": "APP-2401", "appliedAt": "2026.06.13", "parentCode": "NG-LEAD-0001", "applicantCode": "NG-SP-0001", "country": "나이지리아", "partnerName": "Nova", "subMerchantCount": "50", "monthVolume": "250 KORI", "monthTxCount": "150", "status": null },
+    { "no": "APP-2399", "appliedAt": "2026.06.13", "parentCode": "NG-LEAD-0001", "applicantCode": "NG-SP-0001", "country": "나이지리아", "partnerName": "Nova", "subMerchantCount": "50", "monthVolume": "250 KORI", "monthTxCount": "150", "status": null },
+    { "no": "APP-2398", "appliedAt": "2026.06.13", "parentCode": "-", "applicantCode": "NG-SP-0001", "country": "대한민국", "partnerName": "Nova", "subMerchantCount": "50", "monthVolume": "250 KORI", "monthTxCount": "150", "status": "review" },
+    { "no": "APP-2397", "appliedAt": "2026.06.12", "parentCode": "-", "applicantCode": "NG-SP-0001", "country": "이탈리아", "partnerName": "Nova", "subMerchantCount": "50", "monthVolume": "250 KORI", "monthTxCount": "150", "status": "waiting" },
+    { "no": "APP-2401", "appliedAt": "2026.06.13", "parentCode": "-", "applicantCode": "NG-SP-0001", "country": "나이지리아", "partnerName": "Nova", "subMerchantCount": "50", "monthVolume": "250 KORI", "monthTxCount": "150", "status": "infoRequested" },
+    { "no": "APP-2397", "appliedAt": "2026.06.12", "parentCode": "NG-LEAD-0001", "applicantCode": "NG-SP-0001", "country": "덴마크", "partnerName": "Nova", "subMerchantCount": "50", "monthVolume": "250 KORI", "monthTxCount": "150", "status": null }
+  ]
+}

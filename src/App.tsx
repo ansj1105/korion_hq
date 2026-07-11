@@ -35,6 +35,7 @@ import HqDashboard from './pages/hq/Dashboard'
 import HqCountryDashboard from './pages/hq/CountryDashboard'
 import HqApplications from './pages/hq/Applications'
 import HqRequestsLeader from './pages/hq/RequestsLeader'
+import HqRequestsPartnerByLeader from './pages/hq/RequestsPartnerByLeader'
 import HqLeaders from './pages/hq/Leaders'
 import HqPartners from './pages/hq/Partners'
 import HqMerchants from './pages/hq/Merchants'
@@ -60,6 +61,7 @@ const HQ_PAGES: Record<string, JSX.Element> = {
   'dashboard/by-country': <HqCountryDashboard />,
   applications: <HqApplications />,
   'requests/leader': <HqRequestsLeader />,
+  'requests/partner-by-leader': <HqRequestsPartnerByLeader />,
   leaders: <HqLeaders />,
   'leaders/sales': <HqLeaderSales />,
   partners: <HqPartners />,
