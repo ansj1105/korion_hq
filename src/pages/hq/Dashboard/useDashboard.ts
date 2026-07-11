@@ -196,6 +196,10 @@ const RANGE_SENSITIVE_MINI_STATS = new Set([
   'pending',
   'docsRequested',
   'approvedToday',
+  'totalLeaders',
+  'totalPartners',
+  'totalMerchants',
+  'problemPartners',
 ])
 
 function formatScaledNumber(value: number, hasDecimals: boolean) {
@@ -219,6 +223,14 @@ function scaleDisplayValue(value: string, multiplier: number) {
 
 function countryMatches(rowCountry: string, countryScope: string) {
   return countryScope === ALL_COUNTRIES || rowCountry === countryScope
+}
+
+function fallbackCountryRatio(countryRows: Array<{ id: string; amount?: string }>, selectedCountry: string) {
+  if (selectedCountry === ALL_COUNTRIES) return 1
+  const amountOf = (value?: string) => Number((value ?? '').replace(/[^\d.]/g, '')) || 0
+  const total = countryRows.reduce((sum, row) => sum + amountOf(row.amount), 0)
+  const selected = amountOf(countryRows.find((row) => row.id === selectedCountry)?.amount)
+  return total > 0 && selected > 0 ? selected / total : 1
 }
 
 function scaleMiniStats(stats: MiniStatRaw[], multiplier: number): MiniStatRaw[] {
@@ -268,6 +280,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
   ]
   const selectedCountry = countryOptions.some((option) => option.value === filters.countryScope) ? filters.countryScope ?? ALL_COUNTRIES : ALL_COUNTRIES
   const selectedCountryRow = countryRows.find((row) => row.id === selectedCountry)
+  const fallbackRatio = source === data ? fallbackCountryRatio(countryRows, selectedCountry) : 1
 
   const kpis: StatCardData[] = (source.kpis as KpiRaw[]).map((k) => ({
     id: k.id,
@@ -283,8 +296,10 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
               ? selectedCountryRow.partners
               : selectedCountryRow && k.id === 'merchants'
                 ? selectedCountryRow.merchants
-                : RANGE_SENSITIVE_KPIS.has(k.id)
-                  ? scaleDisplayValue(k.value, rangeMultiplier)
+                : source === data && selectedCountryRow && k.id === 'collateralBalance'
+                  ? scaleDisplayValue(k.value, fallbackRatio)
+                  : RANGE_SENSITIVE_KPIS.has(k.id)
+                  ? scaleDisplayValue(k.value, rangeMultiplier * fallbackRatio)
                   : k.value,
     delta: k.note ?? (k.noteKey ? t(k.noteKey) : ''),
     labelTone: k.labelTone,
@@ -312,7 +327,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     { key: 'detail', label: t('hqDashboard.realtimePayments.col.detail'), width: '1fr' },
   ]
 
-  const offlinePayMiniStats: MiniStatCardData[] = scaleMiniStats(source.offlinePay.miniStats as MiniStatRaw[], rangeMultiplier).map((s) => ({
+  const offlinePayMiniStats: MiniStatCardData[] = scaleMiniStats(source.offlinePay.miniStats as MiniStatRaw[], rangeMultiplier * fallbackRatio).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     note: s.note ?? (s.noteKey ? t(s.noteKey) : undefined),
@@ -321,7 +336,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
   }))
   const offlinePayFlowSteps = source.offlinePay.flowSteps.map((key) => t(key))
 
-  const settlementStats: MiniStatCardData[] = scaleMiniStats(source.settlement.stats as MiniStatRaw[], rangeMultiplier).map((s) => ({
+  const settlementStats: MiniStatCardData[] = scaleMiniStats(source.settlement.stats as MiniStatRaw[], rangeMultiplier * fallbackRatio).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -339,7 +354,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     { key: 'action', label: t('hqDashboard.settlement.col.action'), width: '1fr' },
   ]
 
-  const riskStats: MiniStatCardData[] = scaleMiniStats(source.risk.stats as MiniStatRaw[], rangeMultiplier).map((s) => ({
+  const riskStats: MiniStatCardData[] = scaleMiniStats(source.risk.stats as MiniStatRaw[], rangeMultiplier * fallbackRatio).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -371,7 +386,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     { key: 'growth', label: t('hqDashboard.countryOps.col.growth'), width: 'minmax(96px, 1fr)' },
   ]
 
-  const approvalQueueStats: MiniStatCardData[] = scaleMiniStats(source.approvalQueue.stats as MiniStatRaw[], rangeMultiplier).map((s) => ({
+  const approvalQueueStats: MiniStatCardData[] = scaleMiniStats(source.approvalQueue.stats as MiniStatRaw[], rangeMultiplier * fallbackRatio).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -389,7 +404,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     { key: 'status', label: t('hqDashboard.approvalQueue.col.status'), width: '1fr' },
   ]
 
-  const networkGrowthStats: MiniStatCardData[] = (source.networkGrowth.stats as MiniStatRaw[]).map((s) => ({
+  const networkGrowthStats: MiniStatCardData[] = scaleMiniStats(source.networkGrowth.stats as MiniStatRaw[], fallbackRatio).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -424,7 +439,10 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     action: t(i.actionKey),
   }))
 
-  const quickActions = source.quickActions.map((key) => t(key))
+  const quickActions = source.quickActions.map((key) => ({
+    id: key.replace('hqDashboard.quickActions.', ''),
+    label: t(key),
+  }))
 
   return {
     filters: {
@@ -462,7 +480,14 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
       columns: approvalQueueColumns,
       rows: (source.approvalQueue.rows as ApprovalQueueRow[]).filter((row) => countryMatches(row.country, selectedCountry)),
     },
-    networkGrowth: { stats: networkGrowthStats, trendBars: source.networkGrowth.trendBars, topPartners: source.networkGrowth.topPartners },
+    networkGrowth: {
+      stats: networkGrowthStats,
+      trendBars: source.networkGrowth.trendBars,
+      topPartners:
+        source === data && selectedCountryRow
+          ? [{ id: selectedCountryRow.id, name: selectedCountryRow.id, amount: selectedCountryRow.amount }]
+          : source.networkGrowth.topPartners,
+    },
     paymentMethod: { columns: paymentMethodColumns, rows: source.paymentMethod.rows as PaymentMethodRow[], donut: paymentMethodDonut },
     activityLogs: { columns: activityLogColumns, rows: source.activityLogs.rows as ActivityLogRow[] },
     aiInsight: aiInsightItems,

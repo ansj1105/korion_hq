@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   gap: 18px; /* Figma 콘텐츠 세로 간격 18 — 리더 Dashboard와 동일 컨벤션 */
+  padding-bottom: 96px;
 }
 
 /* 대시보드 조회 조건 — 리더/파트너/가맹점 대시보드의 드롭다운 필터 패턴과 맞춘다. */
@@ -12,6 +13,44 @@
   justify-content: flex-end;
   flex-wrap: wrap;
   gap: var(--space-2);
+  width: 100%;
+}
+
+.tabList {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-right: auto;
+}
+
+.tabButton {
+  height: 30px;
+  padding: 0 var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 48%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-bg-elevated) 72%, transparent);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    color 0.16s ease;
+}
+
+.tabButton:hover,
+.tabButton:focus-visible {
+  border-color: color-mix(in srgb, var(--color-accent-cyan) 72%, transparent);
+  color: var(--color-text);
+}
+
+.tabButtonActive {
+  border-color: color-mix(in srgb, var(--color-accent-cyan) 82%, transparent);
+  background: color-mix(in srgb, var(--color-accent-cyan) 18%, transparent);
+  color: var(--color-text);
 }
 
 .filterField {
@@ -518,15 +557,77 @@
   padding: 0 var(--space-3); /* 높이를 34로 고정하므로 세로 패딩 제거 */
 }
 
-/* Quick Action Center — 4열 버튼 그리드 */
-.quickActionGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-3);
+.floatingActionBar {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  left: var(--space-5);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: min(1120px, calc(100vw - 40px));
+  margin: 0 auto;
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-accent-cyan) 42%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
 }
 
-.quickActionButton {
-  width: 100%;
+.floatingActionText {
+  display: flex;
+  flex: 0 0 210px;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.floatingActionText strong {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.floatingActionText span {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-10);
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.floatingActionButtons {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: 1px;
+}
+
+.floatingActionButtons::-webkit-scrollbar {
+  height: 4px;
+}
+
+.floatingActionButtons::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent-cyan) 45%, transparent);
+}
+
+.floatingActionButton {
+  flex: 0 0 auto;
+  min-width: 112px;
+  height: 34px;
+  padding: 0 var(--space-3);
+  white-space: nowrap;
 }
 
 /* 반응형: 좁은 화면에서 열 수 축소 (CLAUDE.md 반응형 주석 규칙) */
@@ -537,8 +638,7 @@
   .rankingGrid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .insightGrid,
-  .quickActionGrid {
+  .insightGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -548,12 +648,39 @@
   }
 }
 @media (max-width: 640px) {
+  .filterControls {
+    justify-content: flex-start;
+  }
+  .tabList {
+    flex-basis: 100%;
+    width: 100%;
+  }
+  .tabButton {
+    flex: 1 1 auto;
+  }
+  .page {
+    padding-bottom: 154px;
+  }
+  .floatingActionBar {
+    right: var(--space-3);
+    bottom: var(--space-3);
+    left: var(--space-3);
+    width: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+  .floatingActionText {
+    flex-basis: auto;
+  }
+  .floatingActionButtons {
+    width: 100%;
+  }
   .kpiGrid {
     grid-template-columns: repeat(2, 1fr);
   }
   .rankingGrid,
   .insightGrid,
-  .quickActionGrid,
   .miniStatGrid {
     grid-template-columns: 1fr;
   }
