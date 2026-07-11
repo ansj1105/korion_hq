@@ -105,7 +105,10 @@ export function useLeaderSales() {
     { key: 'net', label: t('hqLeaderSales.col.net'), width: '0.9fr' },
     { key: 'status', label: t('hqLeaderSales.col.status'), width: '0.8fr' },
     { key: 'syncStatus', label: t('hqLeaderSales.col.syncStatus'), width: '0.9fr' },
-    { key: 'action', label: t('hqLeaderSales.col.action'), width: '1.6fr' },
+    // 액션 컬럼: 배지 3개(상세/환불요청/리스크요청)가 항상 한 줄로 들어갈 최소폭(150px)을 보장하고
+    // 그 이상은 1.6fr 비율로 넓어진다. 좁은 화면에선 나머지 텍스트 컬럼이 대신 줄어들어(말줄임)
+    // 배지가 잘리거나 삐져나오지 않으면서 표는 가로 스크롤 없이 화면 폭에 맞는다.
+    { key: 'action', label: t('hqLeaderSales.col.action'), width: 'minmax(150px, 1.6fr)' },
   ]
 
   return {

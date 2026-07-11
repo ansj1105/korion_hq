@@ -45,17 +45,21 @@
 /*
  * cell 변형 — 본사어드민 대시보드 표의 상태/처리(Sync·상세 등) 칸 알약.
  * Figma 실측: 폭 86 × 높이 24, 라운드 12, 글자 12px, accent 17% 배경 / 72% 테두리(기본 .badge 틴트와 동일).
- * 칼럼마다 폭을 통일해 보이도록 min-width로 86 근처를 확보하고 가운데 정렬.
- * (긴 라벨은 자연스럽게 늘어나도록 고정폭이 아니라 min-width 사용)
+ * 한 컬럼의 알약 폭이 라벨 길이(PENDING/COMPLETED 등)에 따라 달라지면 안 되므로
+ * min-width가 아니라 width로 폭을 '고정'해 모든 상태/처리 알약이 동일 폭이 되게 한다.
  */
 .cell {
-  /* 반응형: HQ 대시보드 표(컨테이너 쿼리) 안에서만 쓰이므로, 표가 좁아지면 배지 최소폭·좌우여백·
-     글씨가 표 폭(cqi)에 비례해 함께 줄어들어 셀에서 잘리지 않는다(상·하한은 clamp로 고정). */
-  min-width: clamp(40px, 6cqi, 84px);
-  padding: 3px clamp(4px, 0.9cqi, 12px);
+  /* 상태/처리 알약의 폭은 '가장 긴 라벨(COMPLETED)'이 안 잘리는 크기를 기준으로 통일한다.
+     그 기준이 Figma 실측 고정폭 86×24(글자 12)이라, 폭·글자를 표 폭에 따라 줄이지 않고
+     그대로 고정한다 — 줄이면 긴 라벨이 삐져나오기 때문. width 고정이므로 라벨 길이와
+     무관하게 모든 상태/처리 알약이 항상 동일 폭이 된다. */
+  width: 86px;
+  /* 좌우 4px → 텍스트영역 76px. 가장 긴 라벨 COMPLETED(Inter600 12px 실측 74.8px)가
+     잘리지 않고 들어가는 최소 여백. (여백을 더 주면 COMPLETED가 삐져나옴) */
+  padding: 3px var(--space-1);
   justify-content: center;
   border-radius: var(--radius-md); /* 12px */
-  font-size: clamp(8px, 1cqi, 12px);
+  font-size: var(--font-size-12); /* 12px 고정 (표 cqi 축소를 따르지 않음) */
 }
 
 /*
