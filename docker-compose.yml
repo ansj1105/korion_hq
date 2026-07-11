@@ -1,20 +1,20 @@
-name: kori-partners
+name: korion-hq
 
 services:
-  kori-partners-web:
+  korion-hq-web:
     build:
       context: .
       dockerfile: Dockerfile
       args:
         VITE_KORION_CHONG_API_URL: ${VITE_KORION_CHONG_API_URL:-/api}
-    container_name: kori-partners-web
+    container_name: korion-hq-web
     init: true
     restart: unless-stopped
     environment:
       KORION_CHONG_UPSTREAM: ${KORION_CHONG_UPSTREAM:-https://chong.korion.io.kr}
       KORION_CHONG_HOST_HEADER: ${KORION_CHONG_HOST_HEADER:-chong.korion.io.kr}
     ports:
-      - "127.0.0.1:${KORI_PARTNERS_HOST_PORT:-8082}:8080"
+      - "127.0.0.1:${KORION_HQ_HOST_PORT:-8084}:8080"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/healthz || exit 1"]
       interval: 15s
