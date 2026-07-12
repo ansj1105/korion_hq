@@ -1,0 +1,17 @@
+{
+  "fields": [
+    { "labelKey": "hqCollateral.detail.field.txNo", "value": "COL-20260616-001" },
+    { "labelKey": "hqCollateral.col.processedAt", "value": "2026.06.16 10:24" },
+    { "labelKey": "hqCollateral.detail.field.adminCode", "value": "-" },
+    { "labelKey": "hqCollateral.col.country", "value": "Nigeria" },
+    { "labelKey": "hqCollateral.col.memberId", "value": "Richard j" },
+    { "labelKey": "hqCollateral.col.memberName", "value": "Richard jang" },
+    { "labelKey": "hqCollateral.col.type", "value": "충전" },
+    { "labelKey": "hqCollateral.col.amount", "value": "500 KORI" },
+    { "labelKey": "hqCollateral.detail.field.beforeAmount", "value": "200 KORI" },
+    { "labelKey": "hqCollateral.detail.field.afterAmount", "value": "700 KORI" },
+    { "labelKey": "hqCollateral.detail.field.status", "value": "완료" },
+    { "labelKey": "hqCollateral.detail.field.requester", "value": "사용자 직접 요청" }
+  ],
+  "memo": "사용자 직접 충전으로 처리되었습니다. 관련 정산 여부 없음. 마지막 업데이트: 2026.06.16 10:24"
+}
