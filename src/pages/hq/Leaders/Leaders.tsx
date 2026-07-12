@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import RequestListPage from '../../../components/templates/RequestListPage'
 import ActionBadges from '../../../components/molecules/ActionBadges'
 import type { TableRow } from '../../../components/organisms/DataTable'
@@ -13,6 +14,7 @@ import { useLeaders } from './useLeaders'
  */
 export default function Leaders() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { stats, columns, rows: rawRows, statusMeta, detailLabel } = useLeaders()
 
   /*
@@ -57,6 +59,7 @@ export default function Leaders() {
       toolbarInline
       tableMutedText
       tableHeaderBar
+      onRowClick={() => navigate('/hq/leaders/sales')}
     />
   )
 }

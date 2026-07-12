@@ -128,87 +128,96 @@
   color: var(--color-text);
 }
 
-/* 탭 클릭은 되지만 "거래내역" 외 내용을 아직 다 못 만든 탭에 표시 */
-.tabPlaceholder {
-  padding: var(--space-5);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-12);
-  text-align: center;
-}
-
-/*
- * "정산내역" 탭 — 리더 본인용 정산 내역 화면(SettlementHistory.module.css)과
- * 동일한 톤의 요약 카드 2개. Figma에 이 탭 전용 디자인이 없어 사용자 확인을 거쳐
- * 기존에 만들어둔 "정산 내역" 화면 컴포넌트/스타일을 그대로 재사용한다.
- */
-.settleTopRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-4);
-}
-
-.settleCard {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--space-3);
-  min-width: 250px;
-  min-height: 100px;
-  padding: var(--space-4);
-  background-color: color-mix(in srgb, #141027 90%, transparent);
-  border: 1px solid color-mix(in srgb, #7c5cff 32%, transparent);
-  border-radius: 18px;
-}
-.settleCardCurrent {
-  background-color: color-mix(in srgb, #111327 94%, transparent);
-  border-color: color-mix(in srgb, #22d9ff 50%, transparent);
-}
-
-.settleCardHead {
+/* 탭 줄 — 좌측 탭 묶음 / 우측 "1 D" 기간 버튼 (Figma 81:24823 실측) */
+.tabsRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
 }
 
-/* HQ가 보는 화면이라 상태를 바꿀 수 있는 드롭다운 대신 고정 배지로 표시 */
-.settleStatusBadge {
-  flex-shrink: 0;
-  padding: 4px var(--space-3);
-  border-radius: var(--radius-pill);
+/* "1 D" 버튼 — FilterTabs outline 변형(비활성 탭)과 동일한 톤/치수(108x34 고정) */
+.rangeChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  min-width: 108px;
+  padding: 0 12px;
+  border-radius: 10px;
   font-size: var(--font-size-12);
-  font-weight: var(--font-weight-semibold);
-  color: #ffffff;
-  background-color: color-mix(in srgb, #7c5cff 90%, transparent);
-  border: 1px solid color-mix(in srgb, #7c5cff 40%, transparent);
-}
-
-.settleChip {
-  align-self: flex-start;
-  padding: 4px var(--space-3);
-  border-radius: var(--radius-pill);
-  font-size: var(--font-size-12);
-  font-weight: var(--font-weight-semibold);
-}
-.settleChipGray {
-  color: #e2dff8;
-  background-color: color-mix(in srgb, #5c5878 74%, transparent);
-}
-.settleChipTeal {
-  color: #061612;
-  background-color: color-mix(in srgb, #24e6b8 92%, transparent);
-}
-
-.settleValue {
-  font-size: var(--font-size-23);
   font-weight: var(--font-weight-bold);
-  color: #ffffff;
+  line-height: 16px;
+  color: var(--color-text);
+  background-color: rgba(26, 18, 42, 0.82);
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 55%, transparent);
 }
-.settleValueTeal {
-  align-self: flex-end;
-  font-size: 28px;
-  color: #24e6b8;
+
+/*
+ * "관리자 메모" 탭(Figma 81:25195) — sectionBox 톤의 메모 입력 블록(높이 211 실측)
+ * + 아래 저장 버튼(좌) / 글자수 카운터(우) 줄.
+ */
+.memoBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 211px;
+}
+
+/* 설명(13px 연보라) — Figma 실측, 입력 영역 위 고정 안내 문구 */
+.memoDesc {
+  font-size: 13px;
+  font-weight: var(--font-weight-bold);
+  color: #ada3d1;
+}
+
+/* 입력 영역 — 블록 자체가 입력 표면이라 테두리/배경 없이 남은 높이를 채운다 */
+.memoTextarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  font: inherit;
+  font-size: var(--font-size-13, 13px);
+  color: var(--color-text);
+}
+
+.memoFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.memoCounter {
+  font-size: var(--font-size-12);
+  color: var(--color-text-muted);
+}
+
+/*
+ * "정산내역" 탭(Figma 81:25283) — 2)~4) 서브 테이블 박스. 리더 정산 상세 화면
+ * (SettlementDetail.module.css)의 sectionBoxTable/sectionTitleLg/sectionDesc와
+ * 동일한 톤(어두운 채움 82% + 보라 테두리 32%, 제목 20/700, 설명 12 연보라).
+ */
+.settleTableBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background-color: color-mix(in srgb, #141027 82%, transparent);
+  border: 1px solid color-mix(in srgb, #7c5cff 32%, transparent);
+  border-radius: 20px;
+}
+
+.settleTableTitle {
+  font-size: 20px;
+  font-weight: var(--font-weight-bold);
+}
+
+.settleTableDesc {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-regular);
+  color: #bdb7e7;
 }
 
 .actionRow {
