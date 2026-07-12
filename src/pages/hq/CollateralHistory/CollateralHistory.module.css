@@ -1,0 +1,153 @@
+/* CollateralHistory(본사어드민 · 회원 담보금 충전/해제 내역) 페이지 레이아웃 — HQ 대시보드류와 동일 컨벤션 */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* Figma 콘텐츠 세로 간격 18 */
+}
+
+/* 제목 아래 화면 설명 — Figma 13px(토큰 스케일에 없어 직접 지정) */
+.pageDesc {
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
+/* 헤더 아래 "전체 국가 / 오늘" 필터칩 — 동작 없는 표시용 (국가별 대시보드와 동일 시안) */
+.filterChips {
+  display: flex;
+  gap: 15px; /* Figma 실측 칩 간격 15 */
+}
+
+.chip {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--color-accent-cyan) 45%, transparent);
+  background: color-mix(in srgb, var(--color-accent-cyan) 12%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-bold);
+}
+
+/*
+ * 담보금/정산 KPI 그리드 — Figma 실측은 5열 고정폭이지만, 과거 4열 그리드에서
+ * 겪은 "넓은 화면에서 열 수가 의도와 달라지는" 문제(전체 운영 대시보드 CHANGELOG 참고)를
+ * 피하려 폭은 1fr로 풀고 열 개수만 5로 고정한다.
+ */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px 12px;
+}
+
+/*
+ * 안내 카드 2종 — Figma: 어두운 배경(rgba(11,7,20,.86)) + 색 테두리 + radius 18 박스.
+ * 테두리/그림자 색(호박 #fbbf24, 시안 #22d3ee)은 Figma 실측값으로 토큰 accent와 다른 색조라 직접 지정.
+ */
+.guideCard,
+.flowCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 21px 24px;
+  background: rgba(11, 7, 20, 0.86);
+  border-radius: 18px;
+}
+
+.guideCard {
+  border: 1px solid rgba(251, 191, 36, 0.42);
+  box-shadow: 0 14px 24px -8px rgba(251, 191, 36, 0.11);
+}
+
+.flowCard {
+  border: 1px solid rgba(34, 211, 238, 0.42);
+  box-shadow: 0 14px 24px -8px rgba(34, 211, 238, 0.11);
+}
+
+/* 정산 내역 탭의 "PAY 수취금 정산 흐름" 카드 — 흐름 카드와 같은 골격에 테두리만 초록(Figma 실측) */
+.flowCardSettle {
+  border-color: rgba(52, 211, 153, 0.42);
+  box-shadow: 0 14px 24px -8px rgba(52, 211, 153, 0.11);
+}
+
+.guideTitle {
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-bold);
+  color: #f7f3ff; /* Figma 실측 — 기본 텍스트(#f2f0ff)와 미세하게 다른 값 */
+}
+
+/* 흐름 카드 제목은 안내 카드보다 한 단계 큰 20px (Figma 실측, 토큰 스케일에 없어 직접 지정) */
+.flowTitle {
+  font-size: 20px;
+  font-weight: var(--font-weight-bold);
+  color: #f7f3ff;
+}
+
+/* 카드 설명문 — Figma 13px #afa7c8(토큰 muted와 다른 실측값) */
+.cardDesc {
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  color: #afa7c8;
+  line-height: 1.5;
+}
+
+/* 카드 안 배지(알약) 나열 줄 */
+.pillRow {
+  display: flex;
+  flex-wrap: wrap; /* 반응형: 좁은 화면에서 알약이 다음 줄로 흐르게 */
+  gap: 15px; /* Figma 실측 알약 간격 15~23 — 중간값으로 통일 */
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  padding: 0 13px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+/* 흐름 카드의 알약 글자는 안내 카드(medium)와 달리 regular (Figma 실측) */
+.flowCard .pill {
+  font-weight: var(--font-weight-regular);
+}
+
+/* 알약 색 3종 — Figma 실측 색(#22d3ee/#34d399/#8b5cf6). 토큰 accent(cyan #1ad1ff 등)와 다른 색조라 직접 지정 */
+.pillCyan {
+  color: #22d3ee;
+  background: rgba(34, 211, 238, 0.16);
+  border: 1px solid rgba(34, 211, 238, 0.75);
+}
+
+.pillGreen {
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.16);
+  border: 1px solid rgba(52, 211, 153, 0.75);
+}
+
+.pillViolet {
+  color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.16);
+  border: 1px solid rgba(139, 92, 246, 0.75);
+}
+
+/* 정산 흐름 카드의 "정산 요청 / 처리" 알약 — Figma 실측 #3b82f6 (토큰 blue #336bff와 다른 색조) */
+.pillBlue {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.16);
+  border: 1px solid rgba(59, 130, 246, 0.75);
+}
+
+/* 반응형: 좁은 화면에서 KPI 열 수 축소해 카드가 너무 작아지지 않게 함 */
+@media (max-width: 1024px) {
+  .kpiGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
