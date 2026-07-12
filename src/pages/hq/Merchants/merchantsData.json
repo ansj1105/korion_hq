@@ -1,15 +1,65 @@
 {
   "stats": [
-    { "id": "totalMerchants", "labelKey": "hqMerchantList.kpi.totalMerchants", "value": "1,870", "deltaKey": "hqMerchantList.kpi.delta5" },
-    { "id": "activeMerchants", "labelKey": "hqMerchantList.kpi.activeMerchants", "value": "1,450", "deltaKey": "hqMerchantList.kpi.delta5" },
-    { "id": "approvedMerchants", "labelKey": "hqMerchantList.kpi.approvedMerchants", "value": "128", "deltaKey": "hqMerchantList.kpi.delta5" },
-    { "id": "suspendedMerchants", "labelKey": "hqMerchantList.kpi.suspendedMerchants", "value": "10", "deltaKey": "hqMerchantList.kpi.delta5" },
-    { "id": "activePayingMerchants", "labelKey": "hqMerchantList.kpi.activePayingMerchants", "value": "216", "deltaKey": "hqMerchantList.kpi.delta5" },
-    { "id": "monthVolume", "labelKey": "hqMerchantList.kpi.monthVolume", "value": "128,500,000", "deltaKey": "hqMerchantList.kpi.delta5pct" },
-    { "id": "monthTxCount", "labelKey": "hqMerchantList.kpi.monthTxCount", "value": "1,000", "deltaKey": "hqMerchantList.kpi.delta5" },
-    { "id": "totalFee", "labelKey": "hqMerchantList.kpi.totalFee", "value": "12,850,000", "deltaKey": "hqMerchantList.kpi.delta5pct" },
-    { "id": "riskCount", "labelKey": "hqMerchantList.kpi.riskCount", "value": "12", "deltaKey": "hqMerchantList.kpi.delta5" },
-    { "id": "refundCount", "labelKey": "hqMerchantList.kpi.refundCount", "value": "12", "deltaKey": "hqMerchantList.kpi.delta5" }
+    {
+      "id": "totalMerchants",
+      "labelKey": "hqMerchantList.kpi.totalMerchants",
+      "value": "1,870",
+      "deltaKey": "hqMerchantList.kpi.delta5"
+    },
+    {
+      "id": "activeMerchants",
+      "labelKey": "hqMerchantList.kpi.activeMerchants",
+      "value": "1,450",
+      "deltaKey": "hqMerchantList.kpi.delta5"
+    },
+    {
+      "id": "approvedMerchants",
+      "labelKey": "hqMerchantList.kpi.approvedMerchants",
+      "value": "128",
+      "deltaKey": "hqMerchantList.kpi.delta5"
+    },
+    {
+      "id": "suspendedMerchants",
+      "labelKey": "hqMerchantList.kpi.suspendedMerchants",
+      "value": "10",
+      "deltaKey": "hqMerchantList.kpi.delta5"
+    },
+    {
+      "id": "activePayingMerchants",
+      "labelKey": "hqMerchantList.kpi.activePayingMerchants",
+      "value": "216",
+      "deltaKey": "hqMerchantList.kpi.delta5"
+    },
+    {
+      "id": "monthVolume",
+      "labelKey": "hqMerchantList.kpi.monthVolume",
+      "value": "128,500,000",
+      "deltaKey": "hqMerchantList.kpi.delta5pct"
+    },
+    {
+      "id": "monthTxCount",
+      "labelKey": "hqMerchantList.kpi.monthTxCount",
+      "value": "1,000",
+      "deltaKey": "hqMerchantList.kpi.delta5"
+    },
+    {
+      "id": "totalFee",
+      "labelKey": "hqMerchantList.kpi.totalFee",
+      "value": "12,850,000",
+      "deltaKey": "hqMerchantList.kpi.delta5pct"
+    },
+    {
+      "id": "riskCount",
+      "labelKey": "hqMerchantList.kpi.riskCount",
+      "value": "12",
+      "deltaKey": "hqMerchantList.kpi.delta5"
+    },
+    {
+      "id": "refundCount",
+      "labelKey": "hqMerchantList.kpi.refundCount",
+      "value": "12",
+      "deltaKey": "hqMerchantList.kpi.delta5"
+    }
   ],
   "rows": [
     {
@@ -23,59 +73,96 @@
       "monthVolume": "250 KORI",
       "monthTxCount": "150",
       "fee": "100,000",
-      "actions": ["승인", "정지", "상세"]
+      "actions": [
+        "승인",
+        "정지",
+        "상세"
+      ]
     },
     {
       "no": "APP-2399",
       "leaderCode": "NG-LEAD-0001",
-      "partnerCode": "NG-PART-0002",
+      "partnerCode": "NG-PART-0001",
       "country": "나이지리아",
       "region": "Nova",
-      "merchantName": "Lagos Mart",
-      "businessType": "마트",
-      "monthVolume": "180 KORI",
-      "monthTxCount": "90",
-      "fee": "60,000",
-      "actions": ["승인", "정지", "상세"]
+      "merchantName": "Baio",
+      "businessType": "편의점",
+      "monthVolume": "250 KORI",
+      "monthTxCount": "150",
+      "fee": "100,000",
+      "actions": [
+        "승인",
+        "정지",
+        "상세"
+      ]
     },
     {
       "no": "APP-2398",
-      "leaderCode": "KR-LEAD-0001",
-      "partnerCode": "KR-PART-0001",
+      "leaderCode": "-",
+      "partnerCode": "NG-PART-0001",
       "country": "대한민국",
-      "region": "Seoul",
-      "merchantName": "한강 카페",
-      "businessType": "카페",
-      "monthVolume": "120 KORI",
-      "monthTxCount": "60",
-      "fee": "40,000",
-      "actions": ["거절", "상세"]
+      "region": "Nova",
+      "merchantName": "Baio",
+      "businessType": "편의점",
+      "monthVolume": "250 KORI",
+      "monthTxCount": "150",
+      "fee": "100,000",
+      "actions": [
+        "승인",
+        "정지",
+        "상세"
+      ]
     },
     {
       "no": "APP-2397",
-      "leaderCode": "IT-LEAD-0001",
-      "partnerCode": "IT-PART-0001",
+      "leaderCode": "-",
+      "partnerCode": "NG-PART-0001",
       "country": "이탈리아",
-      "region": "Roma",
-      "merchantName": "Roma Pizza",
-      "businessType": "음식점",
-      "monthVolume": "90 KORI",
-      "monthTxCount": "45",
-      "fee": "30,000",
-      "actions": ["승인", "정지", "상세"]
+      "region": "Nova",
+      "merchantName": "Baio",
+      "businessType": "편의점",
+      "monthVolume": "250 KORI",
+      "monthTxCount": "150",
+      "fee": "100,000",
+      "actions": [
+        "승인",
+        "정지",
+        "상세"
+      ]
     },
     {
-      "no": "APP-2396",
-      "leaderCode": "NG-LEAD-0002",
-      "partnerCode": "NG-PART-0003",
+      "no": "APP-2401",
+      "leaderCode": "-",
+      "partnerCode": "-",
       "country": "나이지리아",
       "region": "Nova",
-      "merchantName": "Amara Shop",
+      "merchantName": "Baio",
       "businessType": "편의점",
-      "monthVolume": "150 KORI",
-      "monthTxCount": "75",
-      "fee": "50,000",
-      "actions": ["승인", "정지", "상세"]
+      "monthVolume": "250 KORI",
+      "monthTxCount": "150",
+      "fee": "100,000",
+      "actions": [
+        "승인",
+        "정지",
+        "상세"
+      ]
+    },
+    {
+      "no": "APP-2397",
+      "leaderCode": "-",
+      "partnerCode": "NG-PART-0001",
+      "country": "덴마크",
+      "region": "Nova",
+      "merchantName": "Baio",
+      "businessType": "편의점",
+      "monthVolume": "250 KORI",
+      "monthTxCount": "150",
+      "fee": "100,000",
+      "actions": [
+        "승인",
+        "정지",
+        "상세"
+      ]
     }
   ]
 }

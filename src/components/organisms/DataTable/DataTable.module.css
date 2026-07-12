@@ -76,6 +76,14 @@
 .mutedText .cell {
   color: var(--color-text-muted);
 }
+/*
+ * tallToolbar 변형 — 정산 신청 목록 Figma 실측: 툴바 버튼 세로 패딩 9px(높이 34).
+ * mutedText의 5px 오버라이드(다른 본사어드민 표 실측)보다 뒤에 선언해 함께 쓰일 때 이 값이 이긴다.
+ */
+.tallToolbar .toolbarButton {
+  padding: 9px var(--space-3);
+  line-height: 1.35;
+}
 /* Figma 실측: 전체 간격 10px(기존 9px) */
 .mutedText {
   gap: 10px;

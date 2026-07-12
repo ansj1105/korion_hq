@@ -1,36 +1,260 @@
+/*
+ * PartnerSales — "파트너 정보" 상세 패널 (Figma 81:24063 / 81:24280)
+ * 리더의 LeaderSales.module.css와 동일한 Figma 컴포넌트 패밀리라 클래스 구성이 같다.
+ * (페이지 간 CSS 모듈 격리 원칙에 따라 파일은 분리 — CLAUDE.md 5장)
+ */
 .page {
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
-.profilePanel {
+/* 전체를 감싸는 하나의 패널 — Figma "상세 패널" */
+.panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: 20px;
   padding: var(--space-6);
 }
 
-.profileHead {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
-  flex-wrap: wrap;
+.entityTitle {
+  font-size: 28px;
+  font-weight: var(--font-weight-bold);
 }
 
-.profileCode {
+/* 코드 미리보기 패널 — 좌(캡션+상위 리더/국가 배지) / 우(파트너 코드 라벨+큰 값, 우측 정렬) */
+.codePanel {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: 18px;
+  background-color: rgba(15, 11, 29, 0.88);
+  border: 1px solid rgba(107, 61, 229, 0.72);
+}
+
+.codePanelLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.codePanelRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.codePanelLabel {
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-bold);
+}
+
+.codeBadges {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* "NG-READ-0001"(상위 리더 코드) 배지 — Figma 고정 폭 94px, 진한 보라 톤 */
+.parentBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 94px;
+  height: 30px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-bold);
+  color: #ffffff;
+  background-color: rgba(143, 71, 255, 0.17);
+  border: 1px solid rgba(143, 71, 255, 0.76);
+}
+
+/* "나이지리아" 배지 — 기본 Badge(17%/72%)와 다른 24%/32% 톤 + 12px(Figma 실측) */
+.countryBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 94px;
+  height: 30px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: #ffffff;
+  background-color: rgba(124, 92, 255, 0.24);
+  border: 1px solid rgba(124, 92, 255, 0.32);
+}
+
+.codeKeyLabel {
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-bold);
+}
+
+.codeValue {
+  font-size: 30px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-cyan);
+}
+
+/*
+ * KPI 4개짜리 줄(코드 패널 아래) / 5개짜리 줄(각 탭 안, 표 위).
+ * Figma 실측 폭(238/188)은 '최소'로만 보장 — 화면이 넓으면 남는 폭을 등분해 채운다.
+ */
+.kpiRow4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(238px, 1fr));
+  gap: 14px 20px;
+  overflow-x: auto;
+}
+.kpiRow5 {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(188px, 1fr));
+  gap: 14px 20px;
+  overflow-x: auto;
+}
+
+/* A/B 섹션 박스 — 연보라 채움 + 보라 테두리 18px 라운드(리더 화면과 동일 톤) */
+.sectionBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background-color: color-mix(in srgb, #1c1637 72%, transparent);
+  border: 1px solid color-mix(in srgb, #7c5cff 32%, transparent);
+  border-radius: 18px;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+/* 탭 줄 — 좌측 탭 묶음 / 우측 "1 D" 기간 버튼 (Figma 실측) */
+.tabsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+/* "1 D"·"저장" 버튼 — FilterTabs outline 변형(비활성 탭)과 동일한 톤/치수(108x34 고정) */
+.rangeChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  min-width: 108px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
+  line-height: 16px;
+  color: var(--color-text);
+  background-color: rgba(26, 18, 42, 0.82);
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 55%, transparent);
+}
+
+/*
+ * "정산내역" 탭(Figma 81:25829) — 1) 정산 금액 요약은 1행 5열 그리드(InfoGrid는
+ * 4열 고정이라 페이지 전용으로 직접 구성), 2) 보류·제외 거래는 리더 정산내역 탭과
+ * 동일한 서브 테이블 박스 톤.
+ */
+.settleSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(150px, 1fr));
+  gap: var(--space-4);
+  overflow-x: auto;
+}
+
+.settleSummaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.settleSummaryLabel {
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-semibold);
+  color: #8c86b5;
+}
+
+.settleSummaryValue {
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.settleTableBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background-color: color-mix(in srgb, #141027 82%, transparent);
+  border: 1px solid color-mix(in srgb, #7c5cff 32%, transparent);
+  border-radius: 20px;
+}
+
+.settleTableTitle {
   font-size: 20px;
   font-weight: var(--font-weight-bold);
 }
 
-.profileMeta {
-  color: var(--color-text-muted);
+.settleTableDesc {
   font-size: var(--font-size-12);
+  font-weight: var(--font-weight-regular);
+  color: #bdb7e7;
 }
 
-.tabPlaceholder {
-  padding: var(--space-5);
-  color: var(--color-text-muted);
+/* "관리자 메모" 탭 — 리더 화면(81:25195)과 동일 구성 */
+.memoBox {
+  min-height: 211px;
+}
+
+.memoDesc {
+  font-size: 13px;
+  font-weight: var(--font-weight-bold);
+  color: #ada3d1;
+}
+
+/* 입력 영역 — 블록 자체가 입력 표면이라 테두리/배경 없이 남은 높이를 채운다 */
+.memoTextarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+.memoFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.memoCounter {
   font-size: var(--font-size-12);
-  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.actionRow {
+  display: flex;
+  justify-content: center;
+}
+
+/* "확인" 버튼 — Figma 그라디언트(보라→시안→민트), 가운데 정렬 */
+.confirmButton {
+  width: 130px;
+  height: 46px;
+  border-radius: 13px;
+  border: 1px solid rgba(34, 217, 255, 0.32);
+  background: linear-gradient(to right, #7033ff, #1a9eff 52%, #1fffb8);
+  color: #ffffff;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
 }

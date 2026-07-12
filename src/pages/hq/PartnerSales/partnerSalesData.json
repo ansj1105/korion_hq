@@ -11,11 +11,11 @@
     { "id": "holdAmount", "labelKey": "hqPartnerSales.kpi.holdAmount", "value": "10,000" }
   ],
   "logRows": [
-    { "txNo": "5", "partnerCode": "NG-SP-0005", "txAt": "2026.06.05 15:02", "merchantCode": "NG-MER-0005", "merchantName": "신발매장", "amount": "120 KORI", "method": "BLE", "fee": "1.2 KORI", "net": "118.8 KORI", "status": "완료", "syncStatus": "완료", "actions": ["상세", "환불요청", "리스크요청"] },
-    { "txNo": "4", "partnerCode": "NG-SP-0004", "txAt": "2026.06.05 15:02", "merchantCode": "NG-MER-0004", "merchantName": "편의점", "amount": "120 KORI", "method": "QR", "fee": "1.2 KORI", "net": "118.8 KORI", "status": "완료", "syncStatus": "완료", "actions": ["상세", "환불요청", "리스크요청"] },
-    { "txNo": "3", "partnerCode": "NG-SP-0003", "txAt": "2026.06.05 15:02", "merchantCode": "NG-MER-0003", "merchantName": "편의점", "amount": "120 KORI", "method": "상점", "fee": "1.2 KORI", "net": "118.8 KORI", "status": "실패", "syncStatus": "Sync 대기", "actions": ["상세", "환불요청", "리스크요청"] },
-    { "txNo": "2", "partnerCode": "NG-SP-0002", "txAt": "2026.06.05 15:02", "merchantCode": "NG-MER-0002", "merchantName": "중국집", "amount": "120 KORI", "method": "BLE", "fee": "1.2 KORI", "net": "118.8 KORI", "status": "거절", "syncStatus": "완료", "actions": ["상세", "환불요청", "리스크요청"] },
-    { "txNo": "1", "partnerCode": "NG-SP-0001", "txAt": "2026.06.05 15:02", "merchantCode": "NG-MER-0001", "merchantName": "백화점", "amount": "120 KORI", "method": "NFC", "fee": "1.2 KORI", "net": "118.8 KORI", "status": "완료", "syncStatus": "완료", "actions": ["상세", "환불요청", "리스크요청"] }
+    { "txNo": "5", "partnerCode": "NG-SP-0005", "txAt": "2026.06.05 15:02", "merchantCode": "NG-MER-0005", "merchantName": "신발매장", "amount": "120 KORI", "method": "BLE", "fee": "1.2 KORI", "net": "118.8 KORI", "status": "완료", "syncStatus": "완료", "actions": ["상세", "환불요청", "지급보류"] },
+    { "txNo": "4", "partnerCode": "NG-SP-0004", "txAt": "2026.06.05 15:02", "merchantCode": "NG-MER-0004", "merchantName": "편의점", "amount": "120 KORI", "method": "QR", "fee": "1.2 KORI", "net": "118.8 KORI", "status": "완료", "syncStatus": "완료", "actions": ["상세", "환불요청", "지급보류"] },
+    { "txNo": "3", "partnerCode": "NG-SP-0003", "txAt": "2026.06.05 15:02", "merchantCode": "NG-MER-0003", "merchantName": "편의점", "amount": "120 KORI", "method": "상점", "fee": "1.2 KORI", "net": "118.8 KORI", "status": "실패", "syncStatus": "Sync 대기", "actions": ["상세", "환불요청", "지급보류"] },
+    { "txNo": "2", "partnerCode": "NG-SP-0002", "txAt": "2026.06.05 15:02", "merchantCode": "NG-MER-0002", "merchantName": "중국집", "amount": "120 KORI", "method": "BLE", "fee": "1.2 KORI", "net": "118.8 KORI", "status": "거절", "syncStatus": "완료", "actions": ["상세", "환불요청", "지급보류"] },
+    { "txNo": "1", "partnerCode": "NG-SP-0001", "txAt": "2026.06.05 15:02", "merchantCode": "NG-MER-0001", "merchantName": "백화점", "amount": "120 KORI", "method": "NFC", "fee": "1.2 KORI", "net": "118.8 KORI", "status": "완료", "syncStatus": "완료", "actions": ["상세", "환불요청", "지급보류"] }
   ],
   "profile": {
     "code": "NG-SP-0004",

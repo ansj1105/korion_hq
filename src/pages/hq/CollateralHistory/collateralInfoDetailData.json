@@ -1,0 +1,22 @@
+{
+  "fields": [
+    { "labelKey": "hqCollateral.detail.field.txNo", "value": "COL-20260616-001" },
+    { "labelKey": "hqCollateral.col.country", "value": "Nigeria" },
+    { "labelKey": "hqCollateral.detail.field.adminCode", "value": "NG-READ-0001" },
+    { "labelKey": "hqCollateral.col.memberId", "value": "Richard01", "newRow": true },
+    { "labelKey": "hqCollateral.col.memberName", "value": "Richard jang" },
+    { "labelKey": "hqCollateral.col.totalWallet", "value": "700 KORI" },
+    { "labelKey": "hqCollateral.col.availableWallet", "value": "680 KORI" },
+    { "labelKey": "hqCollateral.col.collateralBalance", "value": "20 KORI" }
+  ],
+  "metrics": [
+    { "labelKey": "hqCollateral.infoDetail.metric.balance", "value": "700 KORI", "tone": "cyan" },
+    { "labelKey": "hqCollateral.infoDetail.metric.available", "value": "680 KORI", "tone": "green" },
+    { "labelKey": "hqCollateral.infoDetail.metric.locked", "value": "20 KORI", "tone": "amber" }
+  ],
+  "activities": [
+    { "at": "06.16 10:24", "type": "충전", "amount": "500 KORI", "status": "완료", "statusTone": "green" },
+    { "at": "06.10 18:02", "type": "해제", "amount": "120 KORI", "status": "완료", "statusTone": "green" },
+    { "at": "06.08 09:44", "type": "결제 Hold", "amount": "20 KORI", "status": "보류", "statusTone": "amber" }
+  ]
+}

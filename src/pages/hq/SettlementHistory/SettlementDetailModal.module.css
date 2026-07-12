@@ -1,0 +1,183 @@
+/*
+ * SettlementDetailModal — 정산 내역 상세 모달 (Figma 81:29429, 460x1085)
+ * 오버레이는 좌측 네브바(--sidebar-width)를 제외한 콘텐츠 영역 기준 가운데 정렬.
+ */
+.overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: var(--sidebar-width);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  /* Figma엔 배경 딤이 없지만 모달 가독성을 위해 옅게 깐다(협의 시 제거 가능) */
+  background-color: rgba(4, 2, 12, 0.6);
+}
+
+/* 반응형: 사이드바가 오버레이로 바뀌는 구간(<=1024px)에선 화면 전체 기준 가운데 */
+@media (max-width: 1024px) {
+  .overlay {
+    left: 0;
+  }
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  width: 460px;
+  max-width: 100%;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 26px 23px;
+  background-color: #151127;
+  border: 1px solid rgba(123, 92, 255, 0.34);
+  border-radius: 26px;
+  box-shadow: 0 20px 52px -20px rgba(0, 0, 0, 0.45);
+}
+
+/*
+ * 모달이 화면보다 길어 내부 스크롤이 생길 때 flex 자식들이 눌려 찌그러지지 않게 고정.
+ * (기본 flex-shrink:1이면 메모 박스가 압축돼 입력 내용이 칸을 벗어난 것처럼 보임)
+ */
+.modal > * {
+  flex-shrink: 0;
+}
+
+/* 헤더: 제목(좌) + 정산 상태 배지(우) */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: 14px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: var(--font-weight-bold);
+  color: #f2f0ff;
+}
+
+/* 정산 상태 배지 — Figma 실측: 연녹색 채움 58x20, 라운드 5, 글자 12px 진녹색 */
+.statusBadge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 20px;
+  margin-top: 12px;
+  padding: 0 6px;
+  border-radius: 5px;
+  background-color: #cff2be;
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: -0.41px;
+  color: #2e8827;
+  white-space: nowrap;
+}
+
+/* 제목 아래 시안색 구분선 (Figma 섹션 라인) */
+.divider {
+  height: 1px;
+  margin-bottom: 21px;
+  border-radius: var(--radius-pill);
+  background-color: rgba(36, 216, 255, 0.28);
+}
+
+/* 라벨/값 19쌍 — 라벨 좌측 흰색, 값 우측 정렬 연보라 (Figma 12px semibold, 행 간격 약 24px) */
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0 0 28px;
+  padding: 0 8px;
+}
+
+.fieldRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+/* 그룹 구분(최종 정산 금액 ↔ 지급 방식) — Figma 실측 간격 47px(기본 24px + 23px) */
+.fieldRowGap {
+  margin-top: 23px;
+}
+
+.fieldLabel {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.fieldValue {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: #ada3d1;
+  text-align: right;
+  word-break: break-all; /* 지갑주소처럼 긴 값이 모달 폭을 넘지 않게 */
+}
+
+.memoLabel {
+  margin: 0 0 10px;
+  padding: 0 8px;
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: #ffffff;
+}
+
+/* 메모/관리자 메모 입력 박스 — Figma 413x122, 어두운 채움 + 보라 테두리 */
+.memoBox {
+  height: 122px;
+  margin-bottom: 22px;
+  padding: 15px;
+  background-color: rgba(12, 10, 30, 0.88);
+  border: 1px solid rgba(123, 92, 255, 0.34);
+  border-radius: 12px;
+  outline: none;
+  resize: none;
+  /* 메모 박스 내부 스크롤 방지(Figma 고정 높이 박스 그대로, 넘치는 내용은 잘림) */
+  overflow: hidden;
+  font: inherit;
+  font-size: 13px;
+  line-height: 18px;
+  color: #8e89b7;
+}
+
+/* "저장" — 관리자 메모 아래 좌측의 작은 어두운 버튼 (Figma 68x43) */
+.saveButton {
+  align-self: flex-start;
+  min-width: 68px;
+  height: 43px;
+  padding: 0 12px;
+  border-radius: 13px;
+  background-color: rgba(33, 27, 61, 0.92);
+  border: 1px solid rgba(107, 98, 164, 0.32);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  color: #ffffff;
+}
+
+/* 하단 확인(그라디언트) 버튼 — 가운데 정렬 */
+.footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 37px;
+}
+
+.confirmButton {
+  min-width: 83px;
+  height: 43px;
+  padding: 0 14px;
+  border-radius: 13px;
+  border: 1px solid rgba(34, 217, 255, 0.32);
+  background: linear-gradient(to right, #7033ff, #1a9eff 52%, #1fffb8);
+  box-shadow: 0 0 24px 0 rgba(0, 204, 255, 0.14), 0 18px 44px -18px rgba(117, 51, 255, 0.28);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  color: #ffffff;
+}

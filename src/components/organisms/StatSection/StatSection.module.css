@@ -31,7 +31,9 @@
  * 항상 정확히 4열 고정. 화면이 988px보다 좁을 땐 overflow-x로 가로 스크롤.
  */
 .gridBare {
-  grid-template-columns: repeat(4, 238px);
+  /* Figma 실측 폭 238은 '최소'로만 보장 — 실제 화면이 Figma 프레임(1140)보다 넓으면
+     다른 화면 KPI 그리드처럼 남는 폭을 4등분해 채운다(238 고정이면 우측이 비어 보임) */
+  grid-template-columns: repeat(4, minmax(238px, 1fr));
   grid-auto-rows: 118px;
   gap: 14px 12px;
   overflow-x: auto;

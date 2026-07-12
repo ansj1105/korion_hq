@@ -24,6 +24,8 @@ export interface StatCardData {
   labelTone?: 'default' | 'amber' | 'green'
   /** 증감줄 색조. 'red'면 리스크 계열 카드처럼 경고색으로. 기본은 cyan */
   deltaTone?: 'cyan' | 'red'
+  /** true면 delta에 '·'가 있어도 상태 배지로 쪼개지 않고 텍스트 한 줄 그대로 표시(회원 담보금 화면의 빨간 경고줄처럼 배지가 아닌 문장인 경우) */
+  deltaPlain?: boolean
   /** true면 내용을 세로 중앙이 아니라 위쪽에 붙인다 — 같은 줄(row) 옆 카드보다 줄 수가 적어서(예: 증감줄 없음) 본문이 세로 중앙에 떠 보이는 카드용 */
   alignTop?: boolean
 }
@@ -62,6 +64,7 @@ export default function StatCard({
   dense,
   labelTone,
   deltaTone,
+  deltaPlain,
   alignTop,
 }: StatCardData) {
   // delta가 있는 화면(본사어드민 등)만 Figma 정확 비율(238:118)로 고정 — 기존 2줄 카드엔 영향 없음
@@ -71,7 +74,7 @@ export default function StatCard({
   const labelToneClass = labelTone === 'amber' ? styles.labelAmber : labelTone === 'green' ? styles.labelGreen : ''
   const labelClassName = labelToneClass ? `${styles.label} ${labelToneClass}` : styles.label
   const deltaClassName = deltaTone === 'red' ? `${styles.delta} ${styles.deltaRed}` : styles.delta
-  const deltaBadges = parseDeltaBadges(delta)
+  const deltaBadges = deltaPlain ? null : parseDeltaBadges(delta)
   return (
     <article className={className}>
       {/* 라벨 + (부가설명)을 한 줄에 인라인으로 표시 (Figma에선 한 텍스트 한 줄) */}

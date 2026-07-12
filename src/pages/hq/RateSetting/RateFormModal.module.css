@@ -1,0 +1,229 @@
+/*
+ * RateFormModal — "국가별 배분율 설정/추가" 모달 (Figma 81:23083 내 Modal Card, 855×602)
+ * 사이드바 영역을 제외한 콘텐츠 섹션 위에만 띄움 → 모달이 콘텐츠 기준 중앙에 온다
+ * (수수료 관리 CommissionFeeModal과 동일 backdrop 방식).
+ */
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-width);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+}
+
+/* 반응형: 사이드바가 오버레이로 바뀌는 구간(<=1024px)에선 화면 전체 기준 가운데 */
+@media (max-width: 1024px) {
+  .backdrop {
+    left: 0;
+  }
+}
+
+/* Figma 실측: 855×602, radius 26, 보라 테두리(rgba(139,92,246,.75)) */
+.panel {
+  display: flex;
+  flex-direction: column;
+  width: 855px;
+  max-width: 100%;
+  max-height: 92vh; /* 화면이 낮으면 패널 내부 스크롤 */
+  overflow-y: auto;
+  /* 우측 패딩만 줄여(Figma 실측 우측 여백 ~15) 다이어그램 고정폭(804px)이 스크롤 없이 들어가게 */
+  padding: 36px 15px 36px 36px;
+  background: rgba(11, 7, 20, 0.82);
+  border: 1px solid rgba(139, 92, 246, 0.75);
+  border-radius: 26px;
+  box-shadow: 0 12px 26px -8px rgba(139, 92, 246, 0.12);
+}
+
+/* 스크롤 시 flex 자식이 눌려 찌그러지지 않게 고정(정산 상세 모달과 동일 이슈 예방) */
+.panel > * {
+  flex-shrink: 0;
+}
+
+/* 헤더: 제목/설명(좌) + 배지·토글(우) */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+/* Figma 26px bold #f7f3ff (토큰 스케일에 없어 직접 지정) */
+.title {
+  margin: 0 0 14px;
+  font-size: 26px;
+  font-weight: var(--font-weight-bold);
+  color: #f7f3ff;
+}
+
+.desc {
+  font-size: 13px;
+  color: #afa7c8;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+/* "현재 이벤트 적용중" 배지 — Figma 110×23, 초록 틴트 알약 */
+.eventBadge {
+  display: inline-flex;
+  align-items: center;
+  height: 23px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: rgba(52, 211, 153, 0.16);
+  border: 1px solid rgba(52, 211, 153, 0.75);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: #34d399;
+  white-space: nowrap;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 33px;
+}
+
+.fieldLabel {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-medium);
+  color: #afa7c8;
+}
+
+/* 국가 셀렉트(표시 전용) — Figma 334×46, radius 12 + 우측 ▼ */
+.selectBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-width: 334px;
+  height: 46px;
+  padding: 0 34px 0 14px;
+  border-radius: var(--radius-md);
+  background: rgba(8, 7, 20, 0.9);
+  border: 1px solid rgba(45, 36, 80, 0.95);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  color: #f7f3ff;
+}
+/* ▼ 화살표 — Figma는 폴리곤 이미지라 CSS 삼각형으로 재현 */
+.selectArrow {
+  position: absolute;
+  right: 14px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 10px solid #f7f3ff;
+}
+
+/* 다이어그램 구획 — 국가 선택과 34px 간격(Figma 실측) */
+.diagramSection {
+  margin-top: 34px;
+}
+/* "기본 배분 구조 설정" — 페이지 다이어그램 카드와 동일 19px bold, 헤더 행 제목 슬롯에 들어감 */
+.diagramTitle {
+  font-size: 19px;
+  font-weight: var(--font-weight-bold);
+  color: #ffffff;
+}
+
+/* 관리자 메모 — 다이어그램과 33px 간격(Figma 실측) */
+.memoField {
+  margin-top: 33px;
+}
+.memoBox {
+  display: flex;
+  align-items: center;
+  max-width: 330px;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  background: rgba(8, 7, 20, 0.84);
+  border: 1px solid rgba(45, 36, 80, 0.82);
+  box-shadow: 0 14px 24px -8px rgba(45, 36, 80, 0.12);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  color: #f7f3ff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 하단 버튼 — 우측 정렬 (Figma: 취소 100×42 시안 고스트 / 추가·수정 130×42 보라).
+   메모(좌)와 버튼(우)이 같은 줄이지만, 세로 쌓임이 반응형에서 더 안전해 버튼을 아래 우측에 둔다 */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 22px;
+  margin-top: -46px; /* Figma: 버튼 줄이 관리자 메모 입력과 같은 높이 */
+}
+/* 반응형: 좁은 화면에선 메모와 버튼이 겹치지 않게 버튼 줄을 아래로 내린다 */
+@media (max-width: 720px) {
+  .footer {
+    margin-top: 22px;
+  }
+}
+.ghostButton {
+  width: 100px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background: rgba(18, 13, 34, 0.14);
+  border: 1px solid rgba(34, 211, 238, 0.9);
+  color: #22d3ee;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+.submitButton {
+  width: 130px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background: rgba(139, 92, 246, 0.88);
+  border: 1px solid rgba(139, 92, 246, 0.9);
+  box-shadow: 0 12px 20px -8px rgba(139, 92, 246, 0.22);
+  color: #ffffff;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+/*
+ * ON 토글 — Figma는 49×23 비트맵(초록 ON 스위치)이라 CSS로 재현(국가/지역 설정과 동일).
+ * 표시 전용.
+ */
+.toggleOn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 49px;
+  height: 23px;
+  padding-left: 7px;
+  border-radius: var(--radius-pill);
+  background: #09c809;
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: var(--font-weight-bold);
+}
+.toggleOn::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #ffffff;
+}

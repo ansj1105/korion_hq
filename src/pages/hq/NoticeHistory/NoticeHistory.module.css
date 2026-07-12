@@ -1,0 +1,48 @@
+/* NoticeHistory(본사어드민 · 알림/공지 · 발송 내역) 페이지 레이아웃 — HQ 화면 공통 컨벤션 */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* Figma 콘텐츠 세로 간격 18 */
+}
+
+/* 제목 아래 화면 설명 — Figma 13px #afa7c8 (토큰 스케일에 없어 직접 지정) */
+.pageDesc {
+  font-size: 13px;
+  font-weight: var(--font-weight-regular);
+  color: #afa7c8;
+}
+
+/* 헤더 아래 "전체 국가 / 오늘" 필터칩 — 동작 없는 표시용 (공지 보내기 화면과 동일 시안) */
+.filterChips {
+  display: flex;
+  gap: 15px; /* Figma 실측 칩 간격 15 */
+}
+
+.chip {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--color-accent-cyan) 45%, transparent);
+  background: color-mix(in srgb, var(--color-accent-cyan) 12%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-bold);
+}
+
+/* 발송 현황 KPI 그리드 — Figma 실측 5열(폭은 1fr로 풀어 넓은 화면에서도 열 수 고정) */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px 12px;
+}
+
+/* 반응형: 좁은 화면에서 KPI 열 수 축소해 카드가 너무 작아지지 않게 함 */
+@media (max-width: 1024px) {
+  .kpiGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "kpis": [
+    {
+      "id": "total",
+      "labelKey": "hqSystemCountry.kpi.total",
+      "value": "18개",
+      "noteKey": "hqSystemCountry.kpi.totalNote",
+      "dense": true
+    },
+    {
+      "id": "active",
+      "labelKey": "hqSystemCountry.kpi.active",
+      "value": "12개",
+      "noteKey": "hqSystemCountry.kpi.activeNote",
+      "dense": true
+    },
+    {
+      "id": "preparing",
+      "labelKey": "hqSystemCountry.kpi.preparing",
+      "value": "3건",
+      "dense": true,
+      "alignTop": true
+    },
+    {
+      "id": "restricted",
+      "labelKey": "hqSystemCountry.kpi.restricted",
+      "value": "2개",
+      "dense": true,
+      "alignTop": true
+    }
+  ],
+  "rows": [
+    {
+      "no": "0001",
+      "registeredAt": "2026.06.14 06:59",
+      "code": "NG",
+      "country": "NIghria",
+      "regions": "Lagos, Abuja",
+      "timezone": "UTC+01",
+      "currency": "NGN",
+      "language": "English",
+      "leader": "JOEL,JANG",
+      "partners": "24",
+      "merchants": "24",
+      "status": "활성",
+      "payment": "ON"
+    },
+    {
+      "no": "0001",
+      "registeredAt": "2026.06.14 06:59",
+      "code": "KR",
+      "country": "KOREA",
+      "regions": "Seoul, Busan",
+      "timezone": "UTC+09",
+      "currency": "KRW",
+      "language": "Korean",
+      "leader": "HQ Direct",
+      "partners": "3",
+      "merchants": "3",
+      "status": "활성",
+      "payment": "ON"
+    },
+    {
+      "no": "0001",
+      "registeredAt": "2026.06.14 06:59",
+      "code": "PH",
+      "country": "Philippines",
+      "regions": "Manila, Cebu",
+      "timezone": "UTC+08",
+      "currency": "PHP",
+      "language": "English",
+      "leader": "미지정",
+      "partners": "8",
+      "merchants": "8",
+      "status": "비활성",
+      "payment": "OFF"
+    },
+    {
+      "no": "0001",
+      "registeredAt": "2026.06.14 06:59",
+      "code": "GH",
+      "country": "Ghana",
+      "regions": "Accra",
+      "timezone": "UTC+00",
+      "currency": "GHS",
+      "language": "English",
+      "leader": "Daniel",
+      "partners": "6",
+      "merchants": "6",
+      "status": "비활성",
+      "payment": "OFF"
+    },
+    {
+      "no": "0001",
+      "registeredAt": "2026.06.14 06:59",
+      "code": "VN",
+      "country": "Vietnam",
+      "regions": "HCMC",
+      "timezone": "UTC+07",
+      "currency": "VND",
+      "language": "Vietnamese",
+      "leader": "미지정",
+      "partners": "0",
+      "merchants": "0",
+      "status": "제한",
+      "payment": "OFF"
+    }
+  ]
+}

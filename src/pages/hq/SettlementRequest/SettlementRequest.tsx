@@ -26,24 +26,40 @@ export default function HqSettlementRequest() {
   const { kpis, columns, rows: rawRows, statusLabel, statusAction, detailLabel, chipAutoInclude, chipExcludeToday, section, subtitle } =
     useSettlementRequest()
 
+  // Figma에서 굵게 표시되는 셀(신청일~전체 거래금액)만 감싸는 헬퍼
+  const strong = (value: string) => <span className={styles.cellStrong}>{value}</span>
+  // Figma처럼 좁은 컬럼(신청 ID/정산 기간)은 말줄임 대신 두 줄로 꺾어 전체 값을 보여준다
+  const wrap = (value: string) => <span className={styles.cellWrap}>{value}</span>
+  const strongWrap = (value: string) => <span className={`${styles.cellStrong} ${styles.cellWrap}`}>{value}</span>
+
   const rows: TableRow[] = rawRows.map((r, index) => ({
     // 신청 ID가 샘플상 중복돼 있어 index로 key를 구분
     id: `${r.id}-${index}`,
     cells: {
-      id: r.id,
-      date: r.date,
-      applicant: r.applicant,
-      partnerName: r.partnerName,
-      country: r.country,
-      period: r.period,
-      totalAmount: r.totalAmount,
+      id: wrap(r.id),
+      date: strong(r.date),
+      applicant: strong(r.applicant),
+      partnerName: strong(r.partnerName),
+      country: strong(r.country),
+      period: strongWrap(r.period),
+      totalAmount: strong(r.totalAmount),
       partnerProfit: r.partnerProfit,
       directProfit: r.directProfit,
       partnerSettle: r.partnerSettle,
       held: r.held,
       finalAmount: r.finalAmount,
       status: <span className={STATUS_CLASS[r.status]}>{statusLabel[r.status]}</span>,
-      action: <ActionBadges labels={[detailLabel, statusAction[r.status]]} accentByLabel={{}} size="xs" solid />,
+      action: (
+        <ActionBadges
+          labels={[detailLabel, statusAction[r.status]]}
+          accentByLabel={{}}
+          size="xs"
+          solid
+          equalWidth
+          /* Figma: 검토 상태 행의 '검토' 배지만 주황 강조 */
+          classNameByLabel={r.status === 'review' ? { [statusAction[r.status]]: styles.badgeReview } : undefined}
+        />
+      ),
     },
   }))
 
@@ -80,6 +96,8 @@ export default function HqSettlementRequest() {
         fill
         inlineToolbar
         mutedText
+        headerBar
+        tallToolbar
         onRowClick={() => navigate('detail')}
       />
     </div>

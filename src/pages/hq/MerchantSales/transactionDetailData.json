@@ -1,0 +1,22 @@
+{
+  "fields": [
+    { "labelKey": "hqMerchantSales.col.txNo", "value": "1234" },
+    { "labelKey": "hqMerchantSales.col.partnerCode", "value": "NG-SP-0005", "small": true },
+    { "labelKey": "hqMerchantSales.col.txAt", "value": "2026.01.19  18:46" },
+    { "labelKey": "hqMerchantSales.col.merchantCode", "value": "NG-MER-0005", "small": true },
+    { "labelKey": "hqMerchantSales.col.merchantName", "value": "편의점" },
+    { "labelKey": "hqMerchantSales.col.amount", "value": "200.000000 KORI" },
+    { "labelKey": "hqMerchantSales.txModal.balanceAfter", "value": "99400.000000 KORI" },
+    { "labelKey": "hqMerchantSales.txModal.txTypeDisplay", "value": "일반 / 정산 / 스토어" },
+    { "labelKey": "hqMerchantSales.txModal.counterpartyDisplay", "value": "닉네임" },
+    { "labelKey": "hqMerchantSales.col.fee", "value": "2.000000" },
+    { "labelKey": "hqMerchantSales.txModal.category", "value": "일반(P2P) / 스토어" },
+    { "labelKey": "hqMerchantSales.txModal.payMethod", "value": "NFC / BLE / QR" },
+    { "labelKey": "hqMerchantSales.txModal.tokenName", "value": "KORI" },
+    { "labelKey": "hqMerchantSales.txModal.network", "value": "TRC-20" },
+    { "labelKey": "hqMerchantSales.txModal.walletAddress", "value": "T2DKLDOKA2034I02KJF0O32RF34K,LF4332", "small": true },
+    { "labelKey": "hqMerchantSales.txModal.payer", "value": "user_1024" }
+  ],
+  "memo": "유럽에서 배낭 여행중 길에서 일반인에게 음료수를 거래함",
+  "adminMemoPlaceholder": "거래자 메모"
+}

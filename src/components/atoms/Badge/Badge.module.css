@@ -34,8 +34,11 @@
  * Figma 기준 패딩 4/9, 배경·테두리도 기본 배지(17%/72% 틴트)보다 훨씬 진한 65%/65% 채움.
  */
 .small {
-  padding: 4px 9px;
+  /* Figma 실측: 높이 15px 고정 납작 알약(패딩·행간으로 세로가 커지지 않게) */
+  height: 15px;
+  padding: 0 9px;
   font-size: var(--font-size-7);
+  line-height: 14px;
   background: color-mix(in srgb, var(--accent, var(--color-text-subtle)) 65%, transparent);
   border-color: color-mix(in srgb, var(--accent, var(--color-text-subtle)) 65%, transparent);
 }
@@ -48,9 +51,12 @@
  * 내용에 맞게 자동으로 두고 패딩/글자 크기만 Figma 그대로 따른다.
  */
 .xs {
-  padding: 4px 9px;
+  /* Figma 실측: sm과 같은 15px 납작 알약(색만 기본 17%/72% 옅은 틴트) */
+  height: 15px;
+  padding: 0 9px;
   font-size: var(--font-size-7);
   font-weight: var(--font-weight-regular);
+  line-height: 14px;
 }
 
 /*

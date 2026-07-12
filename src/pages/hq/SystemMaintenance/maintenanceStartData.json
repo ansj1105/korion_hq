@@ -1,0 +1,28 @@
+{
+  "scopes": [
+    { "labelKey": "hqSystemMaintenance.start.scope.all", "on": false },
+    { "labelKey": "hqSystemMaintenance.start.scope.payMethod", "on": false },
+    { "labelKey": "hqSystemMaintenance.start.scope.feature", "on": true }
+  ],
+  "features": [
+    { "labelKey": "hqSystemMaintenance.start.feature.pay", "on": true },
+    { "labelKey": "hqSystemMaintenance.start.feature.offline", "on": true },
+    { "labelKey": "hqSystemMaintenance.start.feature.qr", "on": true },
+    { "labelKey": "hqSystemMaintenance.start.feature.nfc", "on": true },
+    { "labelKey": "hqSystemMaintenance.start.feature.bluetooth", "on": true },
+    { "labelKey": "hqSystemMaintenance.start.feature.topup", "on": true },
+    { "labelKey": "hqSystemMaintenance.start.feature.release", "on": true },
+    { "labelKey": "hqSystemMaintenance.start.feature.settle", "on": true }
+  ],
+  "timing": [
+    { "labelKey": "hqSystemMaintenance.start.timing.now", "on": true },
+    { "labelKey": "hqSystemMaintenance.start.timing.reserve", "on": false }
+  ],
+  "schedule": {
+    "startDate": "2026.06.20",
+    "startTime": "21:00",
+    "endDate": "2026.06.20",
+    "endTime": "23:00",
+    "userMessage": "현재 KORION PAY 서비스 점검이 진행 중입니다."
+  }
+}

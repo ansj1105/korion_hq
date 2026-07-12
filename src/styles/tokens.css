@@ -49,6 +49,7 @@
 
   /* 폰트 크기 — Figma에서 쓰인 값(px) 그대로. rem 환산은 16px 기준. */
   --font-size-7: 0.4375rem;   /* 7px  — 테이블 액션 배지 등 초소형 */
+  --font-size-8: 0.5rem;      /* 8px  — 헤더 상태 칩(정산 신청 등) */
   --font-size-9: 0.5625rem;   /* 9px  — 미세 캡션 */
   --font-size-10: 0.625rem;   /* 10px */
   --font-size-11: 0.6875rem;  /* 11px */

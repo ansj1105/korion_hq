@@ -1,0 +1,23 @@
+{
+  "fields": [
+    { "labelKey": "hqCollateral.settle.col.no", "value": "SETTLE-240616-001" },
+    { "labelKey": "hqCollateral.settle.col.settledAt", "value": "2026.06.16 13:20" },
+    { "labelKey": "hqCollateral.settle.col.parentPartner", "value": "-" },
+    { "labelKey": "hqCollateral.settle.col.ownCode", "value": "-" },
+    { "labelKey": "hqCollateral.col.country", "value": "Nigeria" },
+    { "labelKey": "hqCollateral.col.memberId", "value": "Richard J" },
+    { "labelKey": "hqCollateral.col.memberName", "value": "Richard jang" },
+    { "labelKey": "hqCollateral.settle.col.target", "value": "KORION WALLET", "newRow": true },
+    { "labelKey": "hqCollateral.settle.col.amount", "value": "1,420 KORI" },
+    { "labelKey": "hqCollateral.settleDetail.field.beforeAmount", "value": "1,420 KORI" },
+    { "labelKey": "hqCollateral.settleDetail.field.afterAmount", "value": "220 KORI" },
+    { "labelKey": "hqCollateral.settle.col.target", "value": "KORION WALLET" },
+    { "labelKey": "hqCollateral.col.status", "value": "성공" },
+    { "labelKey": "hqCollateral.settleDetail.field.txId", "value": "SETTLE-240616-001" }
+  ],
+  "txRows": [
+    { "id": "KP-001", "at": "06.16 09:12", "payAmount": "420 KORI", "receiveAmount": "410 KORI", "status": "완료", "statusTone": "green" },
+    { "id": "KP-002", "at": "06.16 10:44", "payAmount": "380 KORI", "receiveAmount": "370 KORI", "status": "완료", "statusTone": "green" },
+    { "id": "KP-003", "at": "06.16 11:20", "payAmount": "420 KORI", "receiveAmount": "420 KORI", "status": "완료", "statusTone": "green" }
+  ]
+}

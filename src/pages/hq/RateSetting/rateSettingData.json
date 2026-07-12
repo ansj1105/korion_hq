@@ -1,0 +1,27 @@
+{
+  "kpis": [
+    { "labelKey": "hqRate.kpi.base", "value": "50 / 25 / 25 / 0", "noteKey": "hqRate.note.base" },
+    { "labelKey": "hqRate.kpi.leaderDirect", "value": "60 / 40 / 0", "noteKey": "hqRate.note.leaderDirect" },
+    { "labelKey": "hqRate.kpi.hqPartner", "value": "75 / 25 / 0", "noteKey": "hqRate.note.hqPartner" },
+    { "labelKey": "hqRate.kpi.hqMerchant", "value": "100 / 0", "noteKey": "hqRate.note.hqMerchant" },
+    { "labelKey": "hqRate.kpi.countries", "value": "2", "noteKey": "hqRate.note.countries" },
+    { "labelKey": "hqRate.kpi.eventState", "value": "진행중", "noteKey": "hqRate.note.eventState" },
+    { "labelKey": "hqRate.kpi.lastModified", "value": "2026.06.16", "noteKey": "hqRate.note.lastModified" }
+  ],
+  "diagram": [
+    { "route": "via", "cells": [{ "color": "hq", "value": "50" }, { "color": "leader", "value": "25" }, { "color": "partner", "value": "25" }, { "color": "merchant" }] },
+    { "route": "direct", "cells": [{ "color": "hq", "value": "60" }, { "color": "leader", "value": "40" }, { "color": "merchant" }] },
+    { "route": "direct", "cells": [{ "color": "hq", "value": "75" }, { "color": "partner", "value": "25" }, { "color": "merchant" }] },
+    { "route": "direct", "cells": [{ "color": "hq", "value": "100" }, { "color": "merchant" }] }
+  ],
+  "rows": [
+    { "country": "나이지리아", "code": "NG", "hqFee": "0.1%", "leaderFee": "0.1%", "partnerFee": "0.1%", "merchantSettle": "결제금액-수수료", "event": "applied", "coinCount": "3", "status": "active" },
+    { "country": "대한민국", "code": "KR", "hqFee": "0.1%", "leaderFee": "0.1%", "partnerFee": "0.1%", "merchantSettle": "미적용", "event": "applied", "coinCount": "2", "status": "active" },
+    { "country": "필리핀", "code": "PH", "hqFee": "0.1%", "leaderFee": "0.1%", "partnerFee": "0.1%", "merchantSettle": "적용", "event": "applied", "coinCount": "1", "status": "pending" },
+    { "country": "미국", "code": "EN", "hqFee": "0.1%", "leaderFee": "0.1%", "partnerFee": "0.1%", "merchantSettle": "미적용", "event": "none", "coinCount": "2", "status": "active" }
+  ],
+  "modal": {
+    "country": "Nigeria",
+    "memo": "Nigeria 성장 정책 적용"
+  }
+}
