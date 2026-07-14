@@ -189,6 +189,10 @@ interface AiInsightRaw {
 }
 
 interface DashboardData {
+  filters?: {
+    countryOptions?: Array<{ value: string; label: string }>
+    rangeOptions?: HqDashboardRange[]
+  }
   kpis: KpiRaw[]
   rankingPanels: RankingPanelRaw[]
   realtimePayments: { rows: RealtimePaymentRow[] }
@@ -212,64 +216,6 @@ interface DashboardData {
 
 const ALL_COUNTRIES = 'all'
 const RANGE_OPTIONS: HqDashboardRange[] = ['ALL', '1D', '7D', '14D', '30D', '90D', '180D', '365D']
-const RANGE_DAYS: Record<Exclude<HqDashboardRange, 'ALL'>, number> = {
-  '1D': 1,
-  '7D': 7,
-  '14D': 14,
-  '30D': 30,
-  '90D': 90,
-  '180D': 180,
-  '365D': 365,
-}
-
-const COUNTRY_CODE_BY_NAME: Record<string, string> = {
-  Nigeria: 'NG',
-  Korea: 'KR',
-  Philippines: 'PH',
-  Vietnam: 'VN',
-  Ghana: 'GH',
-}
-
-const RANGE_SENSITIVE_KPIS = new Set([
-  'collateralTopup',
-  'collateralTopupCount',
-  'collateralRelease',
-  'newApplicationsToday',
-  'todayPaymentCount',
-  'todayPaymentAmount',
-  'todayFee',
-  'settlementRequests',
-  'settlementPendingAmount',
-  'unsettledMemberPayout',
-  'verificationQueue',
-  'riskHoldAmount',
-  'riskAlerts',
-])
-
-const RANGE_SENSITIVE_MINI_STATS = new Set([
-  'createdTx',
-  'uploadPending',
-  'syncFailed',
-  'longUnsynced',
-  'senderProofOnly',
-  'receiverEvidenceOnly',
-  'totalPending',
-  'completed',
-  'onHold',
-  'memberCollateral',
-  'abnormalWithdrawal',
-  'bugSuspect',
-  'duplicateWallet',
-  'settlementHoldTarget',
-  'receivedToday',
-  'pending',
-  'docsRequested',
-  'approvedToday',
-  'totalLeaders',
-  'totalPartners',
-  'totalMerchants',
-  'problemPartners',
-])
 
 const DASHBOARD_QUICK_ACTION_KEYS = [
   'hqDashboard.quickActions.reviewApplications',
@@ -296,48 +242,6 @@ const emptyDashboardData: DashboardData = {
   activityLogs: { rows: [] },
   aiInsight: { items: [] },
   quickActions: DASHBOARD_QUICK_ACTION_KEYS,
-}
-
-function formatScaledNumber(value: number, hasDecimals: boolean) {
-  const maximumFractionDigits = hasDecimals ? 2 : 0
-  return new Intl.NumberFormat('en-US', {
-    maximumFractionDigits,
-    minimumFractionDigits: hasDecimals ? Math.min(1, maximumFractionDigits) : 0,
-  }).format(value)
-}
-
-function scaleDisplayValue(value: string, multiplier: number) {
-  if (multiplier === 1 || value.includes('%') || value.includes('초')) return value
-
-  return value.replace(/([₩$]?)(\d[\d,]*(?:\.\d+)?)([KM]?)/g, (_match, currency: string, raw: string, suffix: string) => {
-    const numeric = Number(raw.replace(/,/g, ''))
-    if (!Number.isFinite(numeric)) return `${currency}${raw}${suffix}`
-    const scaled = numeric * multiplier
-    return `${currency}${formatScaledNumber(scaled, raw.includes('.'))}${suffix}`
-  })
-}
-
-function countryMatches(rowCountry: string, countryScope: string) {
-  return countryScope === ALL_COUNTRIES || rowCountry === countryScope
-}
-
-function fallbackCountryRatio(countryRows: Array<{ id: string; amount?: string }>, selectedCountry: string) {
-  if (selectedCountry === ALL_COUNTRIES) return 1
-  const amountOf = (value?: string) => Number((value ?? '').replace(/[^\d.]/g, '')) || 0
-  const total = countryRows.reduce((sum, row) => sum + amountOf(row.amount), 0)
-  const selected = amountOf(countryRows.find((row) => row.id === selectedCountry)?.amount)
-  return total > 0 && selected > 0 ? selected / total : 1
-}
-
-function scaleMiniStats(stats: MiniStatRaw[], multiplier: number): MiniStatRaw[] {
-  return stats.map((stat) =>
-    RANGE_SENSITIVE_MINI_STATS.has(stat.id)
-      ? {
-          ...stat,
-          value: scaleDisplayValue(stat.value, multiplier),
-        }
-      : stat,
-  )
 }
 
 function normalizeTopRows(rows: RankingRowRaw[] | undefined): RankingRowRaw[] {
@@ -377,6 +281,7 @@ function withDashboardDefaults(payload: DashboardData): DashboardData {
   return {
     ...emptyDashboardData,
     ...payload,
+    filters: payload.filters,
     kpis: withNonEmptyArray(payload.kpis, emptyDashboardData.kpis),
     rankingPanels: withNonEmptyArray(payload.rankingPanels, emptyDashboardData.rankingPanels),
     realtimePayments: withRows(payload.realtimePayments, emptyDashboardData.realtimePayments),
@@ -459,38 +364,25 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     }
   }, [filters.countryScope, filters.refreshToken, range])
 
-  const rangeMultiplier = source === emptyDashboardData && range !== 'ALL' ? RANGE_DAYS[range] : 1
   const countryRows = (source.countryOps.rows as CountryOpsRow[]).map((row, index) => ({
     ...row,
     rank: row.rank ?? String(index + 1),
   }))
-  const countryOptions = [
-    { value: ALL_COUNTRIES, label: t('hqDashboard.filter.allCountries') },
-    ...countryRows.map((row) => ({ value: row.id, label: row.id })),
-  ]
+  const countryOptions = source.filters?.countryOptions?.length
+    ? source.filters.countryOptions.map((option) => ({
+        value: option.value,
+        label: option.value === ALL_COUNTRIES ? t('hqDashboard.filter.allCountries') : option.label,
+      }))
+    : [
+        { value: ALL_COUNTRIES, label: t('hqDashboard.filter.allCountries') },
+        ...countryRows.map((row) => ({ value: row.id, label: row.id })),
+      ]
   const selectedCountry = countryOptions.some((option) => option.value === filters.countryScope) ? filters.countryScope ?? ALL_COUNTRIES : ALL_COUNTRIES
-  const selectedCountryRow = countryRows.find((row) => row.id === selectedCountry)
-  const fallbackRatio = source === emptyDashboardData ? fallbackCountryRatio(countryRows, selectedCountry) : 1
 
   const kpis: StatCardData[] = (source.kpis as KpiRaw[]).map((k) => ({
     id: k.id,
     label: t(k.labelKey),
-    value:
-      selectedCountryRow && k.id === 'activeCountries'
-        ? `1 ${t('hqDashboard.filter.countryUnit')}`
-        : selectedCountryRow && k.id === 'collateralHolders'
-          ? selectedCountryRow.members
-          : selectedCountryRow && k.id === 'countryLeaders'
-            ? selectedCountryRow.leaders
-            : selectedCountryRow && k.id === 'salesPartners'
-              ? selectedCountryRow.partners
-              : selectedCountryRow && k.id === 'merchants'
-                ? selectedCountryRow.merchants
-                : source === emptyDashboardData && selectedCountryRow && k.id === 'collateralBalance'
-                  ? scaleDisplayValue(k.value, fallbackRatio)
-                  : RANGE_SENSITIVE_KPIS.has(k.id)
-                  ? scaleDisplayValue(k.value, rangeMultiplier * fallbackRatio)
-                  : k.value,
+    value: k.value,
     delta: k.note ?? (k.noteKey ? t(k.noteKey) : ''),
     labelTone: k.labelTone,
     deltaTone: k.deltaTone,
@@ -517,7 +409,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     { key: 'detail', label: t('hqDashboard.realtimePayments.col.detail'), width: '1fr' },
   ]
 
-  const offlinePayMiniStats: MiniStatCardData[] = scaleMiniStats(source.offlinePay.miniStats as MiniStatRaw[], rangeMultiplier * fallbackRatio).map((s) => ({
+  const offlinePayMiniStats: MiniStatCardData[] = (source.offlinePay.miniStats as MiniStatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     note: s.note ?? (s.noteKey ? t(s.noteKey) : undefined),
@@ -526,7 +418,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
   }))
   const offlinePayFlowSteps = source.offlinePay.flowSteps.map((key) => t(key))
 
-  const settlementStats: MiniStatCardData[] = scaleMiniStats(source.settlement.stats as MiniStatRaw[], rangeMultiplier * fallbackRatio).map((s) => ({
+  const settlementStats: MiniStatCardData[] = (source.settlement.stats as MiniStatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -544,7 +436,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     { key: 'action', label: t('hqDashboard.settlement.col.action'), width: '1fr' },
   ]
 
-  const riskStats: MiniStatCardData[] = scaleMiniStats(source.risk.stats as MiniStatRaw[], rangeMultiplier * fallbackRatio).map((s) => ({
+  const riskStats: MiniStatCardData[] = (source.risk.stats as MiniStatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -578,7 +470,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     { key: 'growth', label: t('hqDashboard.countryOps.col.growth'), width: 'minmax(96px, 1fr)' },
   ]
 
-  const approvalQueueStats: MiniStatCardData[] = scaleMiniStats(source.approvalQueue.stats as MiniStatRaw[], rangeMultiplier * fallbackRatio).map((s) => ({
+  const approvalQueueStats: MiniStatCardData[] = (source.approvalQueue.stats as MiniStatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -596,7 +488,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     { key: 'status', label: t('hqDashboard.approvalQueue.col.status'), width: '1fr' },
   ]
 
-  const networkGrowthStats: MiniStatCardData[] = scaleMiniStats(source.networkGrowth.stats as MiniStatRaw[], fallbackRatio).map((s) => ({
+  const networkGrowthStats: MiniStatCardData[] = (source.networkGrowth.stats as MiniStatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -650,30 +542,28 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     rankingPanels,
     realtimePayments: {
       columns: realtimePaymentColumns,
-      rows: (source.realtimePayments.rows as RealtimePaymentRow[]).filter((row) => countryMatches(row.country, selectedCountry)),
+      rows: source.realtimePayments.rows as RealtimePaymentRow[],
     },
     offlinePay: { miniStats: offlinePayMiniStats, flowSteps: offlinePayFlowSteps },
     settlement: {
       stats: settlementStats,
       columns: settlementColumns,
-      rows: (source.settlement.rows as SettlementRow[]).filter((row) => countryMatches(row.country, selectedCountry)),
+      rows: source.settlement.rows as SettlementRow[],
     },
     risk: {
       stats: riskStats,
       columns: riskColumns,
-    rows: (source.risk.rows as RiskRow[]).filter((row) => countryMatches(row.country, selectedCountry)),
+      rows: source.risk.rows as RiskRow[],
     },
     countryOps: {
       columns: countryOpsColumns,
-      rows: selectedCountryRow ? [selectedCountryRow] : countryRows,
-      heatmap: selectedCountryRow
-        ? source.countryOps.heatmap.filter((item) => item.code === (COUNTRY_CODE_BY_NAME[selectedCountryRow.id] ?? selectedCountryRow.id))
-        : source.countryOps.heatmap,
+      rows: countryRows,
+      heatmap: source.countryOps.heatmap,
     },
     approvalQueue: {
       stats: approvalQueueStats,
       columns: approvalQueueColumns,
-      rows: (source.approvalQueue.rows as ApprovalQueueRow[]).filter((row) => countryMatches(row.country, selectedCountry)),
+      rows: source.approvalQueue.rows as ApprovalQueueRow[],
     },
     networkGrowth: {
       stats: networkGrowthStats,

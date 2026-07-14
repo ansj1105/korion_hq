@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { Bell, CheckCircle2, Globe2, LogOut, X } from 'lucide-react'
 import { useTranslation } from '../../../i18n'
-import { clearAuthSession } from '../../../services/authSession'
+import { clearAuthSession, readAuthSession } from '../../../services/authSession'
+import { fetchHqPageData } from '../../../services/korionChongApi'
 import styles from './TopControls.module.css'
 
 type NotificationItem = {
@@ -11,7 +12,12 @@ type NotificationItem = {
   title: string
   description: string
   time: string
+  actionPath?: string
   read?: boolean
+}
+
+type NotificationResponse = {
+  items?: NotificationItem[]
 }
 
 const DEFAULT_NOTIFICATIONS: NotificationItem[] = []
@@ -25,14 +31,36 @@ export default function TopControls() {
   const langLabel = lang === 'ko' ? 'KR · 한국어' : 'EN · English'
   const unreadCount = useMemo(() => notifications.filter((item) => !item.read).length, [notifications])
 
+  useEffect(() => {
+    const session = readAuthSession()
+    if (session?.role !== 'hq') return
+
+    let cancelled = false
+    fetchHqPageData<NotificationResponse>('/api/hq/notifications')
+      .then((response) => {
+        if (!cancelled) setNotifications(response.items ?? [])
+      })
+      .catch(() => {
+        if (!cancelled) setNotifications([])
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   const confirmLogout = () => {
     clearAuthSession()
     setLogoutOpen(false)
     navigate('/login')
   }
 
-  const markRead = (id: string) => {
-    setNotifications((items) => items.map((item) => (item.id === id ? { ...item, read: true } : item)))
+  const openNotification = (item: NotificationItem) => {
+    setNotifications((items) => items.map((current) => (current.id === item.id ? { ...current, read: true } : current)))
+    if (item.actionPath) {
+      setNotificationOpen(false)
+      navigate(item.actionPath)
+    }
   }
 
   return (
@@ -78,7 +106,7 @@ export default function TopControls() {
                     key={item.id}
                     type="button"
                     className={[styles.notificationItem, item.read && styles.notificationItemRead].filter(Boolean).join(' ')}
-                    onClick={() => markRead(item.id)}
+                    onClick={() => openNotification(item)}
                   >
                     <span className={styles.notificationTitle}>{item.title}</span>
                     <span className={styles.notificationDesc}>{item.description}</span>

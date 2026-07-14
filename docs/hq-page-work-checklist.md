@@ -7,6 +7,26 @@
 `운영 검증`은 `https://admin.korion.network` 로그인 세션으로 실제 화면, 실제 데이터, 실제 액션 결과를 확인했다는 뜻이다.  
 운영 브라우저로 직접 확인하지 않은 항목은 완료로 보지 않는다.
 
+## 신뢰 기준
+
+사용자가 지적한 것처럼, 이 문서는 "내가 했다"를 믿기 위한 문서가 아니다.  
+각 페이지를 다시 열어보고, API 응답과 DB/화면/액션 결과가 맞는지 확인하기 위한 검수표다.
+
+- `코드 반영`만 체크된 항목은 운영 완료가 아니다.
+- `운영 검증` 체크는 실제 로그인 세션에서 화면을 열고, 네트워크/API 응답과 화면 값을 대조한 경우에만 한다.
+- 액션 버튼은 클릭 후 표/KPI/로그/DB 중 최소 2개 이상에서 결과가 확인되어야 검증 완료로 본다.
+- KPI는 프론트 하드코딩/샘플 JSON이 아니라 API 응답 또는 DB 집계 기준임을 확인해야 한다.
+- 국가/기간 드롭다운이 있는 페이지는 `전체 기간`, `1D`, `7D`, `30D`, 국가 개별 선택을 최소 케이스로 확인한다.
+- 검색/필터/엑셀/페이지네이션/row 상세/모바일 반응형은 페이지별 공통 검수 항목으로 본다.
+- 운영에서 확인하지 못한 항목은 `미검증` 또는 `[ ]` 상태로 유지한다.
+
+## 현재 기준 HEAD
+
+- [x] 프론트 현재 로컬 HEAD: `ead5ddf`
+- [x] API 현재 로컬 HEAD: `2e7ed96`
+- [ ] 운영 서버가 위 HEAD와 정확히 일치하는지 재확인
+- [ ] 운영 로그인 세션에서 전체 라우트 smoke test 재실행
+
 ## 범례
 
 - [x] 코드 반영 또는 명령 검증 완료
@@ -19,10 +39,10 @@
 - [x] API 저장소 최신화: `/home/ubuntu/work/korion_chong`
 - [x] 프론트 빌드 통과: `npm run build`
 - [x] API 전체 테스트 통과: `./gradlew clean test --no-daemon`
-- [x] 프론트 커밋/푸시 완료: `c9b4f6e`, `1bb2820`, `49f8839`
-- [x] API 커밋/푸시 완료: `c3e5f5a`, `5d4ba61`, `04acd9a`
-- [x] 프론트 운영 배포 완료: `52.44.202.187:/var/www/korion_hq`, HEAD `49f8839`
-- [x] API 운영 배포 완료: `54.83.183.123:/var/www/korion_chong`, HEAD `04acd9a`
+- [x] 프론트 커밋/푸시 완료: 기존 `c9b4f6e`, `1bb2820`, `49f8839` 이후 최신 `ead5ddf`
+- [x] API 커밋/푸시 완료: 기존 `c3e5f5a`, `5d4ba61`, `04acd9a` 이후 최신 `2e7ed96`
+- [x] 프론트 운영 배포 완료 이력: `52.44.202.187:/var/www/korion_hq`
+- [x] API 운영 배포 완료 이력: `54.83.183.123:/var/www/korion_chong`
 - [x] 프론트 컨테이너 확인: `korion-hq-web` healthy
 - [x] API health 확인: `https://chong.korion.io.kr/actuator/health` = `UP`
 - [x] SPA route 확인: `https://admin.korion.network/hq/logs/security` = 200
@@ -132,6 +152,7 @@
 - [x] Quick Action 이동 경로 코드 반영
 - [x] 리스크 액션 API 코드 존재: `/api/hq/dashboard/risk-actions`
 - [x] `dashboardData.json` import/fallback 제거 확인
+- [x] 국가/기간 필터에 따른 KPI/섹션 값 프론트 보정 제거. API 응답 그대로 표시
 - [ ] Quick Action 모든 버튼 실제 이동 확인
 - [ ] KPI/차트/AI insight 실제 데이터 확인
 
@@ -167,6 +188,8 @@
 - [x] 액션별 색상 분리 코드 반영
 - [x] 액션 후 reload 코드 반영
 - [x] export URL 연결 코드 존재
+- [x] HQ 요청 approve/reject/review/waiting/request-info 성공 시 관리자 계정 기반 감사 로그 기록 코드 반영
+- [x] HQ 요청 감사 로그 컨트롤러/저장소 테스트 추가
 - [ ] 승인/거절/검토/대기/자료요청 DB 반영 확인
 - [ ] 요청 처리 결과 로그 반영 확인
 - [ ] 각 요청 페이지 No 최신순 확인
@@ -357,6 +380,16 @@
 - [ ] 필터에 맞는 데이터 반영 확인
 - [ ] 충전/해제 전후 담보금 확인
 - [ ] 회원정보 액션 실제 연결 확인
+
+### 담보 미충전 알림
+- [x] HQ 상단 알림 API 코드 존재: `/api/hq/notifications`
+- [x] 미충전 기준 코드 반영: `KORI` 사용 가능 지갑 잔액 > 0 이고 활성/잠금 담보 잔액 = 0
+- [x] HQ 상단 벨에서 알림 API 호출 코드 반영
+- [x] 알림 클릭 시 `/hq/collateral/history` 이동 코드 반영
+- [x] 저장소 테스트로 미충전 SQL 조건 고정
+- [ ] 운영 DB에서 담보 미충전 대상 사용자 수와 알림 카운트 일치 확인
+- [ ] 담보 충전 후 알림에서 대상이 빠지는지 확인
+- [ ] 실제 사용자 앱/지갑 푸시까지 필요한 경우 별도 사용자 알림 API 연동 확인
 
 ## 리스크 관리
 
@@ -549,3 +582,101 @@
 - [ ] 리스크/통계 페이지가 “구현 예정” 또는 더미 데이터처럼 보이지 않는지 확인
 - [ ] 모든 표에서 긴 컬럼이 잘리지 않고 가로 스크롤/resize가 되는지 확인
 - [ ] 모든 액션 후 활동 로그/처리 결과 로그가 실제로 쌓이는지 확인
+
+## 운영 검증 증거 기록표
+
+검증할 때는 아래 형식으로 증거를 남긴다. 화면만 보고 넘어가지 않는다.
+
+| 일시 | 환경 | 계정 | 라우트 | 확인 항목 | API/DB 증거 | 화면 결과 | 판정 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+|  | 운영 | `korionadmin` | `/hq/dashboard` | 국가/기간 필터, KPI |  |  |  |
+|  | 운영 | `korionadmin` | `/hq/requests/leader` | 승인/거절/검토/자료요청 |  |  |  |
+|  | 운영 | `korionadmin` | `/hq/settlement/request` | 상세 이동/정산 액션 |  |  |  |
+|  | 운영 | `korionadmin` | `/hq/announcements/send` | 즉시/예약/임시저장 |  |  |  |
+|  | 운영 | `korionadmin` | `/hq/system/country` | 국가 추가/상태/결제 토글 |  |  |  |
+
+## 리더/파트너/가맹점 포털 회귀 체크
+
+아래 항목은 기존 `kori_partners` 역할 포털에서 반복 지적된 내용이다. HQ 작업과 별개로 운영에서 다시 확인해야 한다.
+
+### 공통
+
+- [ ] 상단바 모바일 반응형: 알림/언어/로그아웃 버튼이 2열로 밀리지 않는지 확인
+- [ ] 사이드바 프로필 카드: 상위 관리자/관리 코드/국가/운영 상태가 실제 로그인 계정 기준으로 나오는지 확인
+- [ ] 상태 뱃지: 승인/대기/재확인/정지/블랙/보류/완료 색상과 크기가 공통 Badge와 맞는지 확인
+- [ ] i18n: EN 모드에서 sender/target/method/action/status가 한국어로 남지 않는지 확인
+- [ ] No 컬럼: 번호에 뱃지가 붙지 않고 최신/큰 번호가 위에 오는지 확인
+- [ ] 공지 카드/대시보드 공지 영역: 긴 내용이 잘리지 않고 스크롤 또는 높이 처리가 되는지 확인
+- [ ] 검색/필터/엑셀/페이지네이션: DataTable 공통 기능이 각 역할 페이지에서 동작하는지 확인
+- [ ] row click 상세: 클릭 가능한 행이 상세 모달/상세 탭/하위 목록으로 정상 이동하는지 확인
+- [ ] 활동 로그: action/status/target이 의미 없는 숫자나 원문 enum으로 나오지 않는지 확인
+
+### 가맹점 포털
+
+- [ ] `/merchant/dashboard`: KPI, 공지, 최근활동 데이터가 실제 가맹점 기준인지 확인
+- [ ] `/merchant/transactions`: `월 거래 건수` 컬럼 제거, `QR / NFC / BLE` 라벨 확인
+- [ ] `/merchant/transactions/refund`: 메뉴에서 숨김 처리 유지 확인
+- [ ] `/merchant/transactions/failed`: 메뉴에서 숨김 처리 유지 확인
+- [ ] `/merchant/hq-notices`: No 최신순, 번호 뱃지 제거, author/target i18n 확인
+- [ ] `/merchant/settings/profile`: 상위 관리자 수정 요청 버튼명, 파일 선택 optional, 5MB 제한, 오류 메시지/i18n 확인
+- [ ] `/merchant/settings/profile`: 상태 영역이 공통 input box/상태 badge 구조와 맞는지 확인
+- [ ] `/merchant/settings/activity-log`: 대상 숫자 노출 제거, action i18n, 실제 로그 데이터 확인
+
+### 파트너 포털
+
+- [ ] `/partner/dashboard`: 하부 가맹점 수, 승인 대기, 미확인 공지, 총 매출, 거래건수 API 기준 확인
+- [ ] `/partner/requests/merchant`: 가입 요청과 수정 요청이 모두 들어오는지 확인
+- [ ] `/partner/requests/merchant`: 본사-파트너-가맹점 구조에서 승인구조 버튼이 아니라 승인 버튼인지 확인
+- [ ] `/partner/requests/merchant/actions`: 승인/보류/정지/수정 요청 액션 로그가 쌓이는지 확인
+- [ ] `/partner/merchants`: 가맹점 코드가 `<국가코드>-MER-<숫자>` 규칙인지 확인
+- [ ] `/partner/merchants/sales`: 가맹점 row 클릭 시 해당 가맹점 거래 상세가 열리는지 확인
+- [ ] `/partner/settlement/request`: 정산 요청 성공 후 HQ 정산 요청에 들어오는지, 성공 후 reload/상태 갱신 확인
+- [ ] `/partner/settlement/history`: 정산번호 왼쪽 No 컬럼, 상태 뱃지/i18n 확인
+- [ ] `/partner/hq-notices`: 가맹점 페이지와 CSS/구조/No 정렬 일치 확인
+- [ ] `/partner/notices/send`: 대상 선택, 즉시/예약 차이, 임시저장/임시목록, KPI 하단 설명/뱃지 확인
+- [ ] `/partner/notices/history`: sender/target/method/action i18n, 상세에서 title/content/대상 구분 확인
+- [ ] `/partner/settings/profile`: 상위 관리자 답변 read-only, 버튼명 `상위 관리자 수정 요청`, 뱃지 스타일 확인
+- [ ] `/partner/settings/activity-log`: action enum i18n, `PARTNER_SUSPENDED` 등 누락 매핑 확인
+
+### 리더 포털
+
+- [ ] `/leader/dashboard`: 첨부 이미지 기준 KPI 구성, 국가 필터 제거, 공지/요청/최근활동 데이터 확인
+- [ ] `/leader/dashboard`: 하부 파트너/가맹점, 활성회원수, 거래량/거래건수, 수수료, 증감 뱃지 확인
+- [ ] `/leader/requests/partner`: 파트너 페이지와 동일한 action 버튼/상태 뱃지/클릭 동작 확인
+- [ ] `/leader/requests/partner`: 파트너 코드/파트너명/담당지역/하위 가맹점수/월거래액/월거래건수 실제 집계 확인
+- [ ] `/leader/requests/merchant`: 활성/추천/직통/블랙 가맹점 KPI가 API 기준인지 확인
+- [ ] `/leader/partners`: 총/활성/정지/블랙 파트너 카운트, 정지 상태의 active/black 버튼 확인
+- [ ] `/leader/partners/detail`: 상단 status bar와 code hero 설명이 가맹점 상세 양식과 맞는지 확인
+- [ ] `/leader/partners/sales`: 표 컬럼, row click 하위 가맹점, 하위 가맹점 row click 거래내역 확인
+- [ ] `/leader/merchants/detail`: status bar 뱃지 전체 노출 확인
+- [ ] `/leader/merchants/sales`: QR/NFC/BLE 뱃지와 하부 데이터 확인
+- [ ] `/leader/transactions/offline`: 데이터 존재/필터/상세 확인
+- [ ] `/leader/transactions/failed`: No 뱃지 제거 확인
+- [ ] `/leader/settlement/request`: 안내 문구, 지갑/통화, 정산요청 API/HQ 유입, 수익 합계 확인
+- [ ] `/leader/settlement/history`: 데이터 보강, 정산번호 옆 No 컬럼 확인
+- [ ] `/leader/hq-notices`: EN 모드 target 뱃지 한국어 잔존 확인
+- [ ] `/leader/notices/send`: 특정 파트너/가맹점 선택 모달, target filter 표시, 즉시/예약/임시저장 확인
+- [ ] `/leader/notices/history`: 10개 이상 데이터, 타입 뱃지, No 최신순, 상세 title/content/대상 구분 확인
+- [ ] `/leader/settings/profile`: read-only 필드, 상위 관리자 답변 read-only, 첨부 placeholder, 하위 가맹점/미정산수수료 계산 확인
+- [ ] `/leader/settings/activity-log`: KPI 설명/뱃지, action enum 매핑, 실제 로그 데이터 확인
+
+## 본사 신청/승인 흐름 점검
+
+이 항목은 화면만으로 끝내지 않고 DB/API 경로까지 확인해야 한다.
+
+- [ ] 리더가 승인요청한 파트너 요청이 `/hq/requests/leader` 또는 의도한 HQ 요청 페이지에 들어오는지 확인
+- [ ] 본사-파트너 구조의 파트너 직접 신청이 `/hq/requests/partner-direct`에 들어오는지 확인
+- [ ] 본사-가맹점 구조의 가맹점 직접 신청이 `/hq/requests/merchant-direct`에 들어오는지 확인
+- [ ] 가입 요청에서 리더로 가입한 파트너가 리더 승인 후 HQ 승인 요청으로 올라오는지 확인
+- [ ] 승인/거절/검토/자료요청이 `/hq/requests/result-log`에 기록되는지 확인
+- [ ] 처리 완료된 요청이 원래 대기 목록에서 사라지고 결과 로그에 남는지 확인
+- [ ] 누락된 구조가 있으면 요청 유형 enum/API/라우트/표 라벨을 함께 보강
+
+## 검증 우선순위
+
+1. 로그인/권한/라우팅: HQ, 리더, 파트너, 가맹점 각 역할로 1회씩 실제 로그인
+2. 금전/정산/수수료: 정산 요청, 정산 상세, 수수료/배분율, 담보금 화면
+3. 승인 흐름: 리더/파트너/가맹점 신청과 HQ 요청 페이지 유입
+4. 공지 흐름: 즉시/예약/임시저장/취소/수신자 목록
+5. 리스크/로그: 액션 로그, 보안 로그, 위험 상태 처리
+6. UI 회귀: 뱃지 크기/색상, No 컬럼, 모바일, i18n, 검색/필터/엑셀
