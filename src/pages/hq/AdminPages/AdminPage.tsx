@@ -60,15 +60,22 @@ interface CountryAccessFormState {
   menuPermissions: string
 }
 
+interface LoginSecurityFormState {
+  configValue: string
+  status: string
+}
+
 export default function AdminPage({ pageType }: AdminPageProps) {
   const { t } = useTranslation()
   const { title, desc, tableTitle, stats, columns, rows, isLoading, error, reload } = useHqAdminPage(pageType)
   const [selectedRow, setSelectedRow] = useState<null | HqAdminRowWithAccount>(null)
   const [selectedGroup, setSelectedGroup] = useState<null | HqAdminRowWithGroup>(null)
   const [selectedCountryAccess, setSelectedCountryAccess] = useState<null | HqAdminRowWithCountryAccess>(null)
+  const [selectedLoginSecurity, setSelectedLoginSecurity] = useState<null | HqAdminRowWithLoginSecurity>(null)
   const [form, setForm] = useState<AccountFormState>({ adminRole: 'HQ_STAFF', status: 'ACTIVE', parentAdminId: '', countryScope: 'ALL' })
   const [groupForm, setGroupForm] = useState<GroupFormState>({ scope: '', status: 'ACTIVE', permissions: '' })
   const [countryAccessForm, setCountryAccessForm] = useState<CountryAccessFormState>({ countryCode: 'ALL', status: 'ACTIVE', menuPermissions: '' })
+  const [loginSecurityForm, setLoginSecurityForm] = useState<LoginSecurityFormState>({ configValue: '', status: 'ACTIVE' })
   const [saveError, setSaveError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
 
@@ -112,6 +119,18 @@ export default function AdminPage({ pageType }: AdminPageProps) {
     setSaveError(null)
   }
 
+  const openLoginSecurityModal = (row: HqAdminRow) => {
+    if (pageType !== 'login-security') return
+    const policyKey = String(row.policyKey ?? row.id ?? '')
+    if (!policyKey) return
+    setSelectedLoginSecurity({ ...row, policyKey })
+    setLoginSecurityForm({
+      configValue: String(row.currentValue ?? ''),
+      status: String(row.status ?? '') === '검토필요' ? 'REVIEW' : 'ACTIVE',
+    })
+    setSaveError(null)
+  }
+
   const saveAccount = async () => {
     if (!selectedRow) return
     setIsSaving(true)
@@ -148,6 +167,25 @@ export default function AdminPage({ pageType }: AdminPageProps) {
       reload()
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : t('hqAdmin.countryModal.saveError'))
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const saveLoginSecurity = async () => {
+    if (!selectedLoginSecurity) return
+    setIsSaving(true)
+    setSaveError(null)
+    try {
+      await putHqPageData(`/api/hq/admin/login-security/${selectedLoginSecurity.policyKey}`, {
+        configValue: loginSecurityForm.configValue.trim(),
+        status: loginSecurityForm.status,
+        requestId: `hq-login-security-${Date.now()}`,
+      })
+      setSelectedLoginSecurity(null)
+      reload()
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : t('hqAdmin.loginModal.saveError'))
     } finally {
       setIsSaving(false)
     }
@@ -200,6 +238,8 @@ export default function AdminPage({ pageType }: AdminPageProps) {
                 openGroupModal(row)
               } else if (pageType === 'country-access') {
                 openCountryAccessModal(row)
+              } else if (pageType === 'login-security') {
+                openLoginSecurityModal(row)
               }
             }}
           />
@@ -373,6 +413,51 @@ export default function AdminPage({ pageType }: AdminPageProps) {
           </section>
         </div>
       )}
+
+      {selectedLoginSecurity && (
+        <div className={styles.overlay} onClick={() => setSelectedLoginSecurity(null)}>
+          <section className={styles.modal} role="dialog" aria-modal="true" aria-label={t('hqAdmin.loginModal.title')} onClick={(event) => event.stopPropagation()}>
+            <div className={styles.modalHead}>
+              <div>
+                <h2 className={styles.modalTitle}>{t('hqAdmin.loginModal.title')}</h2>
+                <p className={styles.modalDesc}>{t('hqAdmin.loginModal.desc')}</p>
+              </div>
+              <Badge accent={selectedLoginSecurity.status === '적용중' ? 'green' : 'orange'} size="md" shape="rect">{String(selectedLoginSecurity.status ?? '-')}</Badge>
+            </div>
+
+            <dl className={styles.detailGrid}>
+              <div><dt>{t('hqAdmin.col.policyName')}</dt><dd>{String(selectedLoginSecurity.policyName ?? '-')}</dd></div>
+              <div><dt>{t('hqAdmin.col.category')}</dt><dd>{String(selectedLoginSecurity.category ?? '-')}</dd></div>
+              <div><dt>{t('hqAdmin.col.controlRange')}</dt><dd>{String(selectedLoginSecurity.controlRange ?? '-')}</dd></div>
+              <div><dt>{t('hqAdmin.col.recommendedValue')}</dt><dd>{String(selectedLoginSecurity.recommendedValue ?? '-')}</dd></div>
+              <div><dt>{t('hqAdmin.col.enforcement')}</dt><dd>{String(selectedLoginSecurity.enforcement ?? '-')}</dd></div>
+              <div><dt>{t('hqAdmin.col.impact')}</dt><dd>{String(selectedLoginSecurity.impact ?? '-')}</dd></div>
+            </dl>
+
+            <div className={styles.formGrid}>
+              <label className={styles.field}>
+                <span>{t('hqAdmin.loginModal.configValue')}</span>
+                <input value={loginSecurityForm.configValue} onChange={(event) => setLoginSecurityForm((prev) => ({ ...prev, configValue: event.target.value }))} placeholder={t('hqAdmin.loginModal.configValuePlaceholder')} />
+              </label>
+              <label className={styles.field}>
+                <span>{t('hqAdmin.loginModal.status')}</span>
+                <select value={loginSecurityForm.status} onChange={(event) => setLoginSecurityForm((prev) => ({ ...prev, status: event.target.value }))}>
+                  <option value="ACTIVE">ACTIVE</option>
+                  <option value="REVIEW">REVIEW</option>
+                  <option value="DISABLED">DISABLED</option>
+                </select>
+              </label>
+            </div>
+
+            {saveError && <p className={styles.errorText}>{saveError}</p>}
+
+            <div className={styles.modalActions}>
+              <Button variant="secondary" onClick={() => setSelectedLoginSecurity(null)}>{t('hqAdmin.modal.cancel')}</Button>
+              <Button variant="primary" onClick={saveLoginSecurity} disabled={isSaving}>{isSaving ? t('common.loading') : t('hqAdmin.modal.save')}</Button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   )
 }
@@ -380,3 +465,4 @@ export default function AdminPage({ pageType }: AdminPageProps) {
 type HqAdminRowWithAccount = HqAdminRow & { adminId: number }
 type HqAdminRowWithGroup = HqAdminRow & { roleCode: string }
 type HqAdminRowWithCountryAccess = HqAdminRow & { adminId: number }
+type HqAdminRowWithLoginSecurity = HqAdminRow & { policyKey: string }
