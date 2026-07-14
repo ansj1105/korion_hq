@@ -265,17 +265,17 @@ function LeaderSalesDetail({ leaderCode }: { leaderCode: string }) {
             <div className={styles.settlementSection}>
               <h3 className={styles.settlementTitle}>{t('hqLeaderSales.settle.sec2')}</h3>
               <p className={styles.settlementDesc}>파트너명, 코드, 거래금액, 파트너 수수료, 상태 등을 확인합니다.</p>
-              <DataTable columns={leaderSettlement.partnerColumns} rows={settlementPartnerRows} bare mutedText fluid />
+              <DataTable columns={leaderSettlement.partnerColumns} rows={settlementPartnerRows} toolbar={[t('common.search'), t('common.filter'), t('common.excel')]} bare mutedText fluid />
             </div>
             <div className={styles.settlementSection}>
               <h3 className={styles.settlementTitle}>{t('hqLeaderSales.settle.sec3')}</h3>
               <p className={styles.settlementDesc}>직계약 가맹점의 코드와 수수료 정산 내역입니다.</p>
-              <DataTable columns={leaderSettlement.merchantColumns} rows={settlementMerchantRows} bare mutedText fluid />
+              <DataTable columns={leaderSettlement.merchantColumns} rows={settlementMerchantRows} toolbar={[t('common.search'), t('common.filter'), t('common.excel')]} bare mutedText fluid />
             </div>
             <div className={styles.settlementSection}>
               <h3 className={styles.settlementTitle}>{t('hqLeaderSales.settle.sec4')}</h3>
               <p className={styles.settlementDesc}>보류 사유, 거래금액, 보류 수수료와 처리 상태를 확인합니다.</p>
-              <DataTable columns={leaderSettlement.heldColumns} rows={heldRows} bare mutedText fluid />
+              <DataTable columns={leaderSettlement.heldColumns} rows={heldRows} toolbar={[t('common.search'), t('common.filter'), t('common.excel')]} bare mutedText fluid />
             </div>
             <DataTable
               title={t('settle.hist.tableTitle')}

@@ -1,22 +1,27 @@
 import { useState } from 'react'
 import RequestListPage from '../../../components/templates/RequestListPage'
-import ActionBadges from '../../../components/molecules/ActionBadges'
 import DetailSection from '../../../components/molecules/DetailSection'
 import DetailDrawer from '../../../components/organisms/DetailDrawer'
 import Badge from '../../../components/atoms/Badge'
 import Button from '../../../components/atoms/Button'
 import type { TableRow } from '../../../components/organisms/DataTable'
 import type { AccentKey } from '../../../types'
-import { ACCENT_VAR } from '../../../utils/accent'
 import { useTranslation } from '../../../i18n'
-import { usePaymentLog } from './usePaymentLog'
+import { postHqPageData } from '../../../services/korionChongApi'
+import { usePaymentLog, type PaymentLogRow } from './usePaymentLog'
 import { usePaymentLogDetail, type SyncStep } from './usePaymentLogDetail'
 import styles from './PaymentLog.module.css'
 
 /** 액션 컬럼에서 드로어를 여는 배지(데이터 enum). 나머지는 정산 처리 배지. */
 const DETAIL_LABEL = '상세'
-/** 정산 처리 배지 색: 지급완료=초록 / 보류해제=주황 / 지급보류=중립 */
-const SETTLE_ACCENT: Record<string, AccentKey> = { 지급완료: 'green', 보류해제: 'amber' }
+/** 정산 처리 배지 색: 지급완료=초록 / 보류해제=주황 / 지급보류=빨강 */
+const SETTLE_ACCENT: Record<string, AccentKey> = { 지급완료: 'green', 보류해제: 'amber', 지급보류: 'red' }
+
+interface PaymentSettlementHoldResponse {
+  statusLabel: string
+  statusAccent: AccentKey
+  actions: string[]
+}
 
 /*
  * PaymentLog (page) — 본사어드민 · 결제 모니터링 · 전체 결제 로그
@@ -34,6 +39,8 @@ export default function PaymentLog() {
 
   // 어느 행의 "상세"를 눌렀는지(=드로어 열림 여부). null이면 닫힘.
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [pendingActionId, setPendingActionId] = useState<string | null>(null)
+  const [rowOverrides, setRowOverrides] = useState<Record<string, Partial<Pick<PaymentLogRow, 'statusLabel' | 'statusAccent' | 'actions'>>>>({})
   const detail = usePaymentLogDetail(selectedId)
 
   // Sync 스텝 상태 → 스타일 클래스 매핑(완료/진행/대기)
@@ -43,27 +50,83 @@ export default function PaymentLog() {
     pending: styles.stepPending,
   }
 
-  const rows: TableRow[] = rawRows.map((r) => ({
-    id: r.id,
-    cells: {
-      ...r,
-      // 상태는 알약이 아니라 색 글자(성공=초록/실패=빨강/대기=주황) — 색은 토큰 변수로 주입
-      status: (
-        <span className={styles.status} style={{ color: ACCENT_VAR[r.statusAccent] }}>
-          {r.status}
-        </span>
-      ),
-      // 액션: 정산 처리 배지(정적) + 클릭 가능한 "상세" 배지(드로어 오픈)
-      action: (
-        <div className={styles.actionCell}>
-          <ActionBadges labels={r.actions.filter((a) => a !== DETAIL_LABEL)} accentByLabel={SETTLE_ACCENT} size="xs" />
-          <button type="button" className={styles.detailButton} onClick={() => setSelectedId(r.id)}>
-            <Badge size="xs">{t('common.detail')}</Badge>
-          </button>
-        </div>
-      ),
-    },
-  }))
+  const handleSettlementAction = async (rowId: string, label: string) => {
+    if (label !== '지급보류' && label !== '보류해제') return
+    const entryId = parseCommissionEntryId(rowId)
+    if (!entryId) return
+    setPendingActionId(rowId)
+    try {
+      const response = await postHqPageData<PaymentSettlementHoldResponse>(
+        `/api/hq/payments/logs/${entryId}/settlement-hold`,
+        {
+          action: label === '지급보류' ? 'HOLD' : 'RELEASE',
+          reason: label === '지급보류' ? 'HQ payment log manual settlement hold' : 'HQ payment log manual settlement hold release',
+        },
+      )
+      setRowOverrides((prev) => ({
+        ...prev,
+        [rowId]: {
+          statusLabel: response.statusLabel,
+          statusAccent: response.statusAccent,
+          actions: response.actions,
+        },
+      }))
+    } catch {
+      window.alert('정산 상태 변경에 실패했습니다.')
+    } finally {
+      setPendingActionId(null)
+    }
+  }
+
+  const rows: TableRow[] = rawRows.map((rawRow) => {
+    const r = { ...rawRow, ...(rowOverrides[rawRow.id] ?? {}) }
+    const settlementActions = r.actions.filter((a) => a !== DETAIL_LABEL)
+    return {
+      id: r.id,
+      cells: {
+        ...r,
+        no: r.no,
+        status: (
+          <Badge accent={r.statusAccent} size="md" shape="rect">
+            {r.statusLabel ?? r.status}
+          </Badge>
+        ),
+        // 액션: 정산 처리 배지 + 클릭 가능한 "상세" 배지(드로어 오픈)
+        action: (
+          <div className={styles.actionCell}>
+            {settlementActions.map((label) => (
+              <button
+                key={label}
+                type="button"
+                className={styles.actionButton}
+                disabled={pendingActionId === r.id || label === '지급완료'}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  handleSettlementAction(r.id, label)
+                }}
+              >
+                <Badge accent={SETTLE_ACCENT[label]} size="md" shape="rect">
+                  {label}
+                </Badge>
+              </button>
+            ))}
+            <button
+              type="button"
+              className={styles.detailButton}
+              onClick={(event) => {
+                event.stopPropagation()
+                setSelectedId(r.id)
+              }}
+            >
+              <Badge size="md" shape="rect">
+                {t('common.detail')}
+              </Badge>
+            </button>
+          </div>
+        ),
+      },
+    }
+  })
 
   const { sections } = detail
 
@@ -79,6 +142,7 @@ export default function PaymentLog() {
         toolbar={[t('common.search'), t('common.filter'), t('common.excel')]}
         toolbarInline
         tableMutedText
+        onRowClick={(id) => setSelectedId(id)}
         /* 15컬럼이라 가로폭은 컨테이너에 고정하고, 긴 값은 가로 스크롤 대신 다음 줄로 줄바꿈해 끝까지 보이게 */
         tableFluid
         tableWrapCells
@@ -141,4 +205,9 @@ export default function PaymentLog() {
       </DetailDrawer>
     </>
   )
+}
+
+function parseCommissionEntryId(rowId: string) {
+  const match = rowId.match(/^CE-(\d+)$/)
+  return match ? Number(match[1]) : null
 }

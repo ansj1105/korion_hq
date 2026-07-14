@@ -1,4 +1,5 @@
 import { useTranslation } from '../../../i18n'
+import type { MerchantSalesLogRow } from './useMerchantSales'
 import data from './transactionDetailData.json'
 import styles from './TransactionDetailModal.module.css'
 
@@ -10,6 +11,7 @@ interface FieldRaw {
 }
 
 interface TransactionDetailModalProps {
+  transaction?: MerchantSalesLogRow | null
   /** 닫기(확인/배경 클릭) — 표시 전용 모달이라 저장/지급보류도 동작은 추후 협의 */
   onClose: () => void
 }
@@ -22,8 +24,28 @@ interface TransactionDetailModalProps {
  * 데이터는 Figma 샘플값 하드코딩(transactionDetailData.json) — 실데이터 연동 시
  * 클릭한 행의 거래번호로 조회해 채우면 된다.
  */
-export default function TransactionDetailModal({ onClose }: TransactionDetailModalProps) {
+export default function TransactionDetailModal({ transaction, onClose }: TransactionDetailModalProps) {
   const { t } = useTranslation()
+  const fields: FieldRaw[] = transaction
+    ? [
+        { labelKey: 'hqMerchantSales.col.txNo', value: transaction.txNo },
+        { labelKey: 'hqMerchantSales.col.partnerCode', value: transaction.partnerCode, small: true },
+        { labelKey: 'hqMerchantSales.col.txAt', value: transaction.txAt },
+        { labelKey: 'hqMerchantSales.col.merchantCode', value: transaction.merchantCode, small: true },
+        { labelKey: 'hqMerchantSales.col.merchantName', value: transaction.merchantName },
+        { labelKey: 'hqMerchantSales.col.amount', value: transaction.amount },
+        { labelKey: 'hqMerchantSales.txModal.balanceAfter', value: transaction.balanceAfter ?? '-' },
+        { labelKey: 'hqMerchantSales.txModal.txTypeDisplay', value: transaction.txTypeDisplay ?? transaction.status },
+        { labelKey: 'hqMerchantSales.txModal.counterpartyDisplay', value: transaction.counterpartyDisplay ?? '-' },
+        { labelKey: 'hqMerchantSales.col.fee', value: transaction.fee },
+        { labelKey: 'hqMerchantSales.txModal.category', value: transaction.category ?? '-' },
+        { labelKey: 'hqMerchantSales.txModal.payMethod', value: transaction.method },
+        { labelKey: 'hqMerchantSales.txModal.tokenName', value: transaction.tokenName ?? 'KORI' },
+        { labelKey: 'hqMerchantSales.txModal.network', value: transaction.network ?? '-' },
+        { labelKey: 'hqMerchantSales.txModal.walletAddress', value: transaction.walletAddress ?? '-', small: true },
+        { labelKey: 'hqMerchantSales.txModal.payer', value: transaction.payer ?? '-' },
+      ]
+    : (data.fields as FieldRaw[])
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -31,7 +53,7 @@ export default function TransactionDetailModal({ onClose }: TransactionDetailMod
         <h2 className={styles.title}>{t('hqMerchantSales.txModal.title')}</h2>
 
         <dl className={styles.fields}>
-          {(data.fields as FieldRaw[]).map((f) => (
+          {fields.map((f) => (
             <div key={f.labelKey} className={styles.fieldRow}>
               <dt className={styles.fieldLabel}>{t(f.labelKey)}</dt>
               <dd className={f.small ? `${styles.fieldValue} ${styles.fieldValueSm}` : styles.fieldValue}>
@@ -42,7 +64,7 @@ export default function TransactionDetailModal({ onClose }: TransactionDetailMod
         </dl>
 
         <p className={styles.memoLabel}>{t('hqMerchantSales.txModal.memo')}</p>
-        <textarea className={styles.memoBox} defaultValue={data.memo} aria-label={t('hqMerchantSales.txModal.memo')} />
+        <textarea className={styles.memoBox} defaultValue={transaction?.memo ?? data.memo} aria-label={t('hqMerchantSales.txModal.memo')} />
 
         <p className={styles.memoLabel}>{t('hqMerchantSales.txModal.adminMemo')}</p>
         <textarea

@@ -202,7 +202,7 @@ function PartnerSalesDetail({ partnerCode, initialTab }: { partnerCode: string; 
             <div className={styles.settlementSection}>
               <h3 className={styles.settlementTitle}>{t('hqPartnerSales.settle.sec2')}</h3>
               <p className={styles.settlementDesc}>보류 사유, 거래금액, 보류 수수료와 처리 상태를 확인합니다.</p>
-              <DataTable columns={partnerSettlement.heldColumns} rows={heldRows} bare mutedText fluid />
+              <DataTable columns={partnerSettlement.heldColumns} rows={heldRows} toolbar={[t('common.search'), t('common.filter'), t('common.excel')]} bare mutedText fluid />
             </div>
             <DataTable
               title={t('settle.hist.tableTitle')}

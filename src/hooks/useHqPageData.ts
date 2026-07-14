@@ -3,12 +3,19 @@ import { fetchHqPageData } from '../services/korionChongApi'
 
 type Query = Record<string, string | number | undefined>
 
-export function useHqPageData<T>(path: string, initialData: T, query?: Query) {
+export function useHqPageData<T>(path: string | null, initialData: T, query?: Query) {
   const [data, setData] = useState<T>(initialData)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!path) {
+      setData(initialData)
+      setIsLoading(false)
+      setError(null)
+      return
+    }
+
     let cancelled = false
     setIsLoading(true)
     setError(null)

@@ -185,14 +185,14 @@ export default function HqSettlementRequestDetail() {
       <div className={styles.sectionBox}>
         <h3 className={styles.sectionTitle}>{t('hqSettle.reqDetail.pt.title')}</h3>
         <p className={styles.sectionDesc}>{partnerTable.desc}</p>
-        <DataTable columns={partnerTable.columns} rows={ptRows} bare />
+        <DataTable columns={partnerTable.columns} rows={ptRows} toolbar={[t('common.search'), t('common.filter'), t('common.excel')]} bare />
       </div>
 
       {/* 보류 / 제외 거래 */}
       <div className={styles.sectionBox}>
         <h3 className={styles.sectionTitle}>{t('hqSettle.reqDetail.ht.title')}</h3>
         <p className={styles.sectionDesc}>{heldTable.desc}</p>
-        <DataTable columns={heldTable.columns} rows={htRows} bare />
+        <DataTable columns={heldTable.columns} rows={htRows} toolbar={[t('common.search'), t('common.filter'), t('common.excel')]} bare />
       </div>
 
       {/* 본사 정산 요청 폼 */}

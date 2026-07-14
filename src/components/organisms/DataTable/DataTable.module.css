@@ -163,10 +163,39 @@
 /* 툴바(검색/필터/Excel 등) */
 .toolbar {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: var(--space-2);
 }
 
+.searchInput {
+  min-width: 180px;
+  max-width: 260px;
+  height: 32px;
+  padding: 0 var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 62%, transparent);
+  border-radius: var(--radius-sm);
+  background-color: color-mix(in srgb, var(--color-bg-elevated) 82%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-11);
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-muted);
+}
+
+.searchInput:focus {
+  border-color: var(--color-accent-cyan);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent-cyan) 18%, transparent);
+}
+
 .toolbarButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);   /* 10 */
   border: 1px solid var(--color-border-accent);
@@ -174,6 +203,74 @@
   font-size: var(--font-size-11);
   font-weight: var(--font-weight-bold);
   color: var(--color-text);
+}
+
+.toolbarBadge {
+  min-width: 16px;
+  height: 16px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background-color: var(--color-accent-cyan);
+  color: #061018;
+  font-size: 10px;
+  line-height: 16px;
+  font-weight: var(--font-weight-bold);
+}
+
+.filterPanel {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 45%, transparent);
+  border-radius: var(--radius-sm);
+  background-color: color-mix(in srgb, var(--color-surface) 54%, transparent);
+}
+
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 132px;
+}
+
+.filterLabel {
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+}
+
+.filterSelect {
+  height: 32px;
+  padding: 0 var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 62%, transparent);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--font-size-11);
+  outline: none;
+}
+
+.filterSelect:focus {
+  border-color: var(--color-accent-cyan);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent-cyan) 18%, transparent);
+}
+
+.filterResetButton {
+  height: 32px;
+  padding: 0 var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 55%, transparent);
+  border-radius: var(--radius-sm);
+  background-color: color-mix(in srgb, var(--color-bg-elevated) 82%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-bold);
+}
+
+.filterEmpty {
+  font-size: var(--font-size-11);
+  color: var(--color-text-muted);
 }
 
 /* 헤더 행과 데이터 행은 동일한 그리드 컬럼 구성을 공유한다 (--cols로 주입) */
@@ -217,14 +314,59 @@
 }
 
 .headerCell {
+  position: relative;
+  display: flex;
+  align-items: center;
   font-size: var(--cell-fs);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-muted);
   /* 헤더도 컬럼 폭에 맞춰 줄어들도록(트랙이 헤더 글자폭에 끌려 벌어지지 않게) */
   min-width: 0;
+  padding-right: 10px;
+}
+
+.headerLabel {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.resizeHandle {
+  position: absolute;
+  top: 0;
+  right: -4px;
+  z-index: 2;
+  width: 8px;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: col-resize;
+}
+
+.resizeHandle::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  bottom: 20%;
+  left: 50%;
+  width: 1px;
+  background-color: color-mix(in srgb, var(--color-border-accent) 82%, transparent);
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity 0.15s ease;
+}
+
+.resizeHandle:hover::after,
+.resizeHandle:focus-visible::after {
+  opacity: 1;
+}
+
+.resizeHandle:focus-visible {
+  outline: 1px solid var(--color-border-accent);
+  outline-offset: 1px;
+  border-radius: 999px;
 }
 
 /* 데이터 행 — 둥근 반투명 바. 좌우 패딩도 표 폭에 비례(좁아지면 글자 공간 확보) */
@@ -267,7 +409,7 @@
   word-break: break-word;
 }
 /* 헤더 셀도 길면 줄바꿈(라벨이 컬럼보다 길 때 잘리지 않게) */
-.wrapCells .headerCell {
+.wrapCells .headerLabel {
   white-space: normal;
   word-break: break-word;
 }

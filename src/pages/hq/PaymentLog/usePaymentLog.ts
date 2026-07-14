@@ -2,17 +2,27 @@ import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import type { AccentKey } from '../../../types'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 import data from './paymentLogData.json'
 
 interface KpiRaw {
   id: string
   labelKey: string
   value: string
-  noteKey: string
+  noteKey?: string
+  delta?: string
+  deltaBadge?: boolean
+}
+
+interface PaymentLogPageData {
+  kpis?: KpiRaw[]
+  stats?: KpiRaw[]
+  rows: PaymentLogRow[]
 }
 
 /** 전체 결제 로그 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
 export interface PaymentLogRow {
+  no: string
   id: string
   txId: string
   sessionId: string
@@ -28,7 +38,8 @@ export interface PaymentLogRow {
   netAmount: string
   payer: string
   /** 결제 상태 값(성공/실패/대기) — enum/데이터라 번역 대상 아님 */
-  status: string
+  status?: string
+  statusLabel?: string
   /** 상태 글자색 강조 (성공=green / 실패=red / 대기=amber) */
   statusAccent: AccentKey
   /** 액션 배지 라벨(정산 처리 + 상세). enum/데이터라 번역 대상 아님 */
@@ -44,16 +55,18 @@ export interface PaymentLogRow {
  */
 export function usePaymentLog() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useHqPageData<PaymentLogPageData>('/api/hq/payments/logs', data as PaymentLogPageData)
 
-  // KPI 카드 10개 — 라벨/증감줄은 번역, 값은 데이터 그대로. 증감줄은 cyan(기본 deltaTone).
-  const kpis: StatCardData[] = (data.kpis as KpiRaw[]).map((k) => ({
+  const kpis: StatCardData[] = (pageData.stats ?? pageData.kpis ?? []).map((k) => ({
     id: k.id,
     label: t(k.labelKey),
     value: k.value,
-    delta: t(k.noteKey),
+    delta: k.delta ?? (k.noteKey ? t(k.noteKey) : undefined),
+    deltaBadge: k.deltaBadge ?? Boolean(k.delta),
   }))
 
   const columns: Column[] = [
+    { key: 'no', label: t('hqPaymentLog.col.no'), width: '0.5fr', align: 'center' },
     { key: 'txId', label: t('hqPaymentLog.col.txId'), width: '1.2fr' },
     { key: 'sessionId', label: t('hqPaymentLog.col.sessionId'), width: '0.9fr' },
     { key: 'datetime', label: t('hqPaymentLog.col.datetime'), width: '1.1fr' },
@@ -78,6 +91,8 @@ export function usePaymentLog() {
     title: t('hqPaymentLog.title'),
     kpis,
     columns,
-    rows: data.rows as PaymentLogRow[],
+    rows: pageData.rows as PaymentLogRow[],
+    isLoading,
+    error,
   }
 }

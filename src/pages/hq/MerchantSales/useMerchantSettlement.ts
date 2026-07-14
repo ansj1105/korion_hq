@@ -1,5 +1,6 @@
 import { useTranslation } from '../../../i18n'
 import type { Column } from '../../../components/organisms/DataTable'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 import data from './merchantSettlementData.json'
 
 interface FieldRaw {
@@ -24,11 +25,15 @@ export interface MerchantSettleSummaryItem {
  * 문구·샘플값이 파트너 정산내역 탭과 같아 기존 i18n 키를 재사용한다.
  * 파일 분리 이유는 다른 탭과 동일 — 기존 훅의 API 연동 병렬 작업과 충돌 방지.
  */
-export function useMerchantSettlement() {
+export function useMerchantSettlement(merchantCode?: string) {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useHqPageData(
+    merchantCode ? `/api/hq/merchants/${encodeURIComponent(merchantCode)}/sales/settlement` : null,
+    data,
+  )
 
-  const summary: MerchantSettleSummaryItem[] = (data.summary as FieldRaw[]).map((f) => ({
-    label: t(f.labelKey),
+  const summary: MerchantSettleSummaryItem[] = (pageData.summary as Array<FieldRaw & { label?: string }>).map((f) => ({
+    label: f.label ?? (f.labelKey ? t(f.labelKey) : '-'),
     value: f.value,
     color: f.color,
   }))
@@ -57,8 +62,10 @@ export function useMerchantSettlement() {
   return {
     summary,
     heldColumns,
-    heldRows: data.heldRows as Array<Record<string, string>>,
+    heldRows: pageData.heldRows as Array<Record<string, string>>,
     historyColumns,
-    historyRows: data.historyRows as Array<Record<string, string>>,
+    historyRows: pageData.historyRows as Array<Record<string, string>>,
+    isLoading,
+    error,
   }
 }

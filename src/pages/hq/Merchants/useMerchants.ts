@@ -1,20 +1,27 @@
 import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 import data from './merchantsData.json'
 
 interface StatRaw {
   id: string
   labelKey: string
   value: string
+  delta?: string
   deltaKey?: string
+  deltaBadge?: boolean
 }
+
+export type HqMerchantStatus = 'approved' | 'suspended' | 'black'
 
 /** 가맹점 전체 목록(본사) 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
 export interface HqMerchantListRow {
   no: string
+  appliedAt?: string
   leaderCode: string
   partnerCode: string
+  merchantCode: string
   country: string
   region: string
   merchantName: string
@@ -22,7 +29,8 @@ export interface HqMerchantListRow {
   monthVolume: string
   monthTxCount: string
   fee: string
-  actions: string[]
+  status?: HqMerchantStatus
+  actions?: string[]
 }
 
 /*
@@ -33,18 +41,22 @@ export interface HqMerchantListRow {
  */
 export function useMerchants() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useHqPageData('/api/hq/merchants', data)
 
-  const stats: StatCardData[] = (data.stats as StatRaw[]).map((s) => ({
+  const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
-    delta: s.deltaKey ? t(s.deltaKey) : undefined,
+    delta: s.delta ?? (s.deltaKey ? t(s.deltaKey) : undefined),
+    deltaBadge: s.deltaBadge ?? Boolean(s.delta ?? s.deltaKey),
   }))
 
   const columns: Column[] = [
     { key: 'no', label: t('hqMerchantList.col.no'), width: '1fr' },
+    { key: 'appliedAt', label: t('hqMerchantList.col.appliedAt'), width: '1fr' },
     { key: 'leaderCode', label: t('hqMerchantList.col.leaderCode'), width: '1.1fr' },
     { key: 'partnerCode', label: t('hqMerchantList.col.partnerCode'), width: '1.1fr' },
+    { key: 'merchantCode', label: t('hqMerchantList.col.merchantCode'), width: '1.1fr' },
     { key: 'country', label: t('hqMerchantList.col.country'), width: '0.8fr' },
     { key: 'region', label: t('hqMerchantList.col.region'), width: '0.8fr' },
     { key: 'merchantName', label: t('hqMerchantList.col.merchantName'), width: '1fr' },
@@ -52,8 +64,15 @@ export function useMerchants() {
     { key: 'monthVolume', label: t('hqMerchantList.col.monthVolume'), width: '1fr' },
     { key: 'monthTxCount', label: t('hqMerchantList.col.monthTxCount'), width: '0.9fr' },
     { key: 'fee', label: t('hqMerchantList.col.fee'), width: '0.9fr' },
-    { key: 'action', label: t('hqMerchantList.col.action'), width: '1.3fr' },
+    { key: 'status', label: t('hqMerchantList.col.status'), width: '0.8fr', align: 'center' },
+    { key: 'action', label: t('hqMerchantList.col.action'), width: '0.8fr', align: 'center' },
   ]
 
-  return { stats, columns, rows: data.rows as HqMerchantListRow[] }
+  const statusMeta: Record<HqMerchantStatus, { label: string; accent: 'green' | 'red' | 'orange'; solid: boolean }> = {
+    approved: { label: t('hqMerchantList.status.approved'), accent: 'green', solid: false },
+    suspended: { label: t('hqMerchantList.status.suspended'), accent: 'red', solid: true },
+    black: { label: t('hqMerchantList.status.black'), accent: 'orange', solid: true },
+  }
+
+  return { stats, columns, rows: pageData.rows as HqMerchantListRow[], statusMeta, isLoading, error }
 }

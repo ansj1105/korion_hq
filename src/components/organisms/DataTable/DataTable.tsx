@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react'
+import { isValidElement, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
 import styles from './DataTable.module.css'
 
 /** 테이블 컬럼 정의 */
@@ -30,6 +30,10 @@ interface DataTableProps {
   toolbar?: string[]
   /** 툴바 버튼들 뒤에 붙는 페이지 전용 요소 */
   toolbarExtra?: ReactNode
+  /** 검색 대상 컬럼. 없으면 모든 컬럼 텍스트를 검색한다 */
+  searchKeys?: string[]
+  /** 필터 대상 컬럼. 없으면 테이블 값 분포를 보고 페이지별 필터를 자동 구성한다 */
+  filterKeys?: string[]
   /** true면 flex 컬럼 부모 안에서 남은 세로 높이를 채운다 (단일 테이블 목록 화면용) */
   fill?: boolean
   /** true면 카드 외형(배경/테두리/그림자) 없이 표만 렌더 (패널 내부 서브 테이블용) */
@@ -57,6 +61,8 @@ interface DataTableProps {
   headerBar?: boolean
   /** true면 툴바 버튼 세로 패딩을 키운다 */
   tallToolbar?: boolean
+  /** true면 헤더 경계 드래그로 열 폭을 조절한다. 기본 true */
+  resizable?: boolean
 }
 
 /*
@@ -67,10 +73,49 @@ interface DataTableProps {
  * - 액션 버튼·상태 배지 등은 행 데이터의 셀에 React 노드로 직접 넣어 유연하게 표현.
  * - 정렬/검색/필터 등 동작은 작업 범위 밖(정적 표시).
  */
-export default function DataTable({ columns, rows, title, titleRight, toolbar, toolbarExtra, fill, bare, onRowClick, inlineToolbar, mutedText, largeText, navyZebra, zebra, fluid, wrapCells, headerBar, tallToolbar }: DataTableProps) {
+export default function DataTable({ columns, rows, title, titleRight, toolbar, toolbarExtra, searchKeys, filterKeys, fill, bare, onRowClick, inlineToolbar, mutedText, largeText, navyZebra, zebra, fluid, wrapCells, headerBar, tallToolbar, resizable = true }: DataTableProps) {
+  const [searchDraft, setSearchDraft] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [filters, setFilters] = useState<Record<string, string>>({})
+  const [columnWidthOverrides, setColumnWidthOverrides] = useState<Record<string, number>>({})
+  const columnKeySignature = columns.map((column) => column.key).join('|')
+  const resizeStateRef = useRef<{
+    key: string
+    startX: number
+    startWidth: number
+  } | null>(null)
   // 컬럼 폭을 모아 grid-template-columns 값을 만든다
-  const cols = columns.map((c) => c.width ?? '1fr').join(' ')
+  const cols = columns.map((c) => {
+    const override = columnWidthOverrides[c.key]
+    return override ? `${override}px` : c.width ?? '1fr'
+  }).join(' ')
   const gridStyle = { '--cols': cols } as CSSProperties
+  const searchEnabled = Boolean(toolbar?.some(isSearchToolbarLabel))
+  const filterEnabled = Boolean(toolbar?.some(isFilterToolbarLabel))
+  const englishToolbar = hasEnglishToolbar(toolbar)
+  const searchableKeys = searchKeys?.length ? searchKeys : columns.map((column) => column.key)
+  const filterOptions = useMemo(() => {
+    if (!filterEnabled) return []
+    return buildFilterOptions(columns, rows, filterKeys)
+  }, [columns, filterEnabled, filterKeys, rows])
+  const activeFilterCount = Object.values(filters).filter(Boolean).length
+  const displayRows = useMemo(() => {
+    const normalizedSearchTerm = searchTerm.trim().toLowerCase()
+    return rows.filter((row) => {
+      if (normalizedSearchTerm) {
+        const matchesSearch = searchableKeys.some((key) =>
+          cellText(row.cells[key]).toLowerCase().includes(normalizedSearchTerm)
+        )
+        if (!matchesSearch) return false
+      }
+      return filterOptions.every((filter) => {
+        const selected = filters[filter.key]
+        if (!selected) return true
+        return cellText(row.cells[filter.key]) === selected
+      })
+    })
+  }, [filterOptions, filters, rows, searchTerm, searchableKeys])
 
   const wrapClass = [
     styles.wrap,
@@ -89,6 +134,56 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
     .filter(Boolean)
     .join(' ')
 
+  useEffect(() => {
+    setColumnWidthOverrides((prev) => {
+      const next: Record<string, number> = {}
+      const keys = new Set(columns.map((column) => column.key))
+      for (const [key, width] of Object.entries(prev)) {
+        if (keys.has(key)) {
+          next[key] = width
+        }
+      }
+      return next
+    })
+  }, [columnKeySignature])
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      const resizeState = resizeStateRef.current
+      if (!resizeState) return
+      const nextWidth = Math.max(72, Math.round(resizeState.startWidth + event.clientX - resizeState.startX))
+      setColumnWidthOverrides((prev) => ({ ...prev, [resizeState.key]: nextWidth }))
+    }
+    const handleMouseUp = () => {
+      resizeStateRef.current = null
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+  }, [])
+
+  const beginColumnResize = (event: ReactMouseEvent, column: Column) => {
+    event.preventDefault()
+    event.stopPropagation()
+    if (!resizable) return
+    resizeStateRef.current = {
+      key: column.key,
+      startX: event.clientX,
+      startWidth: columnWidthOverrides[column.key] ?? parseColumnPixelWidth(column.width) ?? event.currentTarget.parentElement?.getBoundingClientRect().width ?? 120,
+    }
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+  }
+
+  const applySearch = () => setSearchTerm(searchDraft)
+
   return (
     <div className={wrapClass}>
       {(title || toolbar || toolbarExtra) && (
@@ -100,13 +195,85 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
           </div>
           {(toolbar || toolbarExtra) && (
             <div className={styles.toolbar}>
-              {toolbar?.map((label) => (
-                <button key={label} type="button" className={styles.toolbarButton}>
-                  {label}
-                </button>
-              ))}
+              {searchEnabled && (
+                <input
+                  aria-label={getSearchPlaceholder(toolbar)}
+                  className={styles.searchInput}
+                  placeholder={getSearchPlaceholder(toolbar)}
+                  type="search"
+                  value={searchDraft}
+                  onChange={(event) => setSearchDraft(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      applySearch()
+                    }
+                  }}
+                />
+              )}
+              {toolbar?.map((label) => {
+                const isSearch = isSearchToolbarLabel(label)
+                const isFilter = isFilterToolbarLabel(label)
+                const isExcel = isExcelToolbarLabel(label)
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    className={styles.toolbarButton}
+                    onClick={() => {
+                      if (isSearch) {
+                        applySearch()
+                        return
+                      }
+                      if (isFilter) {
+                        setFilterOpen((current) => !current)
+                        return
+                      }
+                      if (isExcel) {
+                        downloadTableCsv({ columns, rows: displayRows, filename: buildCsvFilename(title) })
+                      }
+                    }}
+                  >
+                    {label}
+                    {isFilter && activeFilterCount > 0 && <span className={styles.toolbarBadge}>{activeFilterCount}</span>}
+                  </button>
+                )
+              })}
               {toolbarExtra}
             </div>
+          )}
+        </div>
+      )}
+
+      {filterOpen && filterEnabled && (
+        <div className={styles.filterPanel}>
+          {filterOptions.length > 0 ? (
+            <>
+              {filterOptions.map((filter) => (
+                <label key={filter.key} className={styles.filterField}>
+                  <span className={styles.filterLabel}>{filter.label}</span>
+                  <select
+                    className={styles.filterSelect}
+                    value={filters[filter.key] ?? ''}
+                    onChange={(event) => {
+                      const value = event.target.value
+                      setFilters((prev) => ({ ...prev, [filter.key]: value }))
+                    }}
+                  >
+                    <option value="">{englishToolbar ? 'All' : '전체'}</option>
+                    {filter.options.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ))}
+              <button type="button" className={styles.filterResetButton} onClick={() => setFilters({})}>
+                {englishToolbar ? 'Reset' : '초기화'}
+              </button>
+            </>
+          ) : (
+            <span className={styles.filterEmpty}>{englishToolbar ? 'No available filters.' : '적용 가능한 필터 항목이 없습니다.'}</span>
           )}
         </div>
       )}
@@ -114,14 +281,23 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
       {/* 헤더 행 */}
       <div className={styles.headerRow} style={gridStyle}>
         {columns.map((c) => (
-          <div key={c.key} className={styles.headerCell} style={{ textAlign: c.align }}>
-            {c.label}
+          <div key={c.key} className={styles.headerCell} style={{ textAlign: c.align, justifyContent: getHeaderJustifyContent(c.align) }}>
+            <span className={styles.headerLabel}>{c.label}</span>
+            {resizable && (
+              <button
+                type="button"
+                className={styles.resizeHandle}
+                aria-label={`${c.label} column resize`}
+                onMouseDown={(event) => beginColumnResize(event, c)}
+                onClick={(event) => event.stopPropagation()}
+              />
+            )}
           </div>
         ))}
       </div>
 
       {/* 데이터 행들 (onRowClick 지정 시 행 전체가 클릭 가능) */}
-      {rows.map((row) => (
+      {displayRows.map((row) => (
         <div
           key={row.id}
           className={onRowClick ? `${styles.row} ${styles.rowClickable}` : styles.row}
@@ -137,4 +313,119 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
       ))}
     </div>
   )
+}
+
+interface FilterOption {
+  key: string
+  label: string
+  options: string[]
+}
+
+function buildFilterOptions(columns: Column[], rows: TableRow[], filterKeys?: string[]): FilterOption[] {
+  const allowedKeys = filterKeys?.length ? new Set(filterKeys) : undefined
+  return columns
+    .filter((column) => {
+      if (allowedKeys) return allowedKeys.has(column.key)
+      return !isFilterExcludedColumn(column)
+    })
+    .map((column) => {
+      const values = Array.from(
+        new Set(rows.map((row) => cellText(row.cells[column.key]).trim()).filter((value) => value && value !== '-'))
+      )
+      return {
+        key: column.key,
+        label: column.label,
+        options: values.sort((a, b) => a.localeCompare(b)),
+      }
+    })
+    .filter((filter) => filter.options.length >= 2 && filter.options.length <= 12)
+}
+
+function isFilterExcludedColumn(column: Column) {
+  const key = column.key.toLowerCase()
+  const label = column.label.toLowerCase()
+  return /^(no|number|num|id|actions?|action|detail|details)$/.test(key)
+    || ['번호', 'no', 'no.', '액션', '상세', 'detail', 'details'].includes(label)
+    || key.includes('amount')
+    || key.includes('price')
+    || key.includes('fee')
+    || key.includes('count')
+    || key.includes('date')
+    || key.includes('time')
+}
+
+function cellText(value: ReactNode): string {
+  if (value === null || value === undefined || typeof value === 'boolean') return ''
+  if (typeof value === 'string' || typeof value === 'number') return String(value)
+  if (Array.isArray(value)) return value.map(cellText).join(' ')
+  if (isValidElement(value)) {
+    return cellText((value.props as { children?: ReactNode }).children)
+  }
+  return ''
+}
+
+function isSearchToolbarLabel(label: string) {
+  const normalized = label.trim().toLowerCase()
+  return normalized === '검색' || normalized === 'search'
+}
+
+function isFilterToolbarLabel(label: string) {
+  const normalized = label.trim().toLowerCase()
+  return normalized === '필터' || normalized === 'filter'
+}
+
+function isExcelToolbarLabel(label: string) {
+  const normalized = label.trim().toLowerCase()
+  return normalized === 'excel' || normalized === '엑셀' || normalized === '액셀' || normalized.includes('excel')
+}
+
+function getSearchPlaceholder(toolbar?: string[]) {
+  return hasEnglishToolbar(toolbar) ? 'Search table' : '검색어를 입력해주세요'
+}
+
+function hasEnglishToolbar(toolbar?: string[]) {
+  return Boolean(toolbar?.some((label) => /search|filter|excel/i.test(label)))
+}
+
+function buildCsvFilename(title?: string) {
+  const safeTitle = (title || 'data-table').replace(/[\\/:*?"<>|]/g, '-').trim()
+  const date = new Date().toISOString().slice(0, 10)
+  return `${safeTitle || 'data-table'}-${date}.csv`
+}
+
+function downloadTableCsv({ columns, rows, filename }: { columns: Column[]; rows: TableRow[]; filename: string }) {
+  const lines = [
+    columns.map((column) => escapeCsvValue(column.label)).join(','),
+    ...rows.map((row) => columns.map((column) => escapeCsvValue(cellText(row.cells[column.key]))).join(',')),
+  ]
+  const blob = new Blob([`\uFEFF${lines.join('\n')}`], { type: 'text/csv;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = filename
+  document.body.appendChild(anchor)
+  anchor.click()
+  anchor.remove()
+  URL.revokeObjectURL(url)
+}
+
+function escapeCsvValue(value: string) {
+  const normalized = value.replace(/\r?\n/g, ' ').trim()
+  if (/[",\n]/.test(normalized)) {
+    return `"${normalized.replace(/"/g, '""')}"`
+  }
+  return normalized
+}
+
+function parseColumnPixelWidth(width?: string) {
+  if (!width) return undefined
+  const match = width.trim().match(/^(\d+(?:\.\d+)?)px$/)
+  if (!match) return undefined
+  return Number(match[1])
+}
+
+function getHeaderJustifyContent(align?: Column['align']) {
+  if (align === 'center') return 'center'
+  if (align === 'right') return 'flex-end'
+  return 'flex-start'
 }

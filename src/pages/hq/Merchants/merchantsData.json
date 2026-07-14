@@ -15,7 +15,8 @@
     {
       "no": "APP-2401",
       "leaderCode": "NG-LEAD-0001",
-      "partnerCode": "NG-PART-0001",
+      "partnerCode": "NG-SP-0001",
+      "merchantCode": "NG-MER-0001",
       "country": "나이지리아",
       "region": "Nova",
       "merchantName": "Baio",
@@ -28,7 +29,8 @@
     {
       "no": "APP-2399",
       "leaderCode": "NG-LEAD-0001",
-      "partnerCode": "NG-PART-0002",
+      "partnerCode": "NG-SP-0002",
+      "merchantCode": "NG-MER-0002",
       "country": "나이지리아",
       "region": "Nova",
       "merchantName": "Lagos Mart",
@@ -41,7 +43,8 @@
     {
       "no": "APP-2398",
       "leaderCode": "KR-LEAD-0001",
-      "partnerCode": "KR-PART-0001",
+      "partnerCode": "KR-SP-0001",
+      "merchantCode": "KR-MER-0001",
       "country": "대한민국",
       "region": "Seoul",
       "merchantName": "한강 카페",
@@ -54,7 +57,8 @@
     {
       "no": "APP-2397",
       "leaderCode": "IT-LEAD-0001",
-      "partnerCode": "IT-PART-0001",
+      "partnerCode": "IT-SP-0001",
+      "merchantCode": "IT-MER-0001",
       "country": "이탈리아",
       "region": "Roma",
       "merchantName": "Roma Pizza",
@@ -67,7 +71,8 @@
     {
       "no": "APP-2396",
       "leaderCode": "NG-LEAD-0002",
-      "partnerCode": "NG-PART-0003",
+      "partnerCode": "NG-SP-0003",
+      "merchantCode": "NG-MER-0003",
       "country": "나이지리아",
       "region": "Nova",
       "merchantName": "Amara Shop",

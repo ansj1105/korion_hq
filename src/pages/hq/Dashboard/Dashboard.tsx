@@ -391,7 +391,7 @@ export default function Dashboard() {
           </div>
 
           <Panel title={t('hqDashboard.realtimePayments.title')} subtitle={t('hqDashboard.realtimePayments.desc')}>
-            <DataTable columns={realtimePayments.columns} rows={realtimePaymentRows} largeText navyZebra bare />
+            <DataTable columns={realtimePayments.columns} rows={realtimePaymentRows} toolbar={[t('common.search'), t('common.filter'), t('common.excel')]} largeText navyZebra bare />
           </Panel>
         </>
       )}
@@ -422,7 +422,7 @@ export default function Dashboard() {
               <MiniStatCard key={s.id} {...s} />
             ))}
           </div>
-          <DataTable columns={settlement.columns} rows={settlementRows} largeText navyZebra bare />
+          <DataTable columns={settlement.columns} rows={settlementRows} toolbar={[t('common.search'), t('common.filter'), t('common.excel')]} largeText navyZebra bare />
         </Panel>
       )}
 
@@ -433,7 +433,7 @@ export default function Dashboard() {
               <MiniStatCard key={s.id} {...s} />
             ))}
           </div>
-          <DataTable columns={risk.columns} rows={riskRows} largeText navyZebra bare />
+          <DataTable columns={risk.columns} rows={riskRows} toolbar={[t('common.search'), t('common.filter'), t('common.excel')]} largeText navyZebra bare />
         </Panel>
       )}
 
@@ -442,7 +442,7 @@ export default function Dashboard() {
           <Panel title={t('hqDashboard.countryOps.title')} subtitle={t('hqDashboard.countryOps.desc')}>
             {/* 표는 남은 폭을 모두 채우고 히트맵은 우측 고정폭 — 좁은 화면(<900px)에선 세로로 쌓임 */}
             <div className={styles.countryOpsLayout}>
-              <DataTable columns={countryOps.columns} rows={countryOpsRows} largeText navyZebra bare fluid />
+              <DataTable columns={countryOps.columns} rows={countryOpsRows} toolbar={[t('common.search'), t('common.filter'), t('common.excel')]} largeText navyZebra bare fluid />
               <div className={styles.heatmapBox}>
                 <div className={styles.heatmapHead}>
                   <h4 className={styles.subBoxTitle}>{t('hqDashboard.countryOps.heatmapTitle')}</h4>
@@ -487,7 +487,7 @@ export default function Dashboard() {
                 <MiniStatCard key={s.id} {...s} />
               ))}
             </div>
-            <DataTable columns={approvalQueue.columns} rows={approvalQueueRows} largeText navyZebra bare />
+            <DataTable columns={approvalQueue.columns} rows={approvalQueueRows} toolbar={[t('common.search'), t('common.filter'), t('common.excel')]} largeText navyZebra bare />
           </Panel>
 
           {/*
@@ -566,7 +566,7 @@ export default function Dashboard() {
       {activeTab === 'payment' && (
         <Panel title={t('hqDashboard.paymentMethod.title')} subtitle={t('hqDashboard.paymentMethod.desc')}>
           <div className={styles.sideBySide}>
-            <DataTable columns={paymentMethod.columns} rows={paymentMethodRows} largeText navyZebra bare fluid />
+            <DataTable columns={paymentMethod.columns} rows={paymentMethodRows} toolbar={[t('common.search'), t('common.filter'), t('common.excel')]} largeText navyZebra bare fluid />
             <div className={styles.donutBox}>
               {/* 결제수단 비율 — API pct를 누적한 conic-gradient 원그래프와 수단별 범례. */}
               <div className={styles.donutBody}>
@@ -595,7 +595,7 @@ export default function Dashboard() {
       {activeTab === 'logs' && (
         <>
           <Panel title={t('hqDashboard.activityLogs.title')} subtitle={t('hqDashboard.activityLogs.desc')}>
-            <DataTable columns={activityLogs.columns} rows={activityLogRows} largeText navyZebra bare />
+            <DataTable columns={activityLogs.columns} rows={activityLogRows} toolbar={[t('common.search'), t('common.filter'), t('common.excel')]} largeText navyZebra bare />
           </Panel>
 
           <Panel title={t('hqDashboard.aiInsight.title')} subtitle={t('hqDashboard.aiInsight.desc')}>

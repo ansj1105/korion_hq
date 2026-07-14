@@ -13,12 +13,24 @@
   gap: var(--space-2);
 }
 
-/* "상세" 배지를 감싸는 버튼 — 배지 외형은 그대로, 클릭만 가능하게 */
+.actionButton,
 .detailButton {
   padding: 0;
   border: none;
   background: none;
   cursor: pointer;
+}
+
+.actionButton:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.actionButton:focus-visible,
+.detailButton:focus-visible {
+  outline: 1px solid var(--color-accent-cyan);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 /* ── 상세 Drawer 헤더 영역 ── */
