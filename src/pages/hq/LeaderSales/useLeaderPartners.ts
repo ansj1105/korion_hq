@@ -24,6 +24,11 @@ export interface LeaderPartnerRow {
   lastActive: string
 }
 
+const emptyLeaderPartnersData = {
+  kpi: [],
+  rows: [],
+} as typeof data
+
 /*
  * useLeaderPartners — "국가 리더별 거래내역" 화면의 "파트너별" 탭 데이터 훅
  * ------------------------------------------------------------------
@@ -35,7 +40,7 @@ export function useLeaderPartners(leaderCode?: string) {
   const { t } = useTranslation()
   const { data: pageData, isLoading, error } = useHqPageData(
     `/api/hq/leaders/${encodeURIComponent(leaderCode ?? '')}/sales/partners`,
-    data,
+    emptyLeaderPartnersData,
     { leaderCode },
   )
 

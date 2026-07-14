@@ -8,6 +8,7 @@ interface Props {
   /** 목록 행에 없는 상세 전용 값(발송자/성공·실패 수/본문) */
   extra: NoticeDetailExtra
   onClose: () => void
+  onCancelSend?: () => void
 }
 
 /*
@@ -16,9 +17,8 @@ interface Props {
  * 별도 라우트 없이 row prop으로만 제어. 사이드바를 제외한 콘텐츠 영역 중앙에 노출
  * (CollateralDetailOverlay와 동일한 backdrop 방식). backdrop 클릭 또는 '취소'로 닫힘.
  * 공지 ID/발송일시/국가 등은 클릭한 행 값을 그대로 표시하고,
- * '발송취소'/'발송하기' 버튼은 동작 협의 전이라 UI만(CLAUDE.md 1번 규칙).
  */
-export default function NoticeDetailOverlay({ row, extra, onClose }: Props) {
+export default function NoticeDetailOverlay({ row, extra, onClose, onCancelSend }: Props) {
   const { t } = useTranslation()
 
   if (!row) return null
@@ -93,17 +93,19 @@ export default function NoticeDetailOverlay({ row, extra, onClose }: Props) {
           <div className={styles.contentBox}>{extra.body}</div>
         </div>
 
-        {/* 하단 버튼 — 좌측 "발송취소"(빨강) + 가운데 "취소"/"발송하기" (Figma 배치) */}
+        {/* 하단 버튼 */}
         <div className={styles.footer}>
-          <button type="button" className={styles.cancelSendButton}>
+          <button
+            type="button"
+            className={styles.cancelSendButton}
+            onClick={onCancelSend}
+            disabled={row.rawStatus === 'CANCELLED'}
+          >
             {t('hqNoticeHistory.action.cancelSend')}
           </button>
           <div className={styles.centerButtons}>
             <button type="button" className={styles.cancelButton} onClick={onClose}>
               {t('hqNoticeSend.form.cancel')}
-            </button>
-            <button type="button" className={styles.sendButton}>
-              {t('hqNoticeSend.form.send')}
             </button>
           </div>
         </div>

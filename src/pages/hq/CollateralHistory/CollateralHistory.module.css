@@ -64,6 +64,20 @@
   gap: 14px 12px;
 }
 
+.stateText,
+.errorText {
+  margin: -6px 0 0;
+  font-size: var(--font-size-12);
+}
+
+.stateText {
+  color: var(--color-text-muted);
+}
+
+.errorText {
+  color: var(--color-accent-red);
+}
+
 /*
  * 안내 카드 2종 — Figma: 어두운 배경(rgba(11,7,20,.86)) + 색 테두리 + radius 18 박스.
  * 테두리/그림자 색(호박 #fbbf24, 시안 #22d3ee)은 Figma 실측값으로 토큰 accent와 다른 색조라 직접 지정.

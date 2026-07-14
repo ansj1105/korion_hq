@@ -2,9 +2,6 @@ import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './collateralHistoryData.json'
-import infoData from './collateralInfoData.json'
-import settlementData from './collateralSettlementData.json'
 
 interface KpiRaw {
   id: string
@@ -84,26 +81,24 @@ interface CollateralHistoryPageData {
   }
 }
 
-const fallbackData: CollateralHistoryPageData = {
-  kpis: data.kpis as KpiRaw[],
-  history: { rows: data.history.rows as CollateralHistoryRow[] },
-  info: { rows: infoData.rows as CollateralInfoRow[] },
-  settlement: { rows: settlementData.rows as CollateralSettlementRow[] },
+const EMPTY_COLLATERAL_HISTORY_DATA: CollateralHistoryPageData = {
+  kpis: [],
+  history: { rows: [] },
+  info: { rows: [] },
+  settlement: { rows: [] },
 }
 
 /*
  * useCollateralHistory — 본사어드민 "회원 담보금 충전 / 해제 내역" 데이터 훅
  * ------------------------------------------------------------------
- * collateralHistoryData.json(더미)을 읽어 UI 라벨(지표명/컬럼명)만 번역해 반환한다.
- * KPI 라벨은 전체 운영 대시보드와 동일한 항목(활성국가/담보금 잔액 등)이 많아
- * 기존 hqDashboard.kpi.* 키를 재사용한다. 추후 실 연동 시 이 훅 내부만
- * API 호출로 교체하면 CollateralHistory.tsx는 그대로 동작한다.
+ * /api/hq/collateral-history 응답만 화면에 반영한다. API 실패 시 정적 더미를
+ * 표시하지 않고 빈 데이터와 오류 상태를 그대로 노출한다.
  */
 export function useCollateralHistory(countryScope: string, date: string) {
   const { t } = useTranslation()
   const { data: pageData, isLoading, error } = useHqPageData<CollateralHistoryPageData>(
     '/api/hq/collateral-history',
-    fallbackData,
+    EMPTY_COLLATERAL_HISTORY_DATA,
     { countryScope, date }
   )
 
@@ -122,23 +117,23 @@ export function useCollateralHistory(countryScope: string, date: string) {
 
   // 컬럼 폭은 Figma 실측 px(49/65/75/69/68/69/46/62/85/48/128)의 상대 비율
   const columns: Column[] = [
-    { key: 'no', label: t('hqCollateral.col.no'), width: '0.75fr' },
-    { key: 'processedAt', label: t('hqCollateral.col.processedAt'), width: '1fr' },
-    { key: 'code', label: t('hqCollateral.col.code'), width: '1.15fr' },
-    { key: 'country', label: t('hqCollateral.col.country'), width: '1.05fr' },
-    { key: 'memberId', label: t('hqCollateral.col.memberId'), width: '1.05fr' },
-    { key: 'memberName', label: t('hqCollateral.col.memberName'), width: '1.05fr' },
-    { key: 'type', label: t('hqCollateral.col.type'), width: '0.7fr' },
-    { key: 'amount', label: t('hqCollateral.col.amount'), width: '0.95fr' },
-    { key: 'beforeAfter', label: t('hqCollateral.col.beforeAfter'), width: '1.3fr' },
-    { key: 'status', label: t('hqCollateral.col.status'), width: '0.75fr' },
-    { key: 'action', label: t('hqCollateral.col.action'), width: '1.95fr' },
+    { key: 'no', label: t('hqCollateral.col.no'), width: '56px', align: 'center' },
+    { key: 'processedAt', label: t('hqCollateral.col.processedAt'), width: '136px' },
+    { key: 'code', label: t('hqCollateral.col.code'), width: '132px' },
+    { key: 'country', label: t('hqCollateral.col.country'), width: '110px' },
+    { key: 'memberId', label: t('hqCollateral.col.memberId'), width: '116px' },
+    { key: 'memberName', label: t('hqCollateral.col.memberName'), width: '128px' },
+    { key: 'type', label: t('hqCollateral.col.type'), width: '86px' },
+    { key: 'amount', label: t('hqCollateral.col.amount'), width: '112px' },
+    { key: 'beforeAfter', label: t('hqCollateral.col.beforeAfter'), width: '134px' },
+    { key: 'status', label: t('hqCollateral.col.status'), width: '96px' },
+    { key: 'action', label: t('hqCollateral.col.action'), width: '220px' },
   ]
 
   return {
     kpis,
     columns,
-    rows: pageData.history.rows as CollateralHistoryRow[],
+    rows: (pageData.history?.rows ?? []) as CollateralHistoryRow[],
     infoRows: (pageData.info?.rows ?? []) as CollateralInfoRow[],
     settlementRows: (pageData.settlement?.rows ?? []) as CollateralSettlementRow[],
     countryOptions: pageData.filters?.countries ?? fallbackCountryOptions(pageData),

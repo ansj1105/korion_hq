@@ -87,15 +87,24 @@ export default function Sidebar({
   mobileOpen = false,
   onMobileClose,
 }: SidebarProps) {
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
   const { t } = useTranslation()
   const [collapsed, setCollapsed] = useState(false)
 
   const fullPath = (itemPath: string) => `${basePath}/${itemPath}`
   const allPaths = useMemo(() => nav.flatMap((group) => group.items.map((item) => fullPath(item.path))), [basePath, nav])
-  const activePath = allPaths
+  const matchedActivePath = allPaths
     .filter((path) => pathname === path || pathname.startsWith(path + '/'))
     .sort((a, b) => b.length - a.length)[0]
+  const searchParams = new URLSearchParams(search)
+  const activePath =
+    pathname === `${basePath}/leaders/sales` && searchParams.has('leaderCode')
+      ? `${basePath}/leaders`
+      : pathname === `${basePath}/partners/sales` && searchParams.has('partnerCode')
+        ? `${basePath}/partners`
+        : pathname === `${basePath}/merchants/sales` && searchParams.has('merchantCode')
+          ? `${basePath}/merchants`
+          : matchedActivePath
   const activeGroupKey = nav.find((group) => group.items.some((item) => fullPath(item.path) === activePath))?.titleKey
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => new Set(activeGroupKey ? [activeGroupKey] : []))
 

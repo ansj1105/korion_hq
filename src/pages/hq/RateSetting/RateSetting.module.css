@@ -39,9 +39,32 @@
   line-height: 31px;
   color: var(--color-text);
 }
-.kpiNote {
+.kpiNoteBadge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: 22px;
+  padding: 3px 8px;
+  border: 1px solid color-mix(in srgb, var(--color-accent-cyan) 74%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-accent-cyan) 16%, transparent);
   font-size: var(--font-size-11);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
   color: var(--color-accent-cyan);
+  white-space: normal;
+}
+
+.stateText {
+  margin: -6px 0 0;
+  font-size: var(--font-size-12);
+  color: var(--color-text-muted);
+}
+
+.errorText {
+  margin: -6px 0 0;
+  font-size: var(--font-size-12);
+  color: var(--color-accent-red);
 }
 
 /* 안내 칩 — Figma 270×30, 시안 틴트 알약 */

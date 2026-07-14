@@ -2,7 +2,6 @@ import { useTranslation } from '../../../i18n'
 import { useHqPageData } from '../../../hooks/useHqPageData'
 import type { Column } from '../../../components/organisms/DataTable'
 import type { StatCardData } from '../../../components/molecules/StatCard'
-import data from './paymentErrorCodesData.json'
 
 export interface PaymentErrorCodeRow {
   id: string
@@ -42,11 +41,22 @@ interface PaymentErrorCodesPageData {
   rows: PaymentErrorCodeRow[]
 }
 
+const emptyPaymentErrorCodesData: PaymentErrorCodesPageData = {
+  stats: [],
+  options: {
+    categories: [],
+    severities: [],
+    autoActions: [],
+    statuses: [],
+  },
+  rows: [],
+}
+
 export function usePaymentErrorCodes() {
   const { t } = useTranslation()
   const { data: pageData, isLoading, error } = useHqPageData<PaymentErrorCodesPageData>(
     '/api/hq/payments/error-codes',
-    data as PaymentErrorCodesPageData,
+    emptyPaymentErrorCodesData,
   )
 
   const stats: StatCardData[] = pageData.stats.map((stat) => ({

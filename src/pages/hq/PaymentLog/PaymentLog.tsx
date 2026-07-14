@@ -52,22 +52,26 @@ export default function PaymentLog() {
     pending: styles.stepPending,
   }
 
-  const handleSettlementAction = async (rowId: string, label: string) => {
-    if (label !== '지급보류' && label !== '보류해제') return
-    const entryId = parseCommissionEntryId(rowId)
-    if (!entryId) return
-    setPendingActionId(rowId)
+  const handleSettlementAction = async (row: PaymentLogRow, label: string) => {
+    const normalizedLabel = normalizeSettlementActionLabel(label)
+    if (normalizedLabel !== '지급보류' && normalizedLabel !== '보류해제') return
+    const entryId = getCommissionEntryId(row)
+    if (!entryId) {
+      window.alert('정산 처리 대상 거래 ID를 확인할 수 없습니다.')
+      return
+    }
+    setPendingActionId(row.id)
     try {
       const response = await postHqPageData<PaymentSettlementHoldResponse>(
         `/api/hq/payments/logs/${entryId}/settlement-hold`,
         {
-          action: label === '지급보류' ? 'HOLD' : 'RELEASE',
-          reason: label === '지급보류' ? 'HQ payment log manual settlement hold' : 'HQ payment log manual settlement hold release',
+          action: normalizedLabel === '지급보류' ? 'HOLD' : 'RELEASE',
+          reason: normalizedLabel === '지급보류' ? 'HQ payment log manual settlement hold' : 'HQ payment log manual settlement hold release',
         },
       )
       setRowOverrides((prev) => ({
         ...prev,
-        [rowId]: {
+        [row.id]: {
           statusLabel: response.statusLabel,
           statusAccent: response.statusAccent,
           actions: response.actions,
@@ -101,13 +105,13 @@ export default function PaymentLog() {
                 key={label}
                 type="button"
                 className={styles.actionButton}
-                disabled={pendingActionId === r.id || label === '지급완료'}
+                disabled={pendingActionId === r.id || normalizeSettlementActionLabel(label) === '지급완료'}
                 onClick={(event) => {
                   event.stopPropagation()
-                  handleSettlementAction(r.id, label)
+                  handleSettlementAction(r, label)
                 }}
               >
-                <Badge accent={SETTLE_ACCENT[label]} size="md" shape="rect">
+                <Badge accent={SETTLE_ACCENT[normalizeSettlementActionLabel(label)]} size="md" shape="rect">
                   {label}
                 </Badge>
               </button>
@@ -238,7 +242,14 @@ export default function PaymentLog() {
   )
 }
 
-function parseCommissionEntryId(rowId: string) {
-  const match = rowId.match(/^CE-(\d+)$/)
+function normalizeSettlementActionLabel(label: string) {
+  return label.replace(/\s/g, '')
+}
+
+function getCommissionEntryId(row: PaymentLogRow) {
+  if (typeof row.entryId === 'number' && row.entryId > 0) {
+    return row.entryId
+  }
+  const match = row.id.match(/^CE-(\d+)$/)
   return match ? Number(match[1]) : null
 }

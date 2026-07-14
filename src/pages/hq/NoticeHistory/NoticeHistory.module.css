@@ -1,48 +1,172 @@
-/* NoticeHistory(본사어드민 · 알림/공지 · 발송 내역) 페이지 레이아웃 — HQ 화면 공통 컨벤션 */
 .page {
   display: flex;
   flex-direction: column;
-  gap: 18px; /* Figma 콘텐츠 세로 간격 18 */
+  gap: 18px;
+  flex: 1;
 }
 
-/* 제목 아래 화면 설명 — Figma 13px #afa7c8 (토큰 스케일에 없어 직접 지정) */
 .pageDesc {
-  font-size: 13px;
-  font-weight: var(--font-weight-regular);
-  color: #afa7c8;
+  max-width: 720px;
+  font-size: var(--font-size-12);
+  line-height: 1.6;
+  color: #bdb7e7;
 }
 
-/* 헤더 아래 "전체 국가 / 오늘" 필터칩 — 동작 없는 표시용 (공지 보내기 화면과 동일 시안) */
 .filterChips {
   display: flex;
-  gap: 15px; /* Figma 실측 칩 간격 15 */
+  flex-wrap: wrap;
+  gap: var(--space-3);
 }
 
-.chip {
-  padding: var(--space-1) var(--space-3);
+.filterSelectField {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 32px;
+  padding: 0 var(--space-3);
   border-radius: var(--radius-pill);
-  border: 1px solid color-mix(in srgb, var(--color-accent-cyan) 45%, transparent);
-  background: color-mix(in srgb, var(--color-accent-cyan) 12%, transparent);
+  border: 1px solid color-mix(in srgb, #7c5cff 34%, transparent);
+  background-color: color-mix(in srgb, #141027 78%, transparent);
   color: var(--color-text);
-  font-size: var(--font-size-10);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
 }
 
-/* 발송 현황 KPI 그리드 — Figma 실측 5열(폭은 1fr로 풀어 넓은 화면에서도 열 수 고정) */
-.kpiGrid {
+.filterSelectField span {
+  color: #8c86b5;
+}
+
+.filterSelect {
+  min-width: 92px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  outline: none;
+  cursor: pointer;
+}
+
+.filterSelect option {
+  background: #120d22;
+  color: #f7f3ff;
+}
+
+.metrics {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 14px 12px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-4);
 }
 
-/* 반응형: 좁은 화면에서 KPI 열 수 축소해 카드가 너무 작아지지 않게 함 */
-@media (max-width: 1024px) {
-  .kpiGrid {
-    grid-template-columns: repeat(3, 1fr);
+.stateText,
+.errorText {
+  margin: -4px 0 0;
+  font-size: var(--font-size-12);
+}
+
+.stateText {
+  color: var(--color-text-muted);
+}
+
+.errorText {
+  color: var(--color-accent-red);
+}
+
+.recipientBackdrop {
+  position: fixed;
+  inset: 0 0 0 var(--sidebar-width);
+  z-index: 210;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: rgba(0, 0, 0, 0.62);
+}
+
+.recipientPanel {
+  width: min(1080px, 100%);
+  max-height: 88vh;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid color-mix(in srgb, var(--color-accent-purple) 38%, transparent);
+  border-radius: var(--radius-md);
+  background: #080714;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.44);
+}
+
+.recipientHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.recipientHeader h2 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--color-text);
+}
+
+.recipientHeader p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-12);
+}
+
+.recipientHeader button,
+.toast button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.recipientHeader button {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.toast {
+  position: fixed;
+  top: 22px;
+  left: 50%;
+  z-index: 260;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 260px;
+  max-width: min(520px, calc(100vw - 32px));
+  padding: 12px 16px;
+  border: 1px solid color-mix(in srgb, var(--color-accent-cyan) 50%, transparent);
+  border-radius: var(--radius-md);
+  background: #091326;
+  color: var(--color-text);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.36);
+  font-size: var(--font-size-13);
+}
+
+.toast span {
+  flex: 1;
+}
+
+@media (max-width: 1180px) {
+  .metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
-@media (max-width: 640px) {
-  .kpiGrid {
-    grid-template-columns: repeat(2, 1fr);
+
+@media (max-width: 720px) {
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .recipientBackdrop {
+    inset: 0;
+    padding: var(--space-3);
   }
 }

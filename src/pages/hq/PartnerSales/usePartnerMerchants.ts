@@ -2,7 +2,6 @@ import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './partnerDetailData.json'
 
 interface KpiRaw {
   id: string
@@ -24,11 +23,16 @@ export interface PartnerMerchantRow {
   usage: string
 }
 
+const emptyPartnerMerchantsData = {
+  kpi: [],
+  rows: [],
+}
+
 export function usePartnerMerchants(partnerCode?: string) {
   const { t } = useTranslation()
   const { data: pageData, isLoading, error } = useHqPageData(
     `/api/hq/partners/${encodeURIComponent(partnerCode ?? '')}/sales/merchants`,
-    { kpi: data.tabKpi, rows: data.merchantRows },
+    emptyPartnerMerchantsData,
     { partnerCode },
   )
 

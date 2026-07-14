@@ -24,6 +24,7 @@ interface SettlementRequestActionResponse {
   status: RequestStatus
   statusAccent?: AccentKey
   sourceStatus?: string
+  actions?: SettlementRequestActionCode[]
 }
 
 /*
@@ -38,7 +39,7 @@ export default function HqSettlementRequest() {
   const navigate = useNavigate()
   const { kpis, columns, rows: rawRows, statusLabel, actionLabel, chipAutoInclude, chipExcludeToday, section, subtitle, isLoading, error } =
     useSettlementRequest()
-  const [statusOverrides, setStatusOverrides] = useState<Record<string, Pick<SettlementRequestActionResponse, 'status' | 'statusAccent' | 'sourceStatus'>>>({})
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, Pick<SettlementRequestActionResponse, 'status' | 'statusAccent' | 'sourceStatus' | 'actions'>>>({})
   const [actionError, setActionError] = useState<string | null>(null)
 
   const openDetail = (row: Partial<RequestRow>) => {
@@ -70,6 +71,7 @@ export default function HqSettlementRequest() {
           status: response.status,
           statusAccent: response.statusAccent,
           sourceStatus: response.sourceStatus,
+          actions: response.actions,
         },
       }))
     } catch (err) {
@@ -82,7 +84,7 @@ export default function HqSettlementRequest() {
     const status = override?.status ?? r.status
     const statusAccent = override?.statusAccent ?? r.statusAccent ?? statusAccentByStatus(status)
     const sourceStatus = override?.sourceStatus ?? r.sourceStatus
-    const actions = r.actions?.length ? r.actions : DEFAULT_ACTIONS
+    const actions = override?.actions?.length ? override.actions : r.actions?.length ? r.actions : DEFAULT_ACTIONS
     const actionLabels = actions.map((action) => actionLabel[action])
     const actionAccentByLabel = Object.fromEntries(actions.map((action) => [actionLabel[action], ACTION_ACCENT[action]])) as Record<string, AccentKey>
     return {

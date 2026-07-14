@@ -2,10 +2,10 @@ import { useTranslation } from '../../../i18n'
 import { useHqPageData } from '../../../hooks/useHqPageData'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
-import data from './paymentSyncIssuesData.json'
 
 export interface PaymentSyncIssueRow {
   id: string
+  entryId?: number
   no: string
   txId: string
   sessionId: string
@@ -41,11 +41,16 @@ interface PaymentSyncIssuesPageData {
   rows: PaymentSyncIssueRow[]
 }
 
+const emptyPaymentSyncIssuesData: PaymentSyncIssuesPageData = {
+  stats: [],
+  rows: [],
+}
+
 export function usePaymentSyncIssues() {
   const { t } = useTranslation()
   const { data: pageData, isLoading, error } = useHqPageData<PaymentSyncIssuesPageData>(
     '/api/hq/payments/sync-issues',
-    data as PaymentSyncIssuesPageData,
+    emptyPaymentSyncIssuesData,
   )
 
   const stats: StatCardData[] = pageData.stats.map((stat) => ({

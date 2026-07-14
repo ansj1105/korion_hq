@@ -32,12 +32,26 @@ const statusAccent: Record<string, AccentKey> = {
   SYNC_FAILED: 'red',
   RISK_HOLD: 'amber',
 }
+const actionAccent: Record<string, AccentKey> = {
+  상세: 'cyan',
+  재시도: 'blue',
+  강제검증: 'purple',
+  오류코드: 'red',
+  보류사유: 'amber',
+  검토: 'purple',
+  증빙: 'green',
+}
 
 export default function PaymentSyncIssues() {
   const { t } = useTranslation()
   const { title, desc, tableTitle, noticeTitle, noticeDesc, stats, columns, rows, isLoading, error } = usePaymentSyncIssues()
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedAction, setSelectedAction] = useState<string | null>(null)
   const selectedRow = rows.find((row) => row.id === selectedId) ?? null
+  const openDetail = (rowId: string, action?: string) => {
+    setSelectedId(rowId)
+    setSelectedAction(action ?? null)
+  }
 
   const tableRows: TableRow[] = rows.map((row) => ({
     id: row.id,
@@ -55,12 +69,23 @@ export default function PaymentSyncIssues() {
         </span>
       ),
       action: (
-        <button type="button" className={styles.detailButton} onClick={(event) => {
-          event.stopPropagation()
-          setSelectedId(row.id)
-        }}>
-          <Badge size="md" shape="rect">{t('common.detail')}</Badge>
-        </button>
+        <div className={styles.actionCell}>
+          {row.actions.map((label) => (
+            <button
+              key={label}
+              type="button"
+              className={styles.actionButton}
+              onClick={(event) => {
+                event.stopPropagation()
+                openDetail(row.id, label)
+              }}
+            >
+              <Badge accent={actionAccent[label] ?? 'cyan'} size="md" shape="rect">
+                {label === '상세' ? t('common.detail') : label}
+              </Badge>
+            </button>
+          ))}
+        </div>
       ),
     },
   }))
@@ -90,7 +115,7 @@ export default function PaymentSyncIssues() {
         rows={tableRows}
         searchKeys={['txId', 'sessionId', 'merchantName', 'senderDeviceId', 'receiverDeviceId', 'senderUploadStatus', 'receiverUploadStatus', 'overallStatus', 'reason']}
         filterKeys={['connection', 'senderUploadStatus', 'receiverUploadStatus', 'serverVerifyStatus', 'settlementStatus', 'overallStatus']}
-        onRowClick={setSelectedId}
+        onRowClick={(id) => openDetail(id)}
         mutedText
         headerBar
         wrapCells
@@ -98,11 +123,15 @@ export default function PaymentSyncIssues() {
 
       <DetailDrawer
         open={Boolean(selectedRow)}
-        onClose={() => setSelectedId(null)}
+        onClose={() => {
+          setSelectedId(null)
+          setSelectedAction(null)
+        }}
         title={selectedRow ? `${selectedRow.txId} ${t('hqPaymentSyncIssues.detail.titleSuffix')}` : t('hqPaymentSyncIssues.detail.title')}
         headerExtra={selectedRow && (
           <div className={styles.drawerHead}>
             <StatusBadge value={selectedRow.overallStatus} accent={selectedRow.overallAccent} />
+            {selectedAction && <Badge accent={actionAccent[selectedAction] ?? 'cyan'} size="xs" shape="rect">{selectedAction}</Badge>}
             <span className={styles.drawerMeta}>{selectedRow.sessionId} · {selectedRow.connection} · {selectedRow.occurredAt}</span>
           </div>
         )}

@@ -30,6 +30,8 @@ export default function HqRateSetting() {
     saveDiagramRows,
     saveCountryRate,
     deleteCountryRate,
+    isLoading,
+    error,
   } = useRateSetting()
   // 모달 모드 — null: 닫힘 / add: 국가별 배분율 추가 / edit: 행 상세(수정)
   const [modalMode, setModalMode] = useState<'add' | 'edit' | null>(null)
@@ -69,10 +71,12 @@ export default function HqRateSetting() {
           <div key={k.id} className={styles.kpiCard}>
             <span className={styles.kpiLabel}>{k.label}</span>
             <span className={styles.kpiValue}>{k.value}</span>
-            <span className={styles.kpiNote}>{k.note}</span>
+            <span className={styles.kpiNoteBadge}>{k.note}</span>
           </div>
         ))}
       </div>
+      {isLoading && <p className={styles.stateText}>{t('common.loading')}</p>}
+      {error && <p className={styles.errorText}>{error}</p>}
 
       {/* 안내 칩 — 국가별 설정이 없으면 기본 배분율 적용 */}
       <span className={styles.infoChip}>{t('hqRate.chip')}</span>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import PageHeader from '../../../components/organisms/PageHeader'
-import StatCard from '../../../components/molecules/StatCard'
+import StatCard, { type StatCardData } from '../../../components/molecules/StatCard'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
 import Badge from '../../../components/atoms/Badge'
 import DetailDrawer from '../../../components/organisms/DetailDrawer'
@@ -31,6 +31,7 @@ export default function PaymentErrorCodes() {
   }, [fetchedRows])
 
   const selectedRow = rows.find((row) => row.id === selectedId) ?? null
+  const displayStats = applyErrorCodeRowStats(stats, rows)
 
   const submit = async (payload: PaymentErrorCodeCreateRequest) => {
     const created = await postHqPageData<PaymentErrorCodeRow>('/api/hq/payments/error-codes', payload)
@@ -69,7 +70,7 @@ export default function PaymentErrorCodes() {
       </PageHeader>
 
       <div className={styles.kpiGrid}>
-        {stats.map((stat) => <StatCard key={stat.id} {...stat} />)}
+        {displayStats.map((stat) => <StatCard key={stat.id} {...stat} />)}
       </div>
 
       <section className={styles.noticeCard}>
@@ -135,4 +136,18 @@ export default function PaymentErrorCodes() {
       </DetailDrawer>
     </div>
   )
+}
+
+function applyErrorCodeRowStats(stats: StatCardData[], rows: PaymentErrorCodeRow[]) {
+  const values: Record<string, string> = {
+    total: String(rows.length),
+    active: String(rows.filter((row) => row.status === 'ACTIVE').length),
+    critical: String(rows.filter((row) => row.severity === 'CRITICAL').length),
+    retryable: String(rows.filter((row) => row.retryable).length),
+    settlementBlocked: String(rows.filter((row) => row.settlementBlocked).length),
+  }
+  return stats.map((stat) => ({
+    ...stat,
+    value: values[stat.id] ?? stat.value,
+  }))
 }

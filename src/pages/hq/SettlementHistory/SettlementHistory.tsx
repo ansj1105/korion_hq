@@ -28,8 +28,9 @@ const STATUS_ACCENT: Record<HistoryStatus, 'cyan' | 'green' | 'orange' | 'purple
  */
 export default function HqSettlementHistory() {
   const { t } = useTranslation()
-  const { kpis, columns, rows: rawRows, statusLabel, section } = useSettlementHistory()
+  const { kpis, columns, rows: rawRows, statusLabel, section, isLoading, error } = useSettlementHistory()
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null)
+  const rowSourceById = new Map<string, number | undefined>()
 
   const rows: TableRow[] = rawRows.map((r, index) => ({
     // 신청 ID가 샘플상 중복돼 있어 index로 key를 구분
@@ -52,6 +53,7 @@ export default function HqSettlementHistory() {
       status: <Badge accent={r.statusAccent ?? STATUS_ACCENT[r.status]} size="md" shape="rect">{statusLabel[r.status]}</Badge>,
     },
   }))
+  rows.forEach((row, index) => rowSourceById.set(row.id, rawRows[index]?.settlementRequestId))
 
   return (
     <div className={styles.page}>
@@ -88,8 +90,15 @@ export default function HqSettlementHistory() {
         paginated
         pageSize={10}
       />
+      {isLoading && <p className={styles.stateText}>{t('common.loading')}</p>}
+      {error && <p className={styles.errorText}>{error}</p>}
 
-      {selectedRowId && <SettlementDetailModal onClose={() => setSelectedRowId(null)} />}
+      {selectedRowId && (
+        <SettlementDetailModal
+          settlementRequestId={rowSourceById.get(selectedRowId)}
+          onClose={() => setSelectedRowId(null)}
+        />
+      )}
     </div>
   )
 }

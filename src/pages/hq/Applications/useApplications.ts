@@ -72,16 +72,16 @@ export function useApplications() {
   }))
 
   const columns: Column[] = [
-    { key: 'no', label: t('hqApplications.col.no'), width: '0.85fr' },
-    { key: 'appliedAt', label: t('hqApplications.col.appliedAt'), width: '0.8fr' },
-    { key: 'type', label: t('hqApplications.col.type'), width: '1fr' },
-    { key: 'country', label: t('hqApplications.col.country'), width: '0.9fr' },
-    { key: 'contact', label: t('hqApplications.col.contact'), width: '0.9fr' },
-    { key: 'company', label: t('hqApplications.col.company'), width: '1fr' },
-    { key: 'email', label: t('hqApplications.col.email'), width: '1.1fr' },
-    { key: 'interest', label: t('hqApplications.col.interest'), width: '0.9fr' },
-    { key: 'status', label: t('hqApplications.col.status'), width: '0.8fr' },
-    { key: 'action', label: t('hqApplications.col.action'), width: '1.6fr' },
+    { key: 'no', label: t('hqApplications.col.no'), width: '76px', align: 'center' },
+    { key: 'appliedAt', label: t('hqApplications.col.appliedAt'), width: '118px' },
+    { key: 'type', label: t('hqApplications.col.type'), width: '150px' },
+    { key: 'country', label: t('hqApplications.col.country'), width: '136px' },
+    { key: 'contact', label: t('hqApplications.col.contact'), width: '136px' },
+    { key: 'company', label: t('hqApplications.col.company'), width: '150px' },
+    { key: 'email', label: t('hqApplications.col.email'), width: '164px' },
+    { key: 'interest', label: t('hqApplications.col.interest'), width: '132px' },
+    { key: 'status', label: t('hqApplications.col.status'), width: '120px' },
+    { key: 'action', label: t('hqApplications.col.action'), width: '300px' },
   ]
 
   /*

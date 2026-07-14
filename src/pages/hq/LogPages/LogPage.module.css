@@ -1,0 +1,27 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.pageDesc {
+  margin: 0;
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.stateText,
+.errorText {
+  margin: 0;
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-medium);
+}
+
+.stateText {
+  color: var(--color-text-secondary);
+}
+
+.errorText {
+  color: var(--color-accent-red);
+}

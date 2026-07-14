@@ -86,6 +86,25 @@
   background-color: rgba(36, 216, 255, 0.28);
 }
 
+.stateText,
+.errorText,
+.notice,
+.requestNo {
+  margin: 0 8px 16px;
+  font-size: var(--font-size-12);
+  line-height: 1.6;
+  color: #ada3d1;
+}
+
+.errorText {
+  color: #ff6b8a;
+}
+
+.requestNo {
+  color: #f2f0ff;
+  font-weight: var(--font-weight-bold);
+}
+
 /* 라벨/값 19쌍 — 라벨 좌측 흰색, 값 우측 정렬 연보라 (Figma 12px semibold, 행 간격 약 24px) */
 .fields {
   display: flex;

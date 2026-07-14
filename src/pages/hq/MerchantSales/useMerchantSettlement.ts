@@ -1,7 +1,6 @@
 import { useTranslation } from '../../../i18n'
 import type { Column } from '../../../components/organisms/DataTable'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './merchantSettlementData.json'
 
 interface FieldRaw {
   labelKey: string
@@ -17,6 +16,12 @@ export interface MerchantSettleSummaryItem {
   color?: string
 }
 
+const emptyMerchantSettlementData = {
+  summary: [],
+  heldRows: [],
+  historyRows: [],
+}
+
 /*
  * useMerchantSettlement — "가맹점 거래내역" 화면의 "정산내역" 탭 데이터 훅
  * ------------------------------------------------------------------
@@ -29,7 +34,7 @@ export function useMerchantSettlement(merchantCode?: string) {
   const { t } = useTranslation()
   const { data: pageData, isLoading, error } = useHqPageData(
     merchantCode ? `/api/hq/merchants/${encodeURIComponent(merchantCode)}/sales/settlement` : null,
-    data,
+    emptyMerchantSettlementData,
   )
 
   const summary: MerchantSettleSummaryItem[] = (pageData.summary as Array<FieldRaw & { label?: string }>).map((f) => ({

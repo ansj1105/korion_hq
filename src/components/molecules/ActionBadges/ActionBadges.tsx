@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react'
 import Badge from '../../atoms/Badge'
 import type { AccentKey } from '../../../types'
 import styles from './ActionBadges.module.css'
@@ -43,8 +44,14 @@ interface ActionBadgesProps {
  */
 export default function ActionBadges({ labels, accentByLabel, size = 'sm', shape = 'pill', solid, solidByLabel, equalWidth, onLabelClick }: ActionBadgesProps) {
   const className = equalWidth ? `${styles.actions} ${styles.equalWidth}` : styles.actions
+  const stopActionPropagation = (event: MouseEvent<HTMLDivElement>) => {
+    if (onLabelClick) {
+      event.stopPropagation()
+    }
+  }
+
   return (
-    <div className={className}>
+    <div className={className} onClick={stopActionPropagation}>
       {labels.map((label) => (
         <Badge
           key={label}

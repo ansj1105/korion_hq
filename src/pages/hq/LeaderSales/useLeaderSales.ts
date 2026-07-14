@@ -40,6 +40,42 @@ export interface LeaderSalesLogRow {
   actions: string[]
 }
 
+const emptyLeaderSalesData = {
+  profile: {
+    topLabel: '상위 리더 / 해당 국가',
+    parentBadge: '본사',
+    country: '-',
+    code: '-',
+  },
+  kpiTop: [],
+  kpiBottom: [],
+  account: {
+    loginId: '-',
+    password: '******',
+    email: '-',
+    telegram: '-',
+    phone: '-',
+    twitter: '-',
+    appliedAt: '-',
+    approvedAt: '-',
+  },
+  basic: {
+    name: '-',
+    country: '-',
+    region: '-',
+    language: '-',
+    directContractReason: '-',
+    walletAddress: '-',
+  },
+  logRows: [],
+  settlement: {
+    lastSettleDate: '-',
+    thisRequestAmount: '0 KORI',
+    status: '-',
+    rows: [],
+  },
+} as typeof data
+
 /*
  * useLeaderSales — 본사어드민 "국가 리더별 거래내역" 데이터 훅
  * ------------------------------------------------------------------
@@ -53,7 +89,7 @@ export function useLeaderSales(leaderCode?: string) {
   const { t } = useTranslation()
   const { data: pageData, isLoading, error } = useHqPageData(
     `/api/hq/leaders/${encodeURIComponent(leaderCode ?? '')}/sales/overview`,
-    data,
+    emptyLeaderSalesData,
     { leaderCode },
   )
 

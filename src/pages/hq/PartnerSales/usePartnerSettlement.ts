@@ -2,7 +2,6 @@ import { useTranslation } from '../../../i18n'
 import type { InfoItem } from '../../../components/molecules/InfoGrid'
 import type { Column } from '../../../components/organisms/DataTable'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './partnerSettlementData.json'
 
 interface FieldRaw {
   labelKey?: string
@@ -11,11 +10,17 @@ interface FieldRaw {
   color?: string
 }
 
+const emptyPartnerSettlementData = {
+  summary: [],
+  heldRows: [],
+  historyRows: [],
+}
+
 export function usePartnerSettlement(partnerCode?: string) {
   const { t } = useTranslation()
   const { data: pageData, isLoading, error } = useHqPageData(
     `/api/hq/partners/${encodeURIComponent(partnerCode ?? '')}/sales/settlement`,
-    data,
+    emptyPartnerSettlementData,
     { partnerCode },
   )
 

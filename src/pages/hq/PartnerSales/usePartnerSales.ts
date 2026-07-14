@@ -28,6 +28,36 @@ export interface PartnerSalesLogRow {
   actions: string[]
 }
 
+const emptyPartnerDetailData = {
+  profile: {
+    topLabel: '상위 리더 / 해당 국가',
+    parentBadge: '-',
+    country: '-',
+    code: '-',
+  },
+  kpiTop: [],
+  account: {
+    loginId: '-',
+    password: '******',
+    email: '-',
+    telegram: '-',
+    phone: '-',
+    twitter: '-',
+    appliedAt: '-',
+    approvedAt: '-',
+  },
+  basic: {
+    name: '-',
+    country: '-',
+    region: '-',
+    language: '-',
+    directContractReason: '-',
+    walletAddress: '-',
+  },
+  tabKpi: [],
+  merchantRows: [],
+} as typeof detailData
+
 /*
  * usePartnerSales (hq) — 본사어드민 "파트너별 거래내역" 데이터 훅
  * ------------------------------------------------------------------
@@ -86,13 +116,13 @@ export function usePartnerOverview(partnerCode?: string) {
   const { t } = useTranslation()
   const { data: pageData, isLoading, error } = useHqPageData(
     `/api/hq/partners/${encodeURIComponent(partnerCode ?? '')}/sales/overview`,
-    detailData,
+    emptyPartnerDetailData,
     { partnerCode },
   )
 
   const toStats = (items: StatRaw[]): StatCardData[] => items.map((s) => ({ id: s.id, label: t(s.labelKey), value: s.value }))
-  const account = pageData.account ?? detailData.account
-  const basic = pageData.basic ?? detailData.basic
+  const account = pageData.account
+  const basic = pageData.basic
 
   const accountInfo: InfoItem[] = [
     { label: t('hqPartnerSales.account.loginId'), value: account.loginId },
@@ -116,8 +146,8 @@ export function usePartnerOverview(partnerCode?: string) {
   ]
 
   return {
-    profile: pageData.profile ?? detailData.profile,
-    kpiTop: toStats((pageData.kpiTop ?? detailData.kpiTop) as StatRaw[]),
+    profile: pageData.profile,
+    kpiTop: toStats(pageData.kpiTop as StatRaw[]),
     accountInfo,
     basicInfo,
     isLoading,

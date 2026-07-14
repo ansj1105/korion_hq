@@ -36,6 +36,42 @@ export interface MerchantSalesLogRow {
   memo?: string
 }
 
+const emptyMerchantSalesData = {
+  profile: {
+    topLabel: '상위 리더 / 해당 국가',
+    country: '-',
+    parentBadge: '-',
+    code: '-',
+  },
+  kpiTop: [],
+  account: {
+    loginId: '-',
+    password: '******',
+    email: '-',
+    telegram: '-',
+    phone: '-',
+    twitter: '-',
+    appliedAt: '-',
+    approvedAt: '-',
+  },
+  basic: {
+    name: '-',
+    country: '-',
+    region: '-',
+    language: '-',
+    directContractReason: '-',
+    walletAddress: '-',
+  },
+  store: {
+    name: '-',
+    owner: '-',
+    businessType: '-',
+    address: '-',
+  },
+  kpiBottom: [],
+  logRows: [],
+} as typeof data
+
 /*
  * useMerchantSales (hq) — 본사어드민 "가맹점 거래내역" 데이터 훅
  * ------------------------------------------------------------------
@@ -49,7 +85,7 @@ export function useMerchantSales(merchantCode?: string) {
   const { t } = useTranslation()
   const { data: pageData, isLoading, error } = useHqPageData(
     merchantCode ? `/api/hq/merchants/${encodeURIComponent(merchantCode)}/sales` : null,
-    data,
+    emptyMerchantSalesData,
   )
 
   const toStats = (items: KpiRaw[]): StatCardData[] =>

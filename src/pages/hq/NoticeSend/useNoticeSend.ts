@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
+import { fetchHqPageData } from '../../../services/korionChongApi'
 import data from './noticeSendData.json'
 
 interface KpiRaw {
@@ -21,21 +23,64 @@ export interface NoticeSendForm {
   noticeBody: string
 }
 
+export type HqNoticeSendRange = 'ALL' | 'TODAY' | '1D' | '7D' | '30D' | '90D'
+
+interface NoticeSendOption {
+  value: string
+  label: string
+}
+
+interface NoticeSendFilters {
+  countryOptions?: NoticeSendOption[]
+  rangeOptions?: HqNoticeSendRange[]
+}
+
+interface NoticeSendPageData {
+  kpis: KpiRaw[]
+  filters?: NoticeSendFilters
+  form: NoticeSendForm
+}
+
+interface UseNoticeSendFilters {
+  countryScope: string
+  range: HqNoticeSendRange
+}
+
 /*
  * useNoticeSend — 본사어드민 "알림 / 공지 - 공지 보내기" 데이터 훅
  * ------------------------------------------------------------------
- * noticeSendData.json(더미)을 읽어 KPI 라벨/부가설명(UI 텍스트)만 번역해 반환한다.
- * 추후 실 연동 시 이 훅 내부만 API 호출로 교체하면 NoticeSend.tsx는 그대로 동작한다.
+ * API에서 KPI/필터 옵션을 가져오고, 실패 시 기존 JSON을 fallback으로 사용한다.
  */
-export function useNoticeSend() {
+export function useNoticeSend({ countryScope, range }: UseNoticeSendFilters) {
   const { t } = useTranslation()
+  const [pageData, setPageData] = useState<NoticeSendPageData>(data as NoticeSendPageData)
 
-  const kpis: StatCardData[] = (data.kpis as KpiRaw[]).map((k) => ({
+  useEffect(() => {
+    let cancelled = false
+    fetchHqPageData<NoticeSendPageData>('/api/hq/announcements/send-summary', { countryScope, range })
+      .then((response) => {
+        if (!cancelled) setPageData(response)
+      })
+      .catch(() => {
+        if (!cancelled) setPageData(data as NoticeSendPageData)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [countryScope, range])
+
+  const kpis: StatCardData[] = pageData.kpis.map((k) => ({
     id: k.id,
     label: t(k.labelKey),
     value: k.value,
     delta: k.noteKey ? t(k.noteKey) : undefined,
   }))
 
-  return { kpis, form: data.form as NoticeSendForm }
+  const countryOptions = (pageData.filters?.countryOptions ?? [{ value: 'all', label: 'all' }]).map((option) => ({
+    value: option.value,
+    label: option.value === 'all' ? t('hqDashboard.filter.allCountries') : option.label,
+  }))
+  const rangeOptions = pageData.filters?.rangeOptions ?? ['ALL', 'TODAY', '7D', '30D', '90D']
+
+  return { kpis, filters: { countryOptions, rangeOptions }, form: pageData.form }
 }

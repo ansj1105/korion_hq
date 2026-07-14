@@ -1,0 +1,157 @@
+.backdrop {
+  position: fixed;
+  inset: 0 0 0 var(--sidebar-width);
+  z-index: 220;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: rgba(0, 0, 0, 0.58);
+}
+
+.panel {
+  width: min(900px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 58%, transparent);
+  border-radius: var(--radius-lg);
+  background: #151127;
+  box-shadow: 0 24px 64px -24px rgba(0, 0, 0, 0.55);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-accent-cyan) 26%, transparent);
+  padding-bottom: var(--space-3);
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: var(--font-weight-bold);
+}
+
+.subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-12);
+}
+
+.sectionLabel,
+.field span,
+.duplicateGrid span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-semibold);
+}
+
+.reasonBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.memoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 45%, transparent);
+  border-radius: var(--radius-sm);
+  background: rgba(12, 10, 30, 0.88);
+  color: var(--color-text);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-12);
+  padding: 0 var(--space-3);
+}
+
+.field input {
+  height: 34px;
+}
+
+.field textarea {
+  min-height: 88px;
+  padding: var(--space-3);
+  resize: vertical;
+}
+
+.duplicateGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.duplicateGrid div {
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 38%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.duplicateGrid strong {
+  font-size: 18px;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.footer button {
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  padding: 0 var(--space-4);
+}
+
+@media (max-width: 780px) {
+  .backdrop {
+    left: 0;
+    padding: var(--space-3);
+  }
+
+  .grid,
+  .memoGrid,
+  .duplicateGrid {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -3,7 +3,6 @@ import { useTranslation } from '../../../i18n'
 import type { Column } from '../../../components/organisms/DataTable'
 import { deleteHqPageData, fetchHqPageData, postHqPageData, putHqPageData } from '../../../services/korionChongApi'
 import type { DiagramRow } from './DistributionDiagram'
-import data from './rateSettingData.json'
 
 interface KpiRaw {
   id?: string
@@ -70,25 +69,40 @@ interface RateSettingApiData {
   modal?: Partial<RateModalData>
 }
 
-const fallbackData = data as RateSettingApiData
+const EMPTY_RATE_SETTING_DATA: RateSettingApiData = {
+  kpis: [],
+  diagram: [],
+  rows: [],
+  countries: [],
+}
 
 export function useRateSetting() {
   const { t } = useTranslation()
-  const [pageData, setPageData] = useState<RateSettingApiData>(fallbackData)
+  const [pageData, setPageData] = useState<RateSettingApiData>(EMPTY_RATE_SETTING_DATA)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
+    setIsLoading(true)
+    setError(null)
     fetchHqPageData<RateSettingApiData>('/api/hq/distribution-rates')
       .then((response) => {
         if (!cancelled) setPageData(normalizeRateSetting(response))
       })
-      .catch(() => {
-        if (!cancelled) setPageData(normalizeRateSetting(fallbackData))
+      .catch((err) => {
+        if (!cancelled) {
+          setPageData(EMPTY_RATE_SETTING_DATA)
+          setError(err instanceof Error ? err.message : 'API 데이터를 불러오지 못했습니다.')
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false)
       })
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [t])
 
   const kpis: KpiItem[] = useMemo(
     () =>
@@ -102,16 +116,16 @@ export function useRateSetting() {
   )
 
   const columns: Column[] = [
-    { key: 'no', label: t('hqRate.col.no'), width: '0.55fr', align: 'center' },
-    { key: 'country', label: t('hqRate.col.country'), width: '1.5fr' },
-    { key: 'code', label: t('hqRate.col.code'), width: '0.89fr' },
-    { key: 'hqFee', label: t('hqRate.col.hqFee'), width: '0.97fr' },
-    { key: 'leaderFee', label: t('hqRate.col.leaderFee'), width: '1.05fr' },
-    { key: 'partnerFee', label: t('hqRate.col.partnerFee'), width: '1.06fr' },
-    { key: 'merchantSettle', label: t('hqRate.col.merchantSettle'), width: '1.43fr' },
-    { key: 'event', label: t('hqRate.col.event'), width: '1.15fr' },
-    { key: 'coinCount', label: t('hqRate.col.coinCount'), width: '1.2fr' },
-    { key: 'status', label: t('hqRate.col.status'), width: '1.2fr' },
+    { key: 'no', label: t('hqRate.col.no'), width: '56px', align: 'center' },
+    { key: 'country', label: t('hqRate.col.country'), width: '150px' },
+    { key: 'code', label: t('hqRate.col.code'), width: '92px' },
+    { key: 'hqFee', label: t('hqRate.col.hqFee'), width: '106px' },
+    { key: 'leaderFee', label: t('hqRate.col.leaderFee'), width: '112px' },
+    { key: 'partnerFee', label: t('hqRate.col.partnerFee'), width: '116px' },
+    { key: 'merchantSettle', label: t('hqRate.col.merchantSettle'), width: '136px' },
+    { key: 'event', label: t('hqRate.col.event'), width: '116px' },
+    { key: 'coinCount', label: t('hqRate.col.coinCount'), width: '112px' },
+    { key: 'status', label: t('hqRate.col.status'), width: '116px' },
   ]
 
   const statusLabel: Record<RateStatus, string> = {
@@ -190,14 +204,18 @@ export function useRateSetting() {
     saveDiagramRows,
     saveCountryRate,
     deleteCountryRate,
+    isLoading,
+    error,
   }
 }
 
 function normalizeRateSetting(response: RateSettingApiData): RateSettingApiData {
   return {
     ...response,
-    diagram: response.diagram.map((row, index) => enrichDiagramRow(row, index)),
-    rows: response.rows.map((row, index, rows) => ({
+    kpis: response.kpis ?? [],
+    countries: response.countries ?? [],
+    diagram: (response.diagram ?? []).map((row, index) => enrichDiagramRow(row, index)),
+    rows: (response.rows ?? []).map((row, index, rows) => ({
       ...row,
       no: row.no ?? String(rows.length - index),
       countryCode: row.countryCode ?? row.code,

@@ -1,11 +1,13 @@
 /* Badge — 작은 알약형 라벨 (증감 수치, 상태/구분 태그 등) */
 .badge {
+  appearance: none;
   display: inline-flex;
   align-items: center;
   padding: 2px var(--space-2);
   border-radius: var(--radius-pill);
   font-size: var(--font-size-10);
   font-weight: var(--font-weight-semibold);
+  font-family: inherit;
   line-height: 1.5;
   white-space: nowrap;
 

@@ -1,8 +1,8 @@
 {
   "stats": [
-    { "id": "total", "labelKey": "hqRequestResultLog.kpi.total", "value": "300", "deltaKey": "hqRequestResultLog.kpi.delta5" },
-    { "id": "approved", "labelKey": "hqRequestResultLog.kpi.approved", "value": "250", "deltaKey": "hqRequestResultLog.kpi.delta5" },
-    { "id": "rejected", "labelKey": "hqRequestResultLog.kpi.rejected", "value": "50", "deltaKey": "hqRequestResultLog.kpi.delta5" }
+    { "id": "total", "labelKey": "hqRequestResultLog.kpi.total", "value": "300", "deltaKey": "hqRequestResultLog.kpi.delta5", "deltaBadge": true },
+    { "id": "approved", "labelKey": "hqRequestResultLog.kpi.approved", "value": "250", "deltaKey": "hqRequestResultLog.kpi.delta5", "deltaBadge": true },
+    { "id": "rejected", "labelKey": "hqRequestResultLog.kpi.rejected", "value": "50", "deltaKey": "hqRequestResultLog.kpi.delta5", "deltaBadge": true }
   ],
   "rows": [
     { "no": "6", "applicationNo": "APP-2401", "appliedAt": "2026.06.13", "paidAt": "2026.06.15", "requestType": "파트너 (리더 승인)", "parentCode": "NG-LEAD-0001", "applicantCode": "NG-SP-0001", "country": "나이지리아", "partnerName": "Nova", "adminAction": "approveCancelled" },

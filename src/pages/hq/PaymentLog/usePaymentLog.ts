@@ -3,7 +3,6 @@ import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import type { AccentKey } from '../../../types'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './paymentLogData.json'
 
 interface KpiRaw {
   id: string
@@ -20,10 +19,16 @@ interface PaymentLogPageData {
   rows: PaymentLogRow[]
 }
 
+const emptyPaymentLogData: PaymentLogPageData = {
+  stats: [],
+  rows: [],
+}
+
 /** 전체 결제 로그 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
 export interface PaymentLogRow {
   no: string
   id: string
+  entryId?: number
   txId: string
   sessionId: string
   datetime: string
@@ -55,7 +60,7 @@ export interface PaymentLogRow {
  */
 export function usePaymentLog() {
   const { t } = useTranslation()
-  const { data: pageData, isLoading, error } = useHqPageData<PaymentLogPageData>('/api/hq/payments/logs', data as PaymentLogPageData)
+  const { data: pageData, isLoading, error } = useHqPageData<PaymentLogPageData>('/api/hq/payments/logs', emptyPaymentLogData)
 
   const kpis: StatCardData[] = (pageData.stats ?? pageData.kpis ?? []).map((k) => ({
     id: k.id,

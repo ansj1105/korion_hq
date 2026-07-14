@@ -16,7 +16,7 @@ import { useLeaderSettlement } from './useLeaderSettlement'
 import Leaders from '../Leaders'
 import styles from './LeaderSales.module.css'
 
-/* 탭 인덱스 — row 진입 상세는 Figma 기준 "파트너별"을 기본으로 연다. */
+/* 탭 인덱스 — row 진입 상세는 거래내역을 기본으로 연다. */
 const PARTNER_TAB_INDEX = 0
 const MERCHANT_TAB_INDEX = 1
 const HISTORY_TAB_INDEX = 2
@@ -48,7 +48,7 @@ function LeaderSalesDetail({ leaderCode }: { leaderCode: string }) {
   const leaderMerchants = useLeaderMerchants(leaderCode)
   const leaderTransactions = useLeaderTransactions(leaderCode)
   const leaderSettlement = useLeaderSettlement(leaderCode)
-  const [tab, setTab] = useState(PARTNER_TAB_INDEX)
+  const [tab, setTab] = useState(HISTORY_TAB_INDEX)
   const [memo, setMemo] = useState('')
 
   const rows: TableRow[] = leaderTransactions.rows.map((r) => ({

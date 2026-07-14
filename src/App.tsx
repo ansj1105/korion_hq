@@ -56,9 +56,21 @@ import HqRateSetting from './pages/hq/RateSetting'
 import HqCollateralHistory from './pages/hq/CollateralHistory'
 import HqNoticeSend from './pages/hq/NoticeSend'
 import HqNoticeHistory from './pages/hq/NoticeHistory'
+import HqAdminPage from './pages/hq/AdminPages'
 import HqSystemCountry from './pages/hq/SystemCountry'
 import HqSystemErrorCode from './pages/hq/SystemErrorCode'
+import HqSystemSecurityPolicy from './pages/hq/SystemSecurityPolicy'
 import HqSystemMaintenance from './pages/hq/SystemMaintenance'
+import HqRiskFakeApplications from './pages/hq/RiskFakeApplications'
+import HqRiskFakeMerchants from './pages/hq/RiskFakeMerchants'
+import HqRiskDuplicates from './pages/hq/RiskDuplicates'
+import HqRiskSettlementHold from './pages/hq/RiskSettlementHold'
+import HqRiskBlacklist from './pages/hq/RiskBlacklist'
+import HqStatsCountry from './pages/hq/StatsCountry'
+import HqStatsPartner from './pages/hq/StatsPartner'
+import HqStatsMerchant from './pages/hq/StatsMerchant'
+import HqStatsPaymentMethod from './pages/hq/StatsPaymentMethod'
+import HqLogPage from './pages/hq/LogPages'
 import { ROLES } from './roles'
 import type { NavGroup } from './types'
 
@@ -73,6 +85,7 @@ const HQ_PAGES: Record<string, JSX.Element> = {
   dashboard: <HqDashboard />,
   'dashboard/by-country': <HqCountryDashboard />,
   applications: <HqApplications />,
+  'applications/result-log': <HqRequestResultLog />,
   'requests/leader': <HqRequestsLeader />,
   'requests/partner-by-leader': <HqRequestsPartnerByLeader />,
   'requests/partner-direct': <HqRequestsPartnerDirect />,
@@ -94,9 +107,33 @@ const HQ_PAGES: Record<string, JSX.Element> = {
   'collateral/history': <HqCollateralHistory />,
   'announcements/send': <HqNoticeSend />,
   'announcements/history': <HqNoticeHistory />,
+  admin: <Navigate to="/hq/admin/accounts" replace />,
+  'admin/accounts': <HqAdminPage pageType="accounts" />,
+  'admin/permission-groups': <HqAdminPage pageType="permission-groups" />,
+  'admin/country-access': <HqAdminPage pageType="country-access" />,
+  'admin/login-security': <HqAdminPage pageType="login-security" />,
+  'admin/two-factor': <HqAdminPage pageType="two-factor" />,
+  risk: <HqRiskFakeApplications />,
+  'risk/fake-applications': <HqRiskFakeApplications />,
+  'risk/fake-merchants': <HqRiskFakeMerchants />,
+  'risk/duplicates': <HqRiskDuplicates />,
+  'risk/settlement-hold': <HqRiskSettlementHold />,
+  'risk/blacklist': <HqRiskBlacklist />,
+  stats: <HqStatsCountry />,
+  'stats/country': <HqStatsCountry />,
+  'stats/partner': <HqStatsPartner />,
+  'stats/merchant': <HqStatsMerchant />,
+  'stats/payment-method': <HqStatsPaymentMethod />,
   'system/country': <HqSystemCountry />,
   'system/error-code': <HqSystemErrorCode />,
+  'system/security-policy': <HqSystemSecurityPolicy />,
   'system/maintenance-mode': <HqSystemMaintenance />,
+  logs: <Navigate to="/hq/logs/admin" replace />,
+  'logs/admin': <HqLogPage pageType="admin" />,
+  'logs/approval': <HqLogPage pageType="approval" />,
+  'logs/settlement': <HqLogPage pageType="settlement" />,
+  'logs/permission-change': <HqLogPage pageType="permission-change" />,
+  'logs/security': <HqLogPage pageType="security" />,
 }
 
 const LEADER_PAGES: Record<string, JSX.Element> = {
@@ -187,6 +224,8 @@ export default function App() {
       <Route path={ROLES.hq.basePath} element={<AdminLayout role="hq" />}>
         <Route index element={<Navigate to="dashboard" replace />} />
         {navRoutes(ROLES.hq.nav, HQ_PAGES)}
+        <Route path="risk" element={<Navigate to="risk/fake-applications" replace />} />
+        <Route path="stats" element={<Navigate to="stats/country" replace />} />
         {/* 사이드바엔 없는 상세 화면 (정산 신청의 "상세"에서 진입) */}
         <Route path="settlement/request/detail" element={<HqSettlementRequestDetail />} />
       </Route>

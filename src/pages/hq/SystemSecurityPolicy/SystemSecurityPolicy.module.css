@@ -1,0 +1,52 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.pageDesc,
+.noticeDesc,
+.stateText {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-13);
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+
+.noticeCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid color-mix(in srgb, var(--color-accent-amber) 50%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent-amber) 9%, var(--color-bg));
+}
+
+.noticeTitle {
+  color: var(--color-accent-amber);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
+}
+
+.errorText {
+  margin: 0;
+  color: var(--color-accent-red);
+  font-size: var(--font-size-13);
+}
+
+@media (max-width: 1024px) {
+  .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .kpiGrid {
+    grid-template-columns: 1fr;
+  }
+}

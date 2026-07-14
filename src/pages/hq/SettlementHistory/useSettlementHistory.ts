@@ -2,7 +2,6 @@ import { useTranslation } from '../../../i18n'
 import { useHqPageData } from '../../../hooks/useHqPageData'
 import type { Column } from '../../../components/organisms/DataTable'
 import type { AccentKey } from '../../../types'
-import data from './settlementHistoryData.json'
 
 interface KpiRaw {
   labelKey: string
@@ -36,6 +35,16 @@ export interface HistoryRow {
   sourceStatus?: string
 }
 
+interface SettlementHistoryPageData {
+  kpis: KpiRaw[]
+  rows: HistoryRow[]
+}
+
+const EMPTY_SETTLEMENT_HISTORY_DATA: SettlementHistoryPageData = {
+  kpis: [],
+  rows: [],
+}
+
 /** KPI 카드 (라벨/설명만 번역, highlight면 시안 강조 테두리) */
 export interface KpiItem {
   id: string
@@ -54,9 +63,9 @@ export interface KpiItem {
  */
 export function useSettlementHistory() {
   const { t } = useTranslation()
-  const { data: pageData, isLoading, error } = useHqPageData<{ kpis: KpiRaw[]; rows: HistoryRow[] }>(
+  const { data: pageData, isLoading, error } = useHqPageData<SettlementHistoryPageData>(
     '/api/hq/settlement-history',
-    data as { kpis: KpiRaw[]; rows: HistoryRow[] },
+    EMPTY_SETTLEMENT_HISTORY_DATA,
   )
 
   const kpis: KpiItem[] = pageData.kpis.map((k) => ({
@@ -68,21 +77,21 @@ export function useSettlementHistory() {
   }))
 
   const columns: Column[] = [
-    { key: 'no', label: t('hqSettle.hist.col.no'), width: '0.5fr', align: 'center' },
-    { key: 'id', label: t('hqSettle.hist.col.id'), width: '1.5fr' },
-    { key: 'date', label: t('hqSettle.hist.col.date'), width: '0.9fr' },
-    { key: 'processedAt', label: t('hqSettle.hist.col.processedAt'), width: '0.9fr' },
-    { key: 'code', label: t('hqSettle.hist.col.code'), width: '1fr' },
-    { key: 'partnerName', label: t('hqSettle.hist.col.partnerName'), width: '1fr' },
-    { key: 'country', label: t('hqSettle.hist.col.country'), width: '0.9fr' },
-    { key: 'period', label: t('hqSettle.hist.col.period'), width: '1.5fr' },
-    { key: 'totalAmount', label: t('hqSettle.hist.col.totalAmount'), width: '1fr', align: 'right' },
-    { key: 'partnerProfit', label: t('hqSettle.hist.col.partnerProfit'), width: '0.8fr', align: 'right' },
-    { key: 'directProfit', label: t('hqSettle.hist.col.directProfit'), width: '0.8fr', align: 'right' },
-    { key: 'partnerSettle', label: t('hqSettle.hist.col.partnerSettle'), width: '0.8fr', align: 'right' },
-    { key: 'held', label: t('hqSettle.hist.col.held'), width: '0.6fr', align: 'right' },
-    { key: 'finalAmount', label: t('hqSettle.hist.col.finalAmount'), width: '0.9fr', align: 'right' },
-    { key: 'status', label: t('hqSettle.hist.col.status'), width: '0.9fr' },
+    { key: 'no', label: t('hqSettle.hist.col.no'), width: '56px', align: 'center' },
+    { key: 'id', label: t('hqSettle.hist.col.id'), width: '170px' },
+    { key: 'date', label: t('hqSettle.hist.col.date'), width: '104px' },
+    { key: 'processedAt', label: t('hqSettle.hist.col.processedAt'), width: '112px' },
+    { key: 'code', label: t('hqSettle.hist.col.code'), width: '126px' },
+    { key: 'partnerName', label: t('hqSettle.hist.col.partnerName'), width: '150px' },
+    { key: 'country', label: t('hqSettle.hist.col.country'), width: '110px' },
+    { key: 'period', label: t('hqSettle.hist.col.period'), width: '178px' },
+    { key: 'totalAmount', label: t('hqSettle.hist.col.totalAmount'), width: '122px', align: 'right' },
+    { key: 'partnerProfit', label: t('hqSettle.hist.col.partnerProfit'), width: '112px', align: 'right' },
+    { key: 'directProfit', label: t('hqSettle.hist.col.directProfit'), width: '112px', align: 'right' },
+    { key: 'partnerSettle', label: t('hqSettle.hist.col.partnerSettle'), width: '112px', align: 'right' },
+    { key: 'held', label: t('hqSettle.hist.col.held'), width: '86px', align: 'right' },
+    { key: 'finalAmount', label: t('hqSettle.hist.col.finalAmount'), width: '112px', align: 'right' },
+    { key: 'status', label: t('hqSettle.hist.col.status'), width: '122px' },
   ]
 
   /** 상태 enum → 표시 라벨(데이터 값) + 행 액션 2번째 버튼 라벨(번역, 신청 화면 키 재사용) */

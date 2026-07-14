@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetchHqPageData } from '../services/korionChongApi'
+import { fetchHqPageData, KorionChongApiError } from '../services/korionChongApi'
 
 type Query = Record<string, string | number | undefined>
 
@@ -25,7 +25,12 @@ export function useHqPageData<T>(path: string | null, initialData: T, query?: Qu
         if (!cancelled) setData(response)
       })
       .catch((err: unknown) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'API error')
+        if (!cancelled) {
+          const message = err instanceof KorionChongApiError && err.code === 'UNAUTHORIZED'
+            ? 'HQ 로그인 토큰이 만료되었거나 누락되었습니다. 다시 로그인 후 확인해주세요.'
+            : err instanceof Error ? err.message : 'API error'
+          setError(message)
+        }
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false)

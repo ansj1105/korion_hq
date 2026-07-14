@@ -23,6 +23,11 @@ export interface LeaderMerchantRow {
   usage: string
 }
 
+const emptyLeaderMerchantsData = {
+  kpi: [],
+  rows: [],
+} as typeof data
+
 /*
  * useLeaderMerchants — "국가 리더별 거래내역" 화면의 "가맹점별" 탭 데이터 훅
  * ------------------------------------------------------------------
@@ -34,7 +39,7 @@ export function useLeaderMerchants(leaderCode?: string) {
   const { t } = useTranslation()
   const { data: pageData, isLoading, error } = useHqPageData(
     `/api/hq/leaders/${encodeURIComponent(leaderCode ?? '')}/sales/merchants`,
-    data,
+    emptyLeaderMerchantsData,
     { leaderCode },
   )
 

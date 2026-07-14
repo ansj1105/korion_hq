@@ -1,4 +1,5 @@
 import { useTranslation } from '../../../i18n'
+import type { CountryRow } from './useSystemCountry'
 import { useCountryForm } from './useCountryForm'
 import styles from './CountryFormOverlay.module.css'
 
@@ -7,6 +8,7 @@ interface Props {
   variant: 'add' | 'detail'
   open: boolean
   onClose: () => void
+  country?: CountryRow | null
 }
 
 /*
@@ -18,13 +20,30 @@ interface Props {
  * (CollateralDetailOverlay와 동일한 backdrop 방식). backdrop 클릭 또는 '취소'로 닫힘.
  * 입력/토글/수정·저장 동작은 협의 전이라 시안의 예시값을 채운 UI 상태만 구현(CLAUDE.md 1번).
  */
-export default function CountryFormOverlay({ variant, open, onClose }: Props) {
+export default function CountryFormOverlay({ variant, open, onClose, country }: Props) {
   const { t } = useTranslation()
   const { fields, toggles, memo } = useCountryForm()
 
   if (!open) return null
 
   const title = variant === 'add' ? t('hqSystemCountry.btn.addCountry') : t('hqSystemCountry.detail.title')
+  const displayFields = variant === 'detail' && country ? [
+    { label: t('hqSystemCountry.add.field.name'), value: country.country },
+    { label: t('hqSystemCountry.add.field.code'), value: country.code },
+    { label: t('hqSystemCountry.add.field.regions'), value: country.regions },
+    { label: t('hqSystemCountry.add.field.timezone'), value: country.timezone },
+    { label: t('hqSystemCountry.add.field.currency'), value: country.currency },
+    { label: t('hqSystemCountry.add.field.language'), value: country.language },
+    { label: t('hqSystemCountry.col.leader'), value: country.leader },
+    { label: t('hqSystemCountry.col.status'), value: country.status },
+  ] : fields
+  const displayToggles = variant === 'detail' && country ? [
+    { label: t('hqSystemCountry.add.field.paymentAllowed'), on: country.payment === 'ON' },
+    { label: t('hqSystemCountry.add.field.offlinePaymentAllowed'), on: country.payment === 'ON' },
+  ] : toggles
+  const displayMemo = variant === 'detail' && country
+    ? `${country.country} / ${country.code} · ${country.regions}`
+    : memo
 
   return (
     <div className={styles.backdrop} onClick={onClose}>
@@ -43,7 +62,7 @@ export default function CountryFormOverlay({ variant, open, onClose }: Props) {
 
         {/* 입력 필드 8개 — 2열 그리드 (시안 예시값 표시) */}
         <div className={styles.fieldGrid}>
-          {fields.map((f) => (
+          {displayFields.map((f) => (
             <div key={f.label} className={styles.field}>
               <span className={styles.fieldLabel}>{f.label}</span>
               <span className={styles.fieldValue}>{f.value}</span>
@@ -51,7 +70,7 @@ export default function CountryFormOverlay({ variant, open, onClose }: Props) {
           ))}
 
           {/* 결제 허용 / 오프라인 결제 허용 토글 — 시안은 둘 다 ON(초록) */}
-          {toggles.map((tg) => (
+          {displayToggles.map((tg) => (
             <div key={tg.label} className={styles.field}>
               <span className={styles.fieldLabel}>{tg.label}</span>
               <span className={tg.on ? styles.toggleOn : styles.toggleOff} aria-hidden>
@@ -63,7 +82,7 @@ export default function CountryFormOverlay({ variant, open, onClose }: Props) {
           {/* 관리자 메모 — 첫 번째 열, 다른 인풋보다 높은 박스(Figma 300×90) */}
           <div className={`${styles.field} ${styles.memoField}`}>
             <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.memo')}</span>
-            <span className={`${styles.fieldValue} ${styles.memoValue}`}>{memo}</span>
+            <span className={`${styles.fieldValue} ${styles.memoValue}`}>{displayMemo}</span>
           </div>
         </div>
 

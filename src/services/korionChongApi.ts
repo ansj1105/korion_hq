@@ -50,7 +50,16 @@ export async function getJson<T>(path: string, query?: Record<string, string | n
     headers,
   })
   if (!response.ok) {
-    throw new Error(`KORION Chong API ${response.status}`)
+    let code = ''
+    let detail = ''
+    try {
+      const payload = (await response.json()) as { code?: string; message?: string }
+      code = payload.code ?? ''
+      detail = payload.message ?? payload.code ?? ''
+    } catch {
+      detail = ''
+    }
+    throw new KorionChongApiError(code || `HTTP_${response.status}`, detail || `KORION Chong API ${response.status}`)
   }
   return response.json() as Promise<T>
 }

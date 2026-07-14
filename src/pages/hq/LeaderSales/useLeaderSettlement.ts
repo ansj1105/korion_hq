@@ -11,6 +11,14 @@ interface FieldRaw {
   color?: string
 }
 
+const emptyLeaderSettlementData = {
+  summary: [],
+  partnerRows: [],
+  merchantRows: [],
+  heldRows: [],
+  historyRows: [],
+} as typeof data
+
 /*
  * useLeaderSettlement — "국가 리더별 거래내역" 화면의 "정산내역" 탭 데이터 훅
  * ------------------------------------------------------------------
@@ -24,7 +32,7 @@ export function useLeaderSettlement(leaderCode?: string) {
   const { t } = useTranslation()
   const { data: pageData, isLoading, error } = useHqPageData(
     `/api/hq/leaders/${encodeURIComponent(leaderCode ?? '')}/sales/settlement`,
-    data,
+    emptyLeaderSettlementData,
     { leaderCode },
   )
 

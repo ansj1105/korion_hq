@@ -20,6 +20,8 @@ export interface StatCardData {
   delta?: string
   /** true면 증감 표시줄을 텍스트가 아니라 배지로 표시한다. */
   deltaBadge?: boolean
+  /** true면 증감 표시줄을 공통 배지가 아니라 기존 텍스트 설명으로 표시한다. */
+  deltaPlain?: boolean
   /** 라벨을 11px/regular로(증감줄 없는 작은 KPI 카드 전용 — 본사어드민 상세화면). delta 유무와 무관하게 줄 수 있음 */
   dense?: boolean
   /** 라벨 색조. 'amber'면 "오늘" 계열 카드처럼 라벨을 호박색으로, 'green'이면 담보금 계열 카드처럼 초록색으로(본사어드민 대시보드류). 기본은 흐린 보조색 */
@@ -61,7 +63,7 @@ export default function StatCard({
   tagAccent,
   note,
   delta,
-  deltaBadge,
+  deltaPlain,
   dense,
   labelTone,
   deltaTone,
@@ -86,19 +88,19 @@ export default function StatCard({
         <span className={styles.value}>{value}</span>
         {tag && <Badge accent={tagAccent}>{tag}</Badge>}
       </div>
-      {deltaBadge && delta ? (
-        <div className={styles.deltaBadges}>
-          <Badge accent={deltaTone === 'red' ? 'red' : 'cyan'} size="md" shape="rect">
-            {delta}
-          </Badge>
-        </div>
-      ) : deltaBadges ? (
+      {!deltaPlain && deltaBadges ? (
         <div className={styles.deltaBadges}>
           {deltaBadges.map((item) => (
             <Badge key={item.text} accent={item.accent} size="md" shape="rect">
               {item.text}
             </Badge>
           ))}
+        </div>
+      ) : !deltaPlain && delta ? (
+        <div className={styles.deltaBadges}>
+          <Badge accent={deltaTone === 'red' ? 'red' : 'cyan'} size="md" shape="rect">
+            {delta}
+          </Badge>
         </div>
       ) : (
         delta && <span className={deltaClassName}>{delta}</span>

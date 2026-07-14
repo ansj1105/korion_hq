@@ -12,8 +12,8 @@ interface Props {
  * ------------------------------------------------------------------
  * 별도 라우트 없이 open prop으로만 제어. 사이드바를 제외한 콘텐츠 영역 중앙에 노출
  * (SystemCountry의 CountryFormOverlay와 동일한 backdrop 방식). backdrop 클릭 또는 '취소'로 닫힘.
- * 국가 폼과 달리 토글 없이 입력 필드 9개 구성. 입력/추가 동작은 협의 전이라
- * 시안의 예시값을 채운 UI 상태만 구현(CLAUDE.md 1번).
+ * 국가 폼과 달리 토글 없이 입력 필드 9개 구성. 입력/추가 동작은 별도 저장 API 연결 전이라
+ * 빈 등록 상태만 표시한다.
  */
 export default function ErrorCodeFormOverlay({ open, onClose }: Props) {
   const { t } = useTranslation()
@@ -36,7 +36,7 @@ export default function ErrorCodeFormOverlay({ open, onClose }: Props) {
           <p className={styles.subtitle}>{t('hqSystemErrorCode.add.desc')}</p>
         </div>
 
-        {/* 입력 필드 9개 — 2열 그리드, 마지막 관리자 메모는 좌측 열 단독 (시안 예시값 표시) */}
+        {/* 입력 필드 9개 — 2열 그리드, 마지막 관리자 메모는 좌측 열 단독 */}
         <div className={styles.fieldGrid}>
           {fields.map((f) => (
             <div key={f.label} className={styles.field}>

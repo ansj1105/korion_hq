@@ -1,0 +1,27 @@
+{
+  "stats": [
+    { "id": "countries", "labelKey": "hqStatsCountry.kpi.countries", "value": "6", "delta": "Filter scope", "deltaBadge": true },
+    { "id": "leaders", "labelKey": "hqStatsCountry.kpi.leaders", "value": "2", "delta": "Country leaders", "deltaBadge": true },
+    { "id": "partners", "labelKey": "hqStatsCountry.kpi.partners", "value": "10", "delta": "Sales partners", "deltaBadge": true },
+    { "id": "merchants", "labelKey": "hqStatsCountry.kpi.merchants", "value": "32", "delta": "Merchants", "deltaBadge": true },
+    { "id": "members", "labelKey": "hqStatsCountry.kpi.members", "value": "0", "delta": "KORION Wallet members", "deltaBadge": true },
+    { "id": "amount", "labelKey": "hqStatsCountry.kpi.amount", "value": "0 KORI", "delta": "Payment amount", "deltaBadge": true },
+    { "id": "syncFail", "labelKey": "hqStatsCountry.kpi.syncFail", "value": "0 cases", "delta": "Sync failures", "deltaBadge": true }
+  ],
+  "rankingPanels": [
+    { "id": "byCountry", "titleKey": "hqDashboard.ranking.byCountry", "rows": [] },
+    { "id": "byLeader", "titleKey": "hqDashboard.ranking.byLeader", "rows": [] },
+    { "id": "byPartner", "titleKey": "hqDashboard.ranking.byPartner", "rows": [] },
+    { "id": "byMerchant", "titleKey": "hqDashboard.ranking.byMerchant", "rows": [] }
+  ],
+  "heatmap": [
+    { "code": "KR", "rank": "1", "amount": "0 KORI", "syncFail": "0 cases", "growth": "+0%", "intensity": 24 },
+    { "code": "NG", "rank": "2", "amount": "0 KORI", "syncFail": "0 cases", "growth": "+0%", "intensity": 18 },
+    { "code": "BD", "rank": "3", "amount": "0 KORI", "syncFail": "0 cases", "growth": "+0%", "intensity": 12 }
+  ],
+  "rows": [
+    { "id": "KR", "no": "3", "rank": "3", "country": "KR", "countryCode": "KR", "leaders": "2", "partners": "4", "merchants": "16", "members": "0", "amount": "0 KORI", "syncFail": "0 cases", "growth": "+0%", "status": "idle" },
+    { "id": "NG", "no": "2", "rank": "2", "country": "NG", "countryCode": "NG", "leaders": "0", "partners": "2", "merchants": "16", "members": "0", "amount": "0 KORI", "syncFail": "0 cases", "growth": "+0%", "status": "idle" },
+    { "id": "BD", "no": "1", "rank": "1", "country": "BD", "countryCode": "BD", "leaders": "0", "partners": "2", "merchants": "0", "members": "0", "amount": "0 KORI", "syncFail": "0 cases", "growth": "+0%", "status": "idle" }
+  ]
+}

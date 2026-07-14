@@ -31,6 +31,21 @@
       "noteKey": "hqNoticeSend.kpi.successRate.note"
     }
   ],
+  "filters": {
+    "countryOptions": [
+      {
+        "value": "all",
+        "label": "all"
+      }
+    ],
+    "rangeOptions": [
+      "ALL",
+      "TODAY",
+      "7D",
+      "30D",
+      "90D"
+    ]
+  },
   "form": {
     "sender": "KORION HQ Admin",
     "sendDate": "2026.06.20",

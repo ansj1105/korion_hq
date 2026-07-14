@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import RequestListPage from '../../../components/templates/RequestListPage'
 import ActionBadges from '../../../components/molecules/ActionBadges'
 import Badge from '../../../components/atoms/Badge'
@@ -24,15 +24,39 @@ export default function Applications() {
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus | 'all'>('all')
   const [page, setPage] = useState(1)
   const { stats, columns, rows: rawRows, statusMeta, deleteLabel } = useApplications()
+  const [applicationRows, setApplicationRows] = useState<ApplicationListRow[]>(rawRows)
   const pageSize = 10
+  const actionLabelByStatus: Record<ApplicationStatus, string> = {
+    waiting: statusMeta.waiting.label,
+    review: t('hqApplicationDetail.action.review'),
+    confirmed: t('hqApplicationDetail.action.confirm'),
+    risk: t('hqApplicationDetail.action.risk'),
+  }
+  const actionStatusByLabel: Record<string, ApplicationStatus> = {
+    [actionLabelByStatus.waiting]: 'waiting',
+    [actionLabelByStatus.review]: 'review',
+    [actionLabelByStatus.confirmed]: 'confirmed',
+    [actionLabelByStatus.risk]: 'risk',
+  }
+  const actionAccentByLabel: Record<string, AccentKey> = {
+    [actionLabelByStatus.waiting]: 'orange',
+    [actionLabelByStatus.review]: 'cyan',
+    [actionLabelByStatus.confirmed]: 'green',
+    [actionLabelByStatus.risk]: 'red',
+    [deleteLabel]: 'red',
+  }
+
+  useEffect(() => {
+    setApplicationRows(rawRows)
+  }, [rawRows])
 
   const sortedRows = useMemo(() => {
     const noValue = (value: string) => Number(value.replace(/\D/g, '')) || 0
-    return [...rawRows].sort((a, b) => {
+    return [...applicationRows].sort((a, b) => {
       const dateCompare = b.appliedAt.localeCompare(a.appliedAt)
       return dateCompare !== 0 ? dateCompare : noValue(b.no) - noValue(a.no)
     })
-  }, [rawRows])
+  }, [applicationRows])
 
   const filteredRows = useMemo(() => {
     const query = searchText.trim().toLowerCase()
@@ -52,8 +76,8 @@ export default function Applications() {
 
   const exportCsv = () => {
     const headers = columns.filter((column) => column.key !== 'action').map((column) => column.label)
-    const csvRows = filteredRows.map((row) =>
-      [row.no, row.appliedAt, row.type, row.country, row.contact, row.company, row.email, row.interest, statusMeta[row.status].label]
+    const csvRows = filteredRows.map((row, index) =>
+      [filteredRows.length - index, row.appliedAt, row.type, row.country, row.contact, row.company, row.email, row.interest, statusMeta[row.status].label]
         .map((value) => `"${String(value ?? '').replace(/"/g, '""')}"`)
         .join(','),
     )
@@ -66,19 +90,33 @@ export default function Applications() {
     URL.revokeObjectURL(url)
   }
 
+  const handleAction = (rowId: string, label: string) => {
+    if (label === deleteLabel) {
+      setApplicationRows((prev) => prev.filter((row) => applicationRowId(row) !== rowId))
+      setSelectedApplication((prev) => (prev && applicationRowId(prev) === rowId ? null : prev))
+      return
+    }
+
+    const nextStatus = actionStatusByLabel[label]
+    if (!nextStatus) return
+    setApplicationRows((prev) => prev.map((row) => (applicationRowId(row) === rowId ? { ...row, status: nextStatus } : row)))
+  }
+
   const rows: TableRow[] = pagedRows.map((r, index) => {
-    const labels = [statusMeta.waiting.label, statusMeta.review.label, statusMeta.confirmed.label, statusMeta.risk.label, deleteLabel]
+    const rowId = applicationRowId(r)
+    const displayNo = filteredRows.length - ((currentPage - 1) * pageSize + index)
+    const labels = [actionLabelByStatus.waiting, actionLabelByStatus.review, actionLabelByStatus.confirmed, actionLabelByStatus.risk, deleteLabel]
     const active = statusMeta[r.status]
-    const accentByLabel: Record<string, AccentKey> = { [active.label]: active.accent }
-    // 활성 배지만 상태별 solid 규칙을 따르고, 비활성·삭제 배지는 항상 solid 회색(Figma 기준)
+    const activeActionLabel = actionLabelByStatus[r.status]
+    // 라벨별 색상은 유지하되, 현재 상태 배지만 기존 활성 solid/tint 규칙을 따른다.
     const solidByLabel: Record<string, boolean> = Object.fromEntries(
-      labels.map((label) => [label, label === active.label ? active.solid : true]),
+      labels.map((label) => [label, label === activeActionLabel ? active.solid : true]),
     )
 
     return {
-      id: `${r.no}-${(currentPage - 1) * pageSize + index}`,
+      id: rowId,
       cells: {
-        no: r.no,
+        no: displayNo,
         appliedAt: r.appliedAt,
         type: r.type,
         country: r.country,
@@ -89,7 +127,14 @@ export default function Applications() {
         status: <Badge accent={active.accent} size="md" shape="rect" solid={active.solid}>{active.label}</Badge>,
         action: (
           <span onClick={(event) => event.stopPropagation()}>
-            <ActionBadges labels={labels} accentByLabel={accentByLabel} solidByLabel={solidByLabel} size="md" shape="rect" />
+            <ActionBadges
+              labels={labels}
+              accentByLabel={actionAccentByLabel}
+              solidByLabel={solidByLabel}
+              size="md"
+              shape="rect"
+              onLabelClick={(label) => handleAction(rowId, label)}
+            />
           </span>
         ),
       },
@@ -151,7 +196,7 @@ export default function Applications() {
         tableMutedText
         tableHeaderBar
         onRowClick={(id) => {
-          const selected = filteredRows.find((row, index) => `${row.no}-${index}` === id)
+          const selected = filteredRows.find((row) => applicationRowId(row) === id)
           if (selected) setSelectedApplication(selected)
         }}
       />
@@ -175,4 +220,8 @@ export default function Applications() {
       <ApplicationDetailOverlay application={selectedApplication} onClose={() => setSelectedApplication(null)} />
     </>
   )
+}
+
+function applicationRowId(row: ApplicationListRow) {
+  return [row.no, row.appliedAt, row.type, row.country, row.contact, row.company, row.email].join('|')
 }

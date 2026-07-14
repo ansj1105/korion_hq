@@ -3,7 +3,9 @@ import PageHeader from '../../../components/organisms/PageHeader'
 import StatCard from '../../../components/molecules/StatCard'
 import ActionBadges from '../../../components/molecules/ActionBadges'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
+import Badge from '../../../components/atoms/Badge'
 import { useTranslation } from '../../../i18n'
+import type { AccentKey } from '../../../types'
 import { useSystemErrorCode } from './useSystemErrorCode'
 import ErrorCodeFormOverlay from './ErrorCodeFormOverlay'
 import styles from './SystemErrorCode.module.css'
@@ -18,41 +20,64 @@ import styles from './SystemErrorCode.module.css'
  */
 export default function SystemErrorCode() {
   const { t } = useTranslation()
-  const { kpis, columns, rows: rawRows } = useSystemErrorCode()
+  const { kpis, columns, rows: rawRows, isLoading, error } = useSystemErrorCode()
   // "오류코드 추가" 클릭 → 등록 폼 오버레이(Figma 81:29775)
   const [addOpen, setAddOpen] = useState(false)
 
-  /*
-   * 강조색 — Figma 실측: 심각도 "위험"=#ff4e4e(빨강), 상태 "활성"=#09c809(초록).
-   * "주의"는 기본 흐린 셀 색 그대로. 상태 문자열은 데이터(enum)라 번역하지 않고
-   * 색만 표시 계층에서 입힌다.
-   */
-  const SEVERITY_COLOR: Record<string, string> = {
-    위험: '#ff4e4e',
+  const severityAccent: Record<string, AccentKey> = {
+    INFO: 'blue',
+    WARNING: 'amber',
+    ERROR: 'orange',
+    CRITICAL: 'red',
   }
-  const STATUS_COLOR: Record<string, string> = {
-    활성: '#09c809',
+  const autoActionAccent: Record<string, AccentKey> = {
+    NONE: 'blue',
+    RETRY: 'blue',
+    BLOCK_PAYMENT: 'red',
+    HOLD_SETTLEMENT: 'amber',
+    REQUEST_REVIEW: 'cyan',
+    ESCALATE: 'purple',
+  }
+  const actionAccent: Record<string, AccentKey> = {
+    [t('common.detail')]: 'cyan',
+    상세: 'cyan',
+    수정: 'blue',
+    삭제: 'red',
   }
 
-  // 액션 배지(상세)는 중립 회색 솔리드 — accentByLabel을 빈 매핑으로 줘 중립색으로 통일
-  const actionBadges = (
-    <ActionBadges labels={[t('common.detail')]} accentByLabel={{}} solid equalWidth size="xs" />
-  )
-
-  // Figma 시안은 번호가 전부 "0001"이라 리스트 key는 코드+인덱스로 보강
   const rows: TableRow[] = rawRows.map((r, i) => ({
-    id: `${r.code}-${i}`,
+    id: r.id ?? `${r.code}-${i}`,
     cells: {
-      no: r.no,
+      no: rawRows.length - i,
       registeredAt: r.registeredAt,
       code: r.code,
       name: r.name,
       category: r.category,
-      severity: <span style={{ color: SEVERITY_COLOR[r.severity] }}>{r.severity}</span>,
+      severity: (
+        <Badge accent={(r.severityAccent as AccentKey) ?? severityAccent[r.severity] ?? 'blue'} size="md" shape="rect">
+          {r.severity}
+        </Badge>
+      ),
       userMessage: r.userMessage,
-      autoAction: r.autoAction,
-      status: <span style={{ color: STATUS_COLOR[r.status] }}>{r.status}</span>,
-      action: actionBadges,
+      autoAction: (
+        <Badge accent={autoActionAccent[r.autoAction] ?? 'blue'} size="md" shape="rect">
+          {r.autoAction}
+        </Badge>
+      ),
+      status: (
+        <Badge accent={(r.statusAccent as AccentKey) ?? (r.status === 'ACTIVE' ? 'green' : 'blue')} size="md" shape="rect">
+          {r.status}
+        </Badge>
+      ),
+      action: (
+        <ActionBadges
+          labels={r.actions?.length ? r.actions : [t('common.detail')]}
+          accentByLabel={actionAccent}
+          solid
+          size="md"
+          shape="rect"
+        />
+      ),
     },
   }))
 
@@ -74,6 +99,8 @@ export default function SystemErrorCode() {
         <h2 className={styles.noticeTitle}>{t('hqSystemErrorCode.notice.title')}</h2>
         <p className={styles.noticeDesc}>{t('hqSystemErrorCode.notice.desc')}</p>
       </section>
+      {isLoading && <p className={styles.stateText}>{t('common.loading')}</p>}
+      {error && <p className={styles.errorText}>{error}</p>}
 
       {/* 오류 코드 목록 표 — 툴바 우측 끝에 보라 "오류코드 추가" CTA(Figma 113×33 솔리드) */}
       <DataTable
@@ -85,9 +112,13 @@ export default function SystemErrorCode() {
         }
         columns={columns}
         rows={rows}
+        searchKeys={['code', 'name', 'category', 'severity', 'autoAction', 'status', 'userMessage']}
+        filterKeys={['category', 'severity', 'autoAction', 'status']}
         mutedText
         headerBar
         wrapCells
+        paginated
+        pageSize={10}
       />
 
       <ErrorCodeFormOverlay open={addOpen} onClose={() => setAddOpen(false)} />

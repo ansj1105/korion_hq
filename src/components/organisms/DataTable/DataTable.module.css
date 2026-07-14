@@ -7,12 +7,15 @@
   display: flex;
   flex-direction: column;
   gap: 9px;                  /* Figma 테이블 내부 간격 */
+  min-width: 0;
+  max-width: 100%;
   padding: var(--space-4);
   background-color: color-mix(in srgb, var(--color-bg-elevated) 84%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-border-accent) 62%, transparent);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  overflow-x: auto;          /* 만일을 위한 폴백(아래 상대 크기로 대개 넘치지 않음) */
+  overflow-x: auto;          /* 컬럼이 많거나 리사이즈로 길어진 표는 내부에서 좌우 스크롤 */
+  overscroll-behavior-x: contain;
   /*
    * 반응형: 표가 항상 컨테이너 폭에 맞춰 줄어들도록(가로 스크롤/잘림 방지) 컬럼은 상대폭(fr),
    * 글씨·여백은 표 폭(cqi) 기준 상대 크기로 정의한다. container-type으로 이 표를 크기 기준으로 삼는다.
@@ -20,6 +23,20 @@
    */
   container-type: inline-size;
   --cell-fs: clamp(8px, 0.95cqi, 10px);
+}
+
+.wrap::-webkit-scrollbar {
+  height: 10px;
+}
+
+.wrap::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--color-bg-elevated) 72%, transparent);
+  border-radius: 999px;
+}
+
+.wrap::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-border-accent) 78%, transparent);
+  border-radius: 999px;
 }
 /* largeText·mutedText 표는 기본 글씨가 11px이므로 상한만 11로 올림 */
 .largeText,
@@ -281,8 +298,11 @@
   align-items: center;
   /* 반응형: 컬럼 간격도 표 폭에 비례(좁아지면 좁아짐) */
   gap: clamp(4px, 0.6cqi, 8px);
-  /* 고정 최소폭 제거 → 표가 항상 컨테이너 폭에 맞춰 줄어든다(가로 스크롤/잘림 방지) */
-  min-width: 0;
+  /*
+   * 일반 목록 표는 컬럼 수/폭에 맞춘 최소 폭을 유지해 가로 스크롤로 긴 값을 확인한다.
+   * fluid 표만 아래에서 부모 폭에 맞춰 줄어드는 예외를 둔다.
+   */
+  min-width: var(--table-min-width, 0);
 }
 
 /*
@@ -359,8 +379,9 @@
 }
 
 .resizeHandle:hover::after,
+.headerCell:hover .resizeHandle::after,
 .resizeHandle:focus-visible::after {
-  opacity: 1;
+  opacity: 0.85;
 }
 
 .resizeHandle:focus-visible {

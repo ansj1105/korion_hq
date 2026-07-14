@@ -1,0 +1,26 @@
+{
+  "stats": [
+    { "id": "total", "labelKey": "hqStatsPaymentMethod.kpi.total", "value": "0", "delta": "+0%", "deltaBadge": true },
+    { "id": "success", "labelKey": "hqStatsPaymentMethod.kpi.success", "value": "0", "delta": "0%", "deltaBadge": true },
+    { "id": "failed", "labelKey": "hqStatsPaymentMethod.kpi.failed", "value": "0", "delta": "0%", "deltaBadge": true },
+    { "id": "synced", "labelKey": "hqStatsPaymentMethod.kpi.synced", "value": "0", "delta": "송/수신 업로드 완료", "deltaBadge": true },
+    { "id": "topMethod", "labelKey": "hqStatsPaymentMethod.kpi.topMethod", "value": "-", "delta": "최다 사용 수단", "deltaBadge": true }
+  ],
+  "rankingPanels": [
+    { "id": "byUsage", "titleKey": "hqStatsPaymentMethod.ranking.byUsage", "rows": [] },
+    { "id": "bySuccess", "titleKey": "hqStatsPaymentMethod.ranking.bySuccess", "rows": [] },
+    { "id": "byFailure", "titleKey": "hqStatsPaymentMethod.ranking.byFailure", "rows": [] }
+  ],
+  "donut": [
+    { "id": "QR", "labelKey": "hqDashboard.paymentMethod.donut.qr", "pct": 0, "accent": "cyan" },
+    { "id": "BLE", "labelKey": "hqDashboard.paymentMethod.donut.ble", "pct": 0, "accent": "purple" },
+    { "id": "NFC", "labelKey": "hqDashboard.paymentMethod.donut.nfc", "pct": 0, "accent": "green" },
+    { "id": "Offline", "labelKey": "hqDashboard.paymentMethod.donut.offline", "pct": 0, "accent": "orange" }
+  ],
+  "rows": [
+    { "id": "QR", "rank": 1, "rawCount": 0, "rawSuccessCount": 0, "rawFailCount": 0, "rawSyncCount": 0, "count": "0건", "successRate": "0%", "failRate": "0%", "avgApprove": "0초", "sync": "-", "failReason": "-" },
+    { "id": "BLE", "rank": 2, "rawCount": 0, "rawSuccessCount": 0, "rawFailCount": 0, "rawSyncCount": 0, "count": "0건", "successRate": "0%", "failRate": "0%", "avgApprove": "0초", "sync": "0/0 업로드", "syncAccent": "blue", "failReason": "-" },
+    { "id": "NFC", "rank": 3, "rawCount": 0, "rawSuccessCount": 0, "rawFailCount": 0, "rawSyncCount": 0, "count": "0건", "successRate": "0%", "failRate": "0%", "avgApprove": "0초", "sync": "0/0 업로드", "syncAccent": "blue", "failReason": "-" },
+    { "id": "Offline", "rank": 4, "rawCount": 0, "rawSuccessCount": 0, "rawFailCount": 0, "rawSyncCount": 0, "count": "0건", "successRate": "0%", "failRate": "0%", "avgApprove": "0초", "sync": "0/0 업로드", "syncAccent": "blue", "failReason": "-" }
+  ]
+}

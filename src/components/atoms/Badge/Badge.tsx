@@ -40,8 +40,16 @@ export default function Badge({ children, accent, size, shape = 'pill', solid, o
     .filter(Boolean)
     .join(' ')
 
+  if (onClick) {
+    return (
+      <button type="button" className={badgeClassName} style={style} onClick={onClick}>
+        {children}
+      </button>
+    )
+  }
+
   return (
-    <span className={badgeClassName} style={style} onClick={onClick}>
+    <span className={badgeClassName} style={style}>
       {children}
     </span>
   )

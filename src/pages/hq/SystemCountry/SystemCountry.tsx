@@ -3,10 +3,13 @@ import PageHeader from '../../../components/organisms/PageHeader'
 import StatCard from '../../../components/molecules/StatCard'
 import ActionBadges from '../../../components/molecules/ActionBadges'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
+import Badge from '../../../components/atoms/Badge'
 import { useTranslation } from '../../../i18n'
 import { useSystemCountry } from './useSystemCountry'
 import CountryFormOverlay from './CountryFormOverlay'
 import styles from './SystemCountry.module.css'
+import type { AccentKey } from '../../../types'
+import type { CountryRow } from './useSystemCountry'
 
 /*
  * SystemCountry (page) — 본사어드민 · 시스템 설정 · 국가 / 지역 설정
@@ -17,34 +20,22 @@ import styles from './SystemCountry.module.css'
  */
 export default function SystemCountry() {
   const { t } = useTranslation()
-  const { kpis, columns, rows: rawRows } = useSystemCountry()
+  const { kpis, columns, rows: rawRows, isLoading, error } = useSystemCountry()
   // "국가 추가" 클릭 → 등록 폼(Figma 81:29739) / 행 클릭 → 국가 상세정보 폼(Figma 81:29865)
   const [addOpen, setAddOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
+  const [selectedCountry, setSelectedCountry] = useState<CountryRow | null>(rawRows[0] ?? null)
 
-  /*
-   * 상태/결제 강조색 — Figma 실측: 활성·ON=#09c809, 비활성=#ffad33, 제한=#ff4e4e,
-   * OFF=흰색(기본 흐린 셀 색과 달라 명시). 토큰 accent와 다른 색조라 직접 지정.
-   * 상태 문자열은 데이터(enum)라 번역하지 않고, 색만 표시 계층에서 입힌다.
-   */
-  const STATUS_COLOR: Record<string, string> = {
-    활성: '#09c809',
-    비활성: '#ffad33',
-    제한: '#ff4e4e',
+  const actionAccent: Record<string, AccentKey> = {
+    [t('common.detail')]: 'cyan',
+    수정: 'blue',
+    제한: 'red',
+    활성: 'green',
   }
-  const PAYMENT_COLOR: Record<string, string> = {
-    ON: '#09c809',
-    OFF: '#ffffff',
-  }
-
-  // 액션 배지(상세)는 중립 회색 솔리드 — accentByLabel을 빈 매핑으로 줘 중립색으로 통일
-  const actionBadges = (
-    <ActionBadges labels={[t('common.detail')]} accentByLabel={{}} solid equalWidth size="xs" />
-  )
 
   // Figma 시안은 번호가 전부 "0001"이라 리스트 key는 코드+인덱스로 보강
   const rows: TableRow[] = rawRows.map((r, i) => ({
-    id: `${r.code}-${i}`,
+    id: r.id ?? `${r.code}-${i}`,
     cells: {
       no: r.no,
       registeredAt: r.registeredAt,
@@ -57,9 +48,9 @@ export default function SystemCountry() {
       leader: r.leader,
       partners: r.partners,
       merchants: r.merchants,
-      status: <span style={{ color: STATUS_COLOR[r.status] }}>{r.status}</span>,
-      payment: <span style={{ color: PAYMENT_COLOR[r.payment] }}>{r.payment}</span>,
-      action: actionBadges,
+      status: <Badge accent={(r.statusAccent as AccentKey) ?? (r.status === '활성' ? 'green' : 'orange')} size="md" shape="rect">{r.status}</Badge>,
+      payment: <Badge accent={(r.paymentAccent as AccentKey) ?? (r.payment === 'ON' ? 'green' : 'red')} size="md" shape="rect">{r.payment}</Badge>,
+      action: <ActionBadges labels={r.actions ?? [t('common.detail')]} accentByLabel={actionAccent} solid size="md" shape="rect" />,
     },
   }))
 
@@ -81,6 +72,8 @@ export default function SystemCountry() {
         <h2 className={styles.noticeTitle}>{t('hqSystemCountry.notice.title')}</h2>
         <p className={styles.noticeDesc}>{t('hqSystemCountry.notice.desc')}</p>
       </section>
+      {isLoading && <p className={styles.stateText}>{t('common.loading')}</p>}
+      {error && <p className={styles.errorText}>{error}</p>}
 
       {/* 국가 목록 표 — 툴바 우측 끝에 보라 "국가 추가" CTA(Figma 92×33 솔리드) */}
       <DataTable
@@ -92,15 +85,26 @@ export default function SystemCountry() {
         }
         columns={columns}
         rows={rows}
+        searchKeys={['code', 'country', 'regions', 'timezone', 'currency', 'language']}
+        filterKeys={['status', 'payment', 'currency', 'language']}
         mutedText
         headerBar
         wrapCells
-        onRowClick={() => setDetailOpen(true)}
+        paginated
+        pageSize={10}
+        onRowClick={(id) => {
+          setSelectedCountry(rawRows.find((row, index) => (row.id ?? `${row.code}-${index}`) === id) ?? null)
+          setDetailOpen(true)
+        }}
       />
 
       <CountryFormOverlay variant="add" open={addOpen} onClose={() => setAddOpen(false)} />
-      {/* 행(상세) 클릭 상세 폼 — 시안이 단일 샘플이라 어떤 행이든 같은 내용 */}
-      <CountryFormOverlay variant="detail" open={detailOpen} onClose={() => setDetailOpen(false)} />
+      <CountryFormOverlay
+        variant="detail"
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        country={selectedCountry}
+      />
     </div>
   )
 }

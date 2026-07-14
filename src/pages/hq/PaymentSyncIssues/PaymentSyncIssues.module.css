@@ -34,11 +34,24 @@
   font-weight: var(--font-weight-bold);
 }
 
-.detailButton {
+.actionCell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.actionButton {
   padding: 0;
   border: none;
   background: none;
   cursor: pointer;
+}
+
+.actionButton:focus-visible {
+  outline: 1px solid var(--color-accent-cyan);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .overallCell,

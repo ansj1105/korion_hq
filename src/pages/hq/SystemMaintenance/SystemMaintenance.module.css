@@ -12,6 +12,12 @@
   color: #afa7c8;
 }
 
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
 /*
  * 현재 상태 카드 — Figma: 짙은 초록 배경(rgba(7,21,16,.86)) + 초록 테두리(rgba(52,211,153,.55)) +
  * radius 22. 색은 Figma 실측값으로 토큰 accent-green과 다른 색조라 직접 지정.
@@ -95,10 +101,29 @@
   white-space: nowrap;
 }
 
+.stateText,
+.errorText {
+  margin: 0;
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-medium);
+}
+
+.stateText {
+  color: var(--color-text-secondary);
+}
+
+.errorText {
+  color: var(--color-accent-red);
+}
+
 /* 반응형: 좁은 화면(<720px)에서 상태 카드 가로 배치 → 세로 배치 */
 @media (max-width: 720px) {
   .statusCard {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .kpiGrid {
+    grid-template-columns: 1fr;
   }
 }

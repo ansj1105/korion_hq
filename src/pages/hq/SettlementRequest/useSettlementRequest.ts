@@ -2,7 +2,6 @@ import { useTranslation } from '../../../i18n'
 import { useHqPageData } from '../../../hooks/useHqPageData'
 import type { Column } from '../../../components/organisms/DataTable'
 import type { AccentKey } from '../../../types'
-import data from './settlementRequestData.json'
 
 interface KpiRaw {
   id?: string
@@ -44,6 +43,11 @@ interface SettlementRequestPageData {
   rows: RequestRow[]
 }
 
+const EMPTY_SETTLEMENT_REQUEST_DATA: SettlementRequestPageData = {
+  kpis: [],
+  rows: [],
+}
+
 /** KPI 카드 (라벨만 번역) */
 export interface KpiItem {
   id: string
@@ -63,7 +67,7 @@ export function useSettlementRequest() {
   const { t } = useTranslation()
   const { data: pageData, isLoading, error } = useHqPageData<SettlementRequestPageData>(
     '/api/hq/settlement-requests',
-    data as SettlementRequestPageData,
+    EMPTY_SETTLEMENT_REQUEST_DATA,
   )
 
   const kpis: KpiItem[] = pageData.kpis.map((k) => ({
@@ -74,21 +78,21 @@ export function useSettlementRequest() {
   }))
 
   const columns: Column[] = [
-    { key: 'no', label: t('hqSettle.req.col.no'), width: '0.5fr', align: 'center' },
-    { key: 'id', label: t('hqSettle.req.col.id'), width: '1.5fr' },
-    { key: 'date', label: t('hqSettle.req.col.date'), width: '0.9fr' },
-    { key: 'applicant', label: t('hqSettle.req.col.applicant'), width: '1fr' },
-    { key: 'partnerName', label: t('hqSettle.req.col.partnerName'), width: '1fr' },
-    { key: 'country', label: t('hqSettle.req.col.country'), width: '0.9fr' },
-    { key: 'period', label: t('hqSettle.req.col.period'), width: '1.5fr' },
-    { key: 'totalAmount', label: t('hqSettle.req.col.totalAmount'), width: '1fr', align: 'right' },
-    { key: 'partnerProfit', label: t('hqSettle.req.col.partnerProfit'), width: '0.8fr', align: 'right' },
-    { key: 'directProfit', label: t('hqSettle.req.col.directProfit'), width: '0.8fr', align: 'right' },
-    { key: 'partnerSettle', label: t('hqSettle.req.col.partnerSettle'), width: '0.8fr', align: 'right' },
-    { key: 'held', label: t('hqSettle.req.col.held'), width: '0.6fr', align: 'right' },
-    { key: 'finalAmount', label: t('hqSettle.req.col.finalAmount'), width: '0.9fr', align: 'right' },
-    { key: 'status', label: t('hqSettle.req.col.status'), width: '0.9fr' },
-    { key: 'action', label: t('hqSettle.req.col.action'), width: '1.2fr' },
+    { key: 'no', label: t('hqSettle.req.col.no'), width: '56px', align: 'center' },
+    { key: 'id', label: t('hqSettle.req.col.id'), width: '170px' },
+    { key: 'date', label: t('hqSettle.req.col.date'), width: '104px' },
+    { key: 'applicant', label: t('hqSettle.req.col.applicant'), width: '126px' },
+    { key: 'partnerName', label: t('hqSettle.req.col.partnerName'), width: '150px' },
+    { key: 'country', label: t('hqSettle.req.col.country'), width: '110px' },
+    { key: 'period', label: t('hqSettle.req.col.period'), width: '178px' },
+    { key: 'totalAmount', label: t('hqSettle.req.col.totalAmount'), width: '122px', align: 'right' },
+    { key: 'partnerProfit', label: t('hqSettle.req.col.partnerProfit'), width: '112px', align: 'right' },
+    { key: 'directProfit', label: t('hqSettle.req.col.directProfit'), width: '112px', align: 'right' },
+    { key: 'partnerSettle', label: t('hqSettle.req.col.partnerSettle'), width: '112px', align: 'right' },
+    { key: 'held', label: t('hqSettle.req.col.held'), width: '86px', align: 'right' },
+    { key: 'finalAmount', label: t('hqSettle.req.col.finalAmount'), width: '112px', align: 'right' },
+    { key: 'status', label: t('hqSettle.req.col.status'), width: '122px' },
+    { key: 'action', label: t('hqSettle.req.col.action'), width: '340px' },
   ]
 
   const statusLabel: Record<RequestStatus, string> = {

@@ -98,7 +98,11 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
     const override = columnWidthOverrides[c.key]
     return override ? `${override}px` : c.width ?? '1fr'
   }).join(' ')
-  const gridStyle = { '--cols': cols } as CSSProperties
+  const tableMinWidth = fluid ? undefined : computeTableMinWidth(columns, columnWidthOverrides)
+  const gridStyle = {
+    '--cols': cols,
+    ...(tableMinWidth ? { '--table-min-width': `${tableMinWidth}px` } : {}),
+  } as CSSProperties
   const searchEnabled = Boolean(toolbar?.some(isSearchToolbarLabel))
   const filterEnabled = Boolean(toolbar?.some(isFilterToolbarLabel))
   const englishToolbar = hasEnglishToolbar(toolbar)
@@ -483,6 +487,39 @@ function parseColumnPixelWidth(width?: string) {
   const match = width.trim().match(/^(\d+(?:\.\d+)?)px$/)
   if (!match) return undefined
   return Number(match[1])
+}
+
+function estimateColumnWidthValue(width?: string) {
+  const pixelWidth = parseColumnPixelWidth(width)
+  if (pixelWidth) return pixelWidth
+
+  const minmaxPixelWidth = width?.match(/minmax\(\s*(\d+(?:\.\d+)?)px/i)
+  const frWidth = width?.match(/(\d+(?:\.\d+)?)fr/i)
+  if (minmaxPixelWidth || frWidth) {
+    const minWidth = minmaxPixelWidth ? Number(minmaxPixelWidth[1]) : 0
+    const flexibleWidth = frWidth ? Math.round(Number(frWidth[1]) * 112) : 0
+    return Math.max(88, minWidth, flexibleWidth)
+  }
+
+  return 112
+}
+
+function computeTableMinWidth(columns: Column[], overrides: Record<string, number>) {
+  const columnTotal = columns.reduce((total, column) => {
+    return total + (overrides[column.key] ?? estimateColumnMinWidth(column))
+  }, 0)
+  const gapTotal = Math.max(0, columns.length - 1) * 8
+  const rowPadding = 24
+
+  return Math.max(880, Math.ceil(columnTotal + gapTotal + rowPadding))
+}
+
+function estimateColumnMinWidth(column: Column) {
+  const explicitWidth = estimateColumnWidthValue(column.width)
+  if (column.key === 'action') return Math.max(explicitWidth, 320)
+  if (column.key === 'status') return Math.max(explicitWidth, 120)
+  if (column.key === 'no') return Math.max(explicitWidth, 56)
+  return explicitWidth
 }
 
 function getHeaderJustifyContent(align?: Column['align']) {

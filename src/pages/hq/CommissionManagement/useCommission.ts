@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { Column } from '../../../components/organisms/DataTable'
 import { deleteHqPageData, fetchHqPageData, postHqPageData, putHqPageData } from '../../../services/korionChongApi'
-import data from './commissionData.json'
 
 interface KpiRaw {
   id?: string
@@ -77,15 +76,22 @@ export interface KpiItem {
   note: string
 }
 
-const fallbackData = data as CommissionApiData
+const EMPTY_COMMISSION_DATA: CommissionApiData = {
+  kpis: [],
+  rows: [],
+  countries: [],
+  globalFee: '0',
+}
 
 export function useCommission() {
   const { t } = useTranslation()
-  const [pageData, setPageData] = useState<CommissionApiData>(fallbackData)
+  const [pageData, setPageData] = useState<CommissionApiData>(EMPTY_COMMISSION_DATA)
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
+    setIsLoading(true)
     fetchHqPageData<CommissionApiData>('/api/hq/commission-fees')
       .then((response) => {
         if (!cancelled) {
@@ -95,6 +101,9 @@ export function useCommission() {
       })
       .catch((err: unknown) => {
         if (!cancelled) setError(err instanceof Error ? err.message : 'API error')
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false)
       })
     return () => {
       cancelled = true
@@ -113,17 +122,17 @@ export function useCommission() {
   )
 
   const columns: Column[] = [
-    { key: 'no', label: t('hqCommission.col.no'), width: '0.55fr', align: 'center' },
-    { key: 'country', label: t('hqCommission.col.country'), width: '1.5fr' },
-    { key: 'code', label: t('hqCommission.col.code'), width: '0.89fr' },
-    { key: 'baseFee', label: t('hqCommission.col.baseFee'), width: '0.97fr' },
-    { key: 'online', label: t('hqCommission.col.online'), width: '1.05fr' },
-    { key: 'offline', label: t('hqCommission.col.offline'), width: '1.06fr' },
-    { key: 'event', label: t('hqCommission.col.event'), width: '1.06fr' },
-    { key: 'actualFee', label: t('hqCommission.col.actualFee'), width: '1.15fr' },
-    { key: 'coinCount', label: t('hqCommission.col.coinCount'), width: '1.2fr' },
-    { key: 'status', label: t('hqCommission.col.status'), width: '1.05fr' },
-    { key: 'action', label: t('hqCommission.col.action'), width: '1.35fr' },
+    { key: 'no', label: t('hqCommission.col.no'), width: '56px', align: 'center' },
+    { key: 'country', label: t('hqCommission.col.country'), width: '150px' },
+    { key: 'code', label: t('hqCommission.col.code'), width: '92px' },
+    { key: 'baseFee', label: t('hqCommission.col.baseFee'), width: '106px' },
+    { key: 'online', label: t('hqCommission.col.online'), width: '106px' },
+    { key: 'offline', label: t('hqCommission.col.offline'), width: '106px' },
+    { key: 'event', label: t('hqCommission.col.event'), width: '112px' },
+    { key: 'actualFee', label: t('hqCommission.col.actualFee'), width: '120px' },
+    { key: 'coinCount', label: t('hqCommission.col.coinCount'), width: '116px' },
+    { key: 'status', label: t('hqCommission.col.status'), width: '116px' },
+    { key: 'action', label: t('hqCommission.col.action'), width: '180px' },
   ]
 
   const statusLabel: Record<FeeStatus, string> = {
@@ -183,12 +192,15 @@ export function useCommission() {
     rows: pageData.rows,
     countries: pageData.countries ?? fallbackCountries(pageData.rows),
     statusLabel,
-    globalFee: pageData.globalFee ?? fallbackData.globalFee ?? '0.1',
+    globalFee: pageData.globalFee ?? '0',
+    globalEventEnabled: pageData.rows.some((row) => row.eventEnabled),
+    globalScope: pageData.rows.some((row) => row.scope === 'LEADER_ONLY') ? 'LEADER_ONLY' as const : 'COUNTRY_ALL' as const,
     makeModalData,
     editLabel: t('hqCommission.action.edit'),
     deleteLabel: t('hqCommission.action.delete'),
     saveFee,
     deleteFee,
+    isLoading,
     error,
   }
 }

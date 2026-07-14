@@ -1,17 +1,35 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
-import data from './settlementDetailData.json'
+import { fetchHqPageData } from '../../../services/korionChongApi'
 import styles from './SettlementDetailModal.module.css'
 
 interface FieldRaw {
   labelKey: string
   value: string
-  /** true면 앞 필드 그룹과 간격을 벌린다(Figma: 최종 정산 금액 ↔ 지급 방식 사이) */
-  gapBefore?: boolean
+  editable?: boolean
 }
 
 interface SettlementDetailModalProps {
-  /** 닫기(확인/배경 클릭) — 표시 전용 모달이라 저장 동작은 추후 협의 */
+  settlementRequestId?: number
   onClose: () => void
+}
+
+interface SettlementDetailResponse {
+  header?: {
+    no?: string
+    statusOk?: string
+    contextBadges?: string[]
+  }
+  banner?: {
+    notice?: string
+    period?: string
+    method?: string
+  }
+  form?: {
+    fields?: FieldRaw[]
+    memoPlaceholder?: string
+    replyPlaceholder?: string
+  }
 }
 
 /*
@@ -23,8 +41,40 @@ interface SettlementDetailModalProps {
  * 데이터는 Figma 샘플값 하드코딩(settlementDetailData.json) — 실데이터 연동 시
  * 클릭한 행의 정산 ID로 조회해 채우면 된다.
  */
-export default function SettlementDetailModal({ onClose }: SettlementDetailModalProps) {
+export default function SettlementDetailModal({ settlementRequestId, onClose }: SettlementDetailModalProps) {
   const { t } = useTranslation()
+  const [detail, setDetail] = useState<SettlementDetailResponse | null>(null)
+  const [isLoading, setIsLoading] = useState(Boolean(settlementRequestId))
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!settlementRequestId) {
+      setDetail(null)
+      setIsLoading(false)
+      setError('정산 내역 ID가 없습니다.')
+      return
+    }
+
+    let alive = true
+    setIsLoading(true)
+    setError(null)
+    fetchHqPageData<SettlementDetailResponse>(`/api/hq/settlement-requests/${encodeURIComponent(String(settlementRequestId))}/detail`)
+      .then((payload) => {
+        if (alive) setDetail(payload)
+      })
+      .catch((err: unknown) => {
+        if (alive) setError(err instanceof Error ? err.message : 'API error')
+      })
+      .finally(() => {
+        if (alive) setIsLoading(false)
+      })
+
+    return () => {
+      alive = false
+    }
+  }, [settlementRequestId])
+
+  const fields = detail?.form?.fields ?? []
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -32,27 +82,35 @@ export default function SettlementDetailModal({ onClose }: SettlementDetailModal
         {/* 헤더: 제목 좌측 + 정산 상태 배지(연녹색, 데이터 값) 우측 */}
         <div className={styles.header}>
           <h2 className={styles.title}>{t('hqSettle.histModal.title')}</h2>
-          <span className={styles.statusBadge}>{data.badge}</span>
+          <span className={styles.statusBadge}>{detail?.header?.statusOk ?? '-'}</span>
         </div>
         <div className={styles.divider} />
 
-        <dl className={styles.fields}>
-          {(data.fields as FieldRaw[]).map((f) => (
-            <div key={f.labelKey} className={f.gapBefore ? `${styles.fieldRow} ${styles.fieldRowGap}` : styles.fieldRow}>
-              <dt className={styles.fieldLabel}>{t(f.labelKey)}</dt>
-              <dd className={styles.fieldValue}>{f.value}</dd>
-            </div>
-          ))}
-        </dl>
+        {isLoading && <p className={styles.stateText}>{t('common.loading')}</p>}
+        {error && <p className={styles.errorText}>{error}</p>}
+        {detail?.banner?.notice && <p className={styles.notice}>{detail.banner.notice}</p>}
+        {detail?.header?.no && <p className={styles.requestNo}>{detail.header.no}</p>}
+
+        {!isLoading && !error && (
+          <dl className={styles.fields}>
+            {fields.map((f, index) => (
+              <div key={`${f.labelKey}-${index}`} className={index === 4 ? `${styles.fieldRow} ${styles.fieldRowGap}` : styles.fieldRow}>
+                <dt className={styles.fieldLabel}>{t(f.labelKey)}</dt>
+                <dd className={styles.fieldValue}>{f.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
 
         <p className={styles.memoLabel}>{t('hqSettle.histModal.memo')}</p>
-        <textarea className={styles.memoBox} defaultValue={data.memo} aria-label={t('hqSettle.histModal.memo')} />
+        <textarea className={styles.memoBox} placeholder={detail?.form?.memoPlaceholder ?? ''} aria-label={t('hqSettle.histModal.memo')} />
 
         <p className={styles.memoLabel}>{t('hqSettle.histModal.adminMemo')}</p>
         <textarea
           className={styles.memoBox}
-          placeholder={data.adminMemoPlaceholder}
+          placeholder={detail?.form?.replyPlaceholder ?? ''}
           aria-label={t('hqSettle.histModal.adminMemo')}
+          readOnly
         />
 
         {/* 관리자 메모 아래 좌측의 작은 저장 버튼 (Figma 배치 그대로) */}

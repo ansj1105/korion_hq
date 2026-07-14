@@ -1,0 +1,20 @@
+{
+  "stats": [
+    { "id": "partners", "labelKey": "hqStatsPartner.kpi.partners", "value": "0", "delta": "Filter scope", "deltaBadge": true },
+    { "id": "activePartners", "labelKey": "hqStatsPartner.kpi.activePartners", "value": "0", "delta": "Active", "deltaBadge": true },
+    { "id": "suspendedPartners", "labelKey": "hqStatsPartner.kpi.suspendedPartners", "value": "0", "delta": "Suspended / blocked", "deltaBadge": true },
+    { "id": "subMerchants", "labelKey": "hqStatsPartner.kpi.subMerchants", "value": "0", "delta": "Sub-merchants", "deltaBadge": true },
+    { "id": "txCount", "labelKey": "hqStatsPartner.kpi.txCount", "value": "0", "delta": "Transactions", "deltaBadge": true },
+    { "id": "amount", "labelKey": "hqStatsPartner.kpi.amount", "value": "0 KORI", "delta": "Payment amount", "deltaBadge": true },
+    { "id": "partnerFee", "labelKey": "hqStatsPartner.kpi.partnerFee", "value": "0 KORI", "delta": "Partner fee", "deltaBadge": true },
+    { "id": "unsettledFee", "labelKey": "hqStatsPartner.kpi.unsettledFee", "value": "0 KORI", "delta": "Unsettled fee", "deltaBadge": true }
+  ],
+  "rankingPanels": [
+    { "id": "byPartner", "titleKey": "hqStatsPartner.ranking.byPartner", "rows": [] },
+    { "id": "byMerchantCount", "titleKey": "hqStatsPartner.ranking.byMerchantCount", "rows": [] },
+    { "id": "byTxCount", "titleKey": "hqStatsPartner.ranking.byTxCount", "rows": [] }
+  ],
+  "rows": [
+    { "id": "KR-SP-0015", "no": "1", "rank": "1", "partnerCode": "KR-SP-0015", "partnerName": "Sample Partner", "leaderCode": "KR-LEAD-003", "country": "KR", "subMerchantCount": "0", "amount": "0 KORI", "txCount": "0", "partnerFee": "0 KORI", "unsettledFee": "0 KORI", "syncFail": "0 cases", "growth": "+0%", "status": "active" }
+  ]
+}

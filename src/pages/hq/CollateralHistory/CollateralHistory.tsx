@@ -34,7 +34,17 @@ export default function CollateralHistory() {
   const [tab, setTab] = useState(HISTORY_TAB_INDEX)
   const [countryFilter, setCountryFilter] = useState('all')
   const [dateFilter, setDateFilter] = useState('today')
-  const { kpis, columns, rows: rawRows, infoRows: rawInfoRows, settlementRows: rawSettleRows, countryOptions, dateOptions } = useCollateralHistory(countryFilter, dateFilter)
+  const {
+    kpis,
+    columns,
+    rows: rawRows,
+    infoRows: rawInfoRows,
+    settlementRows: rawSettleRows,
+    countryOptions,
+    dateOptions,
+    isLoading,
+    error,
+  } = useCollateralHistory(countryFilter, dateFilter)
   const info = useCollateralInfo()
   const settle = useCollateralSettlement()
   // 행 클릭 → 상세 폼 오버레이(내역 탭 81:29506 / 정보 탭 81:29553 / 정산 탭 81:29616). 시안이 단일 샘플이라 어떤 행이든 같은 내용
@@ -66,7 +76,7 @@ export default function CollateralHistory() {
             accentByLabel={{ [t('common.detail')]: 'cyan', [t('hqCollateral.action.memberInfo')]: 'purple' }}
             solid
             equalWidth
-            size="xs"
+            size="md"
             shape="rect"
             onLabelClick={(label) => {
               if (label === t('hqCollateral.action.memberInfo')) {
@@ -105,7 +115,7 @@ export default function CollateralHistory() {
             accentByLabel={{ [t('common.detail')]: 'cyan' }}
             solid
             equalWidth
-            size="xs"
+            size="md"
             shape="rect"
             onLabelClick={() => {
               setSelectedSettlementRow(r)
@@ -138,7 +148,7 @@ export default function CollateralHistory() {
             accentByLabel={{ [t('common.detail')]: 'cyan', [t('hqCollateral.action.memberInfo')]: 'purple' }}
             solid
             equalWidth
-            size="xs"
+            size="md"
             shape="rect"
             onLabelClick={() => {
               setSelectedInfoRow(r)
@@ -208,6 +218,8 @@ export default function CollateralHistory() {
           <StatCard key={kpi.id} {...kpi} />
         ))}
       </div>
+      {isLoading && <p className={styles.stateText}>{t('common.loading')}</p>}
+      {error && <p className={styles.errorText}>{error}</p>}
 
       {/* 담보금 / 정산 구조 안내 카드 (호박색 테두리) */}
       <section className={styles.guideCard}>

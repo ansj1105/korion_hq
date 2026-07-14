@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import PageHeader from '../../../components/organisms/PageHeader'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
 import ActionBadges from '../../../components/molecules/ActionBadges'
@@ -18,9 +18,16 @@ import styles from './CommissionManagement.module.css'
  */
 export default function HqCommissionManagement() {
   const { t } = useTranslation()
-  const { kpis, columns, rows: rawRows, countries, statusLabel, globalFee, makeModalData, editLabel, deleteLabel, saveFee, deleteFee } = useCommission()
+  const { kpis, columns, rows: rawRows, countries, statusLabel, globalFee, globalEventEnabled, globalScope, makeModalData, editLabel, deleteLabel, saveFee, deleteFee, isLoading, error } = useCommission()
   const [modalMode, setModalMode] = useState<'add' | 'edit' | null>(null)
   const [selectedCode, setSelectedCode] = useState<string | null>(null)
+  const [eventEnabled, setEventEnabled] = useState(globalEventEnabled)
+  const [scope, setScope] = useState<'COUNTRY_ALL' | 'LEADER_ONLY'>(globalScope)
+
+  useEffect(() => {
+    setEventEnabled(globalEventEnabled)
+    setScope(globalScope)
+  }, [globalEventEnabled, globalScope])
 
   // Figma에서 굵게 표시되는 셀(국가코드~적용 코인수)만 감싸는 헬퍼
   const strong = (value: string) => <span className={styles.cellStrong}>{value}</span>
@@ -49,7 +56,7 @@ export default function HqCommissionManagement() {
           <ActionBadges
             labels={[editLabel, deleteLabel]}
             accentByLabel={{ [editLabel]: 'cyan', [deleteLabel]: 'red' }}
-            size="xs"
+            size="md"
             shape="rect"
             onLabelClick={(label) => {
               if (label === editLabel) {
@@ -86,10 +93,14 @@ export default function HqCommissionManagement() {
         <div className={styles.globalCard}>
           <div className={styles.globalHead}>
             <span className={styles.globalLabel}>{t('hqCommission.global.eventPromo')}</span>
-            {/* 토글 — Figma는 비트맵(초록 ON 스위치)이라 CSS로 재현. 표시 전용 */}
-            <span className={styles.toggleOn} aria-hidden>
-              ON
-            </span>
+            <button
+              type="button"
+              className={eventEnabled ? styles.toggleOn : styles.toggleOff}
+              aria-pressed={eventEnabled}
+              onClick={() => setEventEnabled((current) => !current)}
+            >
+              {eventEnabled ? 'ON' : 'OFF'}
+            </button>
           </div>
           <div className={styles.feeInputRow}>
             <span className={styles.feeInput}>{globalFee}</span>
@@ -98,8 +109,22 @@ export default function HqCommissionManagement() {
           <span className={styles.globalLabel}>{t('hqCommission.global.scopeLabel')}</span>
           {/* 적용 범위 알약 — Figma상 우측(리더 소속만)만 활성 톤. 표시 전용 */}
           <div className={styles.scopeRow}>
-            <span className={`${styles.scopePill} ${styles.scopePillDim}`}>{t('hqCommission.global.scopeAll')}</span>
-            <span className={styles.scopePill}>{t('hqCommission.global.scopeLeader')}</span>
+            <button
+              type="button"
+              className={scope === 'COUNTRY_ALL' ? styles.scopePill : `${styles.scopePill} ${styles.scopePillDim}`}
+              aria-pressed={scope === 'COUNTRY_ALL'}
+              onClick={() => setScope('COUNTRY_ALL')}
+            >
+              {t('hqCommission.global.scopeAll')}
+            </button>
+            <button
+              type="button"
+              className={scope === 'LEADER_ONLY' ? styles.scopePill : `${styles.scopePill} ${styles.scopePillDim}`}
+              aria-pressed={scope === 'LEADER_ONLY'}
+              onClick={() => setScope('LEADER_ONLY')}
+            >
+              {t('hqCommission.global.scopeLeader')}
+            </button>
           </div>
         </div>
 
@@ -144,6 +169,8 @@ export default function HqCommissionManagement() {
           if (row) openEdit(row)
         }}
       />
+      {isLoading && <p className={styles.stateText}>{t('common.loading')}</p>}
+      {error && <p className={styles.errorText}>{error}</p>}
 
       {/* 국가 수수료 추가/수정 모달 — 사이드바 제외 콘텐츠 영역 중앙 */}
       {modalMode && (

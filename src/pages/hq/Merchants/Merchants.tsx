@@ -41,14 +41,30 @@ export default function Merchants() {
     [sortedRows, statusOverrides],
   )
 
-  const stats = useMemo<StatCardData[]>(
-    () =>
-      apiStats.map((stat) => ({
-        ...stat,
-        deltaBadge: stat.deltaBadge ?? Boolean(stat.delta),
-      })),
-    [apiStats],
-  )
+  const stats = useMemo<StatCardData[]>(() => {
+    const approvedCount = rowsWithCurrentStatus.filter((row) => row.currentStatus === 'approved').length
+    const suspendedCount = rowsWithCurrentStatus.filter((row) => row.currentStatus === 'suspended').length
+    const activePayingCount = rowsWithCurrentStatus.filter((row) => extractNumber(row.monthTxCount) > 0).length
+    const monthVolume = rowsWithCurrentStatus.reduce((sum, row) => sum + extractAmount(row.monthVolume), 0)
+    const monthTxCount = rowsWithCurrentStatus.reduce((sum, row) => sum + extractNumber(row.monthTxCount), 0)
+    const totalFee = rowsWithCurrentStatus.reduce((sum, row) => sum + extractAmount(row.fee), 0)
+    const valuesById: Record<string, string> = {
+      totalMerchants: String(rawRows.length),
+      activeMerchants: String(approvedCount),
+      approvedMerchants: String(approvedCount),
+      suspendedMerchants: String(suspendedCount),
+      activePayingMerchants: String(activePayingCount),
+      monthVolume: formatNumber(monthVolume),
+      monthTxCount: String(monthTxCount),
+      totalFee: formatNumber(totalFee),
+    }
+
+    return apiStats.map((stat) => ({
+      ...stat,
+      value: valuesById[stat.id] ?? stat.value,
+      deltaBadge: stat.deltaBadge ?? Boolean(stat.delta),
+    }))
+  }, [apiStats, rawRows.length, rowsWithCurrentStatus])
 
   const filteredRows = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -211,6 +227,16 @@ export default function Merchants() {
 function extractNumber(value: string) {
   const match = value.match(/\d+/g)
   return match ? Number(match.join('')) : 0
+}
+
+function extractAmount(value: string) {
+  const normalized = value.replace(/,/g, '')
+  const match = normalized.match(/-?\d+(?:\.\d+)?/)
+  return match ? Number(match[0]) : 0
+}
+
+function formatNumber(value: number) {
+  return value.toLocaleString(undefined, { maximumFractionDigits: 6 })
 }
 
 function toCsvLine(values: string[]) {

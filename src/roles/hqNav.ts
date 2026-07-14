@@ -20,7 +20,10 @@ export const HQ_NAV: NavGroup[] = [
   },
   {
     titleKey: 'nav.group.hqApplications',
-    items: [{ labelKey: 'nav.item.hqApplicationPartnership', path: 'applications' }],
+    items: [
+      { labelKey: 'nav.item.hqApplicationPartnership', path: 'applications' },
+      { labelKey: 'nav.item.hqApplicationResultHistory', path: 'applications/result-log' },
+    ],
   },
   {
     titleKey: 'nav.group.hqPartnerRequests',

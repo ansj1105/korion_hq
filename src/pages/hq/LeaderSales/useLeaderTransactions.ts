@@ -2,7 +2,6 @@ import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './leaderSalesData.json'
 import type { LeaderSalesLogRow } from './useLeaderSales'
 
 interface KpiRaw {
@@ -17,8 +16,8 @@ interface LeaderTransactionsData {
 }
 
 const fallbackData: LeaderTransactionsData = {
-  kpi: data.kpiBottom as KpiRaw[],
-  rows: data.logRows as LeaderSalesLogRow[],
+  kpi: [],
+  rows: [],
 }
 
 export function useLeaderTransactions(leaderCode?: string) {
