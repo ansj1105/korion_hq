@@ -2,10 +2,11 @@ import { useTranslation } from '../../../i18n'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
 import ActionBadges from '../../../components/molecules/ActionBadges'
 import { useRequestDetail, type DetailField, type DetailKpi } from './useRequestDetail'
+import type { RequestResultLogRow } from './useRequestResultLog'
 import styles from './RequestDetailOverlay.module.css'
 
 interface Props {
-  open: boolean
+  row: RequestResultLogRow | null
   onClose: () => void
 }
 
@@ -16,11 +17,11 @@ interface Props {
  * (ApplicationDetailOverlay와 동일한 backdrop 방식). backdrop 클릭 또는 '확인' 버튼으로 닫힘.
  * 탭(가맹점별/거래내역/정산내역/관리자 메모)은 Figma에 '가맹점별' 내용만 있어 표시 전용.
  */
-export default function RequestDetailOverlay({ open, onClose }: Props) {
+export default function RequestDetailOverlay({ row, onClose }: Props) {
   const { t } = useTranslation()
-  const detail = useRequestDetail()
+  const detail = useRequestDetail(row)
 
-  if (!open) return null
+  if (!row) return null
 
   const renderKpi = (k: DetailKpi) => (
     <div key={k.id} className={styles.kpiCard}>

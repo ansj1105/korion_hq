@@ -2,7 +2,6 @@ import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './leaderMerchantsData.json'
 
 interface KpiRaw {
   id: string
@@ -23,10 +22,15 @@ export interface LeaderMerchantRow {
   usage: string
 }
 
-const emptyLeaderMerchantsData = {
+interface LeaderMerchantsData {
+  kpi: KpiRaw[]
+  rows: LeaderMerchantRow[]
+}
+
+const emptyLeaderMerchantsData: LeaderMerchantsData = {
   kpi: [],
   rows: [],
-} as typeof data
+}
 
 /*
  * useLeaderMerchants — "국가 리더별 거래내역" 화면의 "가맹점별" 탭 데이터 훅

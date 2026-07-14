@@ -3,7 +3,6 @@ import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import type { InfoItem } from '../../../components/molecules/InfoGrid'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './merchantSalesData.json'
 
 interface KpiRaw {
   id: string
@@ -36,7 +35,43 @@ export interface MerchantSalesLogRow {
   memo?: string
 }
 
-const emptyMerchantSalesData = {
+interface MerchantSalesData {
+  profile: {
+    topLabel: string
+    country: string
+    parentBadge: string
+    code: string
+  }
+  kpiTop: KpiRaw[]
+  account: {
+    loginId: string
+    password: string
+    email: string
+    telegram: string
+    phone: string
+    twitter: string
+    appliedAt: string
+    approvedAt: string
+  }
+  basic: {
+    name: string
+    country: string
+    region: string
+    language: string
+    directContractReason: string
+    walletAddress: string
+  }
+  store: {
+    name: string
+    owner: string
+    businessType: string
+    address: string
+  }
+  kpiBottom: KpiRaw[]
+  logRows: MerchantSalesLogRow[]
+}
+
+const emptyMerchantSalesData: MerchantSalesData = {
   profile: {
     topLabel: '상위 리더 / 해당 국가',
     country: '-',
@@ -70,7 +105,7 @@ const emptyMerchantSalesData = {
   },
   kpiBottom: [],
   logRows: [],
-} as typeof data
+}
 
 /*
  * useMerchantSales (hq) — 본사어드민 "가맹점 거래내역" 데이터 훅

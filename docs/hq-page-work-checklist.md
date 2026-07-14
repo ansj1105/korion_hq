@@ -2,312 +2,319 @@
 
 작성일: 2026-07-15
 
-이 문서는 완료 선언이 아니라 재검증용 체크리스트다.  
-`코드 연결`은 라우트/컴포넌트/API 호출 코드가 존재한다는 뜻이고, `수동 검증`은 운영 브라우저에서 로그인 후 실제 데이터와 액션을 직접 확인해야 한다는 뜻이다.
+이 문서는 완료 선언이 아니라 재검증용 작업 체크리스트다.  
+`코드 반영`은 라우트, 컴포넌트, API 호출, 백엔드 엔드포인트가 존재한다는 뜻이다.  
+`운영 검증`은 `https://admin.korion.network` 로그인 세션으로 실제 화면, 실제 데이터, 실제 액션 결과를 확인했다는 뜻이다.  
+운영 브라우저로 직접 확인하지 않은 항목은 완료로 보지 않는다.
 
-## 공통 검증
+## 범례
 
+- [x] 코드 반영 또는 명령 검증 완료
+- [ ] 운영 브라우저 또는 실제 데이터 검증 필요
+- `미검증`: 코드가 있어도 실제 운영 데이터/권한/DB 반영을 확인하지 못한 상태
+
+## 배포/검증 상태
+
+- [x] 프론트 저장소 최신화: `/home/ubuntu/work/KORIONPAY_PAGE_FRONTEND`
+- [x] API 저장소 최신화: `/home/ubuntu/work/korion_chong`
 - [x] 프론트 빌드 통과: `npm run build`
-- [x] 백엔드 전체 테스트 통과: `./gradlew test --no-daemon`
-- [ ] 프론트 운영 배포 완료: 최신 로컬 변경 미배포
-- [ ] 백엔드 운영 배포 완료: 최신 로컬 변경 미배포
-- [ ] `/hq/logs/admin` SPA route 200 확인
-- [ ] `/api/hq/logs/admin` 인증 보호 확인: 무토큰 401
-- [ ] 운영 로그인 세션으로 전체 페이지 직접 화면 확인
-- [ ] 전체 DataTable 좌우 스크롤/컬럼 resize 직접 확인
-- [ ] 전체 검색/필터/엑셀 다운로드 직접 확인
-- [ ] 전체 액션 버튼 클릭 후 KPI/표 즉시 반영 직접 확인
-- [ ] 전체 상세 modal/drawer row click 직접 확인
-- [ ] 전체 상태/액션 뱃지 색상 통일 직접 확인
-- [x] `kori_partners` Badge/ActionBadges 기준 비교 완료
-- [x] HQ 공통 ActionBadges 기본값을 partners 기준(`md` + `rect` + 라벨별 색상)으로 조정
-- [x] HQ 상세 탭 일부 `xs` 액션 배지 제거 및 상태 span을 공통 Badge로 전환
-- [x] DataTable 공통 코드에서 좌우 스크롤/컬럼 resize/search/filter/excel 기능 지원 확인
-- [ ] 운영 브라우저에서 공통 배지 크기 변경 후 표 잘림/가로 스크롤 재확인
-- [ ] 상태 뱃지 색상 기준 확인: 완료/승인/활성=green, 검토/대기/자료요청=orange, 보류=blue/orange, 위험/거절/삭제=red, 승인요청=purple
+- [x] API 전체 테스트 통과: `./gradlew clean test --no-daemon`
+- [x] 프론트 커밋/푸시 완료: `c9b4f6e`, `1bb2820`, `49f8839`
+- [x] API 커밋/푸시 완료: `c3e5f5a`, `5d4ba61`, `04acd9a`
+- [x] 프론트 운영 배포 완료: `52.44.202.187:/var/www/korion_hq`, HEAD `49f8839`
+- [x] API 운영 배포 완료: `54.83.183.123:/var/www/korion_chong`, HEAD `04acd9a`
+- [x] 프론트 컨테이너 확인: `korion-hq-web` healthy
+- [x] API health 확인: `https://chong.korion.io.kr/actuator/health` = `UP`
+- [x] SPA route 확인: `https://admin.korion.network/hq/logs/security` = 200
+- [x] 2026-07-15 로컬 프론트 빌드 재확인: `npm run build`
+- [x] 2026-07-15 HQ 컨트롤러 계약 테스트 재확인: `HqControllerContractTest`
+- [x] 2026-07-15 `src/pages/hq` 정적 JSON import 제거 확인
+- [x] 2026-07-15 `src/pages/hq/**/*.json` 샘플 파일 삭제 완료
+- [x] 2026-07-15 JSON 삭제 후 프론트 빌드 재확인: `npm run build`
+- [x] 2026-07-15 JSON 삭제 후 HQ 컨트롤러 계약 테스트 재확인: `HqControllerContractTest`
+- [x] 2026-07-15 대표 SPA route 200 확인: `/hq/dashboard`, `/hq/payments/sync-issues`, `/hq/payments/error-codes`, `/hq/settlement/request`
+- [x] 2026-07-15 대표 HQ API 무토큰 401 보호 확인: `/api/hq/payments/sync-issues`, `/api/hq/payments/error-codes`, `/api/hq/settlement-requests`
+- [ ] 운영 로그인 세션으로 전체 페이지 직접 확인
+- [ ] 실제 운영 데이터와 KPI 일치 확인
+- [ ] 액션 버튼 클릭 후 DB/표/KPI 즉시 반영 확인
+- [ ] 검색/필터/엑셀 다운로드 전체 페이지 확인
+- [ ] DataTable 좌우 스크롤/컬럼 resize 전체 페이지 확인
+- [ ] row click 상세 modal/drawer 전체 페이지 확인
+- [ ] 상태/액션 뱃지 색상 전체 페이지 확인
 
-## 라우팅 표면 점검
+## 공통 UI/API 작업
 
-아래는 `src/App.tsx`의 `HQ_PAGES` 기준 전체 라우팅 표면이다. 각 라우트는 코드 연결과 별개로 운영 로그인 세션에서 200/렌더/API/배지/표 조작을 직접 확인해야 한다.
+- [x] `kori_partners` 스타일 기준으로 HQ `Badge`/`ActionBadges` 크기, radius, 색상 기준 보정
+- [x] 액션 라벨 기반 색상 매핑 유틸 추가: `src/utils/badgeAccents.ts`
+- [x] `ActionBadges` 기본 크기 `md`, 기본 모양 `rect` 적용
+- [x] 표 액션 버튼 `xs` 위주 표시를 줄이고 가시성 개선
+- [x] Payment error/sync issue 플래그 배지 `md/rect`로 보정
+- [x] HQ `DataTable` resize 기본 활성, 가로 스크롤, 검색/필터/CSV export 경로 정적 확인
+- [x] 결제 로그 표의 `tableFluid/tableWrapCells` 제거로 가로 스크롤/컬럼 resize 경로 복구
+- [x] 요청/신청 액션 공통 처리 후 데이터 재조회 경로 반영
+- [x] `GET /api/hq/logs/{page}` permission/security 분류 보강
+- [x] OpenAPI에 HQ 추가/수정 API 반영
+- [ ] 전체 페이지에서 partners 프로젝트와 동일한 뱃지 크기인지 육안 확인
+- [ ] 전체 페이지에서 상태별 색상 기준 확인
+- [ ] 전체 페이지에서 액션 실패 메시지/권한 오류 처리 확인
 
-### 대시보드
-- [x] `/hq/dashboard` 라우트 연결
-- [x] `/hq/dashboard/by-country` 라우트 연결
-- [ ] `/hq/dashboard` 더미 fallback 제거 여부 확인
-- [ ] `/hq/dashboard/by-country` 더미 기반 여부 확인
-- [ ] Quick Action 이동/권한/배지 색상 직접 확인
+## 상태/액션 색상 기준
 
-### 라우트 alias / 리다이렉트
-- [x] `/hq/admin` -> `/hq/admin/accounts` 리다이렉트 연결
-- [x] `/hq/risk` -> `/hq/risk/fake-applications` 리다이렉트 연결
-- [x] `/hq/stats` -> `/hq/stats/country` 리다이렉트 연결
-- [x] `/hq/logs` -> `/hq/logs/admin` 리다이렉트 연결
-- [x] `/hq/settlement/request/detail` 사이드바 외 상세 라우트 연결
-- [ ] 각 alias가 운영 SPA에서 200 후 의도 라우트로 이동하는지 확인
+- [ ] 승인/완료/활성/정산완료: green
+- [ ] 검토/대기/자료요청/Sync 대기: orange 또는 amber
+- [ ] 승인요청/권한/역할/정보요청: purple
+- [ ] 보류/지급보류/정산보류: orange 또는 blue, 페이지별 의미와 통일 필요
+- [ ] 위험/거절/삭제/차단/블랙/실패/DB 이상/공격 탐지: red
+- [ ] 일반 정보/상세/보기: cyan 또는 blue
 
-### 배지/액션 공통 라우팅 점검
-- [ ] `/hq/applications` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/applications/result-log` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/requests/leader` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/requests/partner-by-leader` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/requests/partner-direct` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/requests/merchant-direct` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/requests/result-log` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/leaders` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/leaders/sales` 상세 탭 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/partners` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/partners/sales` 상세 탭 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/merchants` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/merchants/sales` 상세 탭 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/payments/logs` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/payments/sync-issues` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/payments/error-codes` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/settlement/request` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/settlement/request/detail` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/settlement/history` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/settlement/commission` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/settlement/rate-setting` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/collateral/history` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/announcements/send` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/announcements/history` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/admin/accounts` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/admin/permission-groups` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/admin/country-access` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/admin/login-security` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/admin/two-factor` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/risk/fake-applications` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/risk/fake-merchants` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/risk/duplicates` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/risk/settlement-hold` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/risk/blacklist` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/stats/country` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/stats/partner` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/stats/merchant` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/stats/payment-method` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/system/country` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/system/error-code` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/system/security-policy` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/system/maintenance-mode` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/logs/admin` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/logs/approval` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/logs/settlement` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/logs/permission-change` 상태/액션 배지 색상 직접 확인
-- [ ] `/hq/logs/security` 상태/액션 배지 색상 직접 확인
+## 라우팅/메뉴
 
-### JSON / 더미 잔존 점검
-- [ ] `/hq/dashboard`: [useDashboard.ts](/home/ubuntu/work/KORIONPAY_PAGE_FRONTEND/src/pages/hq/Dashboard/useDashboard.ts)에서 `dashboardData.json` fallback 잔존
-- [ ] `/hq/dashboard/by-country`: [useCountryDashboard.ts](/home/ubuntu/work/KORIONPAY_PAGE_FRONTEND/src/pages/hq/CountryDashboard/useCountryDashboard.ts)에서 `countryDashboardData.json` 기반
-- [ ] `/hq/leaders/sales`: `leaderSalesData.json`, `leaderPartnersData.json`, `leaderMerchantsData.json`, `leaderSettlementData.json` type/초기값 의존 잔존
-- [ ] `/hq/partners/sales`: `partnerSalesData.json`, `partnerDetailData.json` type/초기값 의존 잔존
-- [ ] `/hq/merchants/sales`: `merchantSalesData.json`, `transactionDetailData.json` type/초기값/상세 모달 의존 잔존
-- [x] `/hq/announcements/send`: [useNoticeSend.ts](/home/ubuntu/work/KORIONPAY_PAGE_FRONTEND/src/pages/hq/NoticeSend/useNoticeSend.ts)에서 `noticeSendData.json` fallback 제거 및 파일 삭제
-- [ ] `/hq/settlement/request/detail`: [useSettlementRequestDetail.ts](/home/ubuntu/work/KORIONPAY_PAGE_FRONTEND/src/pages/hq/SettlementRequestDetail/useSettlementRequestDetail.ts)에서 상세 JSON shape 의존 잔존
-- [ ] `/hq/collateral/history`: 충전/정보/정산 상세 overlay JSON 의존 잔존
-- [ ] `/hq/system/maintenance-mode`: 시작/확인 overlay 옵션 JSON 의존 잔존
-- [ ] `/hq/requests/result-log`: 상세 overlay JSON 의존 잔존
-- [ ] 위 JSON 잔존 파일은 API 응답 스키마를 백엔드에서 확정한 뒤 빈 초기값 또는 API 전용 타입으로 제거
+- [x] `/hq/dashboard`
+- [x] `/hq/dashboard/by-country`
+- [x] `/hq/applications`
+- [x] `/hq/applications/result-log`
+- [x] `/hq/requests/leader`
+- [x] `/hq/requests/partner-by-leader`
+- [x] `/hq/requests/partner-direct`
+- [x] `/hq/requests/merchant-direct`
+- [x] `/hq/requests/result-log`
+- [x] `/hq/leaders`
+- [x] `/hq/leaders/sales`
+- [x] `/hq/partners`
+- [x] `/hq/partners/sales`
+- [x] `/hq/merchants`
+- [x] `/hq/merchants/sales`
+- [x] `/hq/payments/logs`
+- [x] `/hq/payments/sync-issues`
+- [x] `/hq/payments/error-codes`
+- [x] `/hq/settlement/request`
+- [x] `/hq/settlement/request/detail`
+- [x] `/hq/settlement/history`
+- [x] `/hq/settlement/commission`
+- [x] `/hq/settlement/rate-setting`
+- [x] `/hq/collateral/history`
+- [x] `/hq/risk/fake-applications`
+- [x] `/hq/risk/fake-merchants`
+- [x] `/hq/risk/duplicates`
+- [x] `/hq/risk/settlement-hold`
+- [x] `/hq/risk/blacklist`
+- [x] `/hq/stats/country`
+- [x] `/hq/stats/partner`
+- [x] `/hq/stats/merchant`
+- [x] `/hq/stats/payment-method`
+- [x] `/hq/announcements/send`
+- [x] `/hq/announcements/history`
+- [x] `/hq/admin/accounts`
+- [x] `/hq/admin/permission-groups`
+- [x] `/hq/admin/country-access`
+- [x] `/hq/admin/login-security`
+- [x] `/hq/admin/two-factor`
+- [x] `/hq/system/country`
+- [x] `/hq/system/error-code`
+- [x] `/hq/system/security-policy`
+- [x] `/hq/system/maintenance-mode`
+- [x] `/hq/logs/admin`
+- [x] `/hq/logs/approval`
+- [x] `/hq/logs/settlement`
+- [x] `/hq/logs/permission-change`
+- [x] `/hq/logs/security`
+- [x] `/hq/admin` -> `/hq/admin/accounts`
+- [x] `/hq/risk` -> `/hq/risk/fake-applications`
+- [x] `/hq/stats` -> `/hq/stats/country`
+- [x] `/hq/logs` -> `/hq/logs/admin`
+- [ ] 위 모든 라우트 운영 로그인 세션 렌더 확인
+- [x] 대표 SPA route 200 확인: dashboard/payment sync/payment error/settlement request
+
+## 대시보드
+
+### `/hq/dashboard`
+- [x] API 호출 코드 존재: `/api/hq/dashboard`
+- [x] Quick Action 이동 경로 코드 반영
+- [x] 리스크 액션 API 코드 존재: `/api/hq/dashboard/risk-actions`
+- [x] `dashboardData.json` import/fallback 제거 확인
+- [ ] Quick Action 모든 버튼 실제 이동 확인
+- [ ] KPI/차트/AI insight 실제 데이터 확인
+
+### `/hq/dashboard/by-country`
+- [x] 라우트/화면 코드 존재
+- [x] `countryDashboardData.json` import 제거 및 `/api/hq/dashboard` 기반 매핑 확인
+- [ ] 국가별 실제 KPI/차트 확인
 
 ## 신청서 관리
 
 ### `/hq/applications`
-- [x] 라우트 연결
-- [x] 표 검색/필터/엑셀 UI 연결
-- [x] 액션 버튼 공통 badge 스타일 적용 코드 반영
-- [x] 신청서 상태 액션 API 연결
-- [x] 더미 fallback 제거
-- [ ] 대기/검토/확인/위험/삭제 액션 실제 처리 확인
-- [ ] 신청서 액션 발생 시 DB `partner_applications.status` 및 활동 로그 적재 운영 확인
-- [ ] No 정렬이 최신 큰 번호 기준인지 확인
-- [ ] 표 가로 스크롤 잘림 여부 확인
+- [x] API 호출 코드 존재: `/api/hq/applications`
+- [x] 상태 액션 API 코드 존재: `/api/hq/applications/{applicationId}/status`
+- [x] 대기/검토/확인/위험/삭제 버튼 클릭 이벤트 코드 반영
+- [x] 검색/필터/엑셀 UI 코드 존재
+- [x] No 컬럼 최신순 정렬 코드 반영
+- [x] 액션 버튼 색상 분리 코드 반영
+- [ ] 각 버튼 실제 상태 변경 확인
+- [ ] 처리 후 KPI/표 갱신 확인
+- [ ] result-log 적재 확인
+- [ ] 표 가로 스크롤 확인
 
 ### `/hq/applications/result-log`
-- [x] 라우트 연결
-- [x] 처리 결과 이력 메뉴 연결
-- [ ] 신청서 액션 발생 시 이력 적재 확인
+- [x] 메뉴/라우트 연결
+- [x] 처리 결과 이력 화면 코드 존재
+- [ ] 신청서 액션이 실제 이력에 적재되는지 확인
 - [ ] 검색/필터/엑셀 확인
 
 ## 요청 관리
 
+### 공통
+- [x] 요청 액션 공통 hook 정리: `useHqRequestActionRows.tsx`
+- [x] 액션별 색상 분리 코드 반영
+- [x] 액션 후 reload 코드 반영
+- [x] export URL 연결 코드 존재
+- [ ] 승인/거절/검토/대기/자료요청 DB 반영 확인
+- [ ] 요청 처리 결과 로그 반영 확인
+- [ ] 각 요청 페이지 No 최신순 확인
+
 ### `/hq/requests/leader`
-- [x] 라우트 연결
-- [x] 승인/거절/검토/대기/자료요청 API 연결
-- [x] No 정렬 로직 반영
-- [x] 액션 버튼 색상 분리 코드 반영
-- [x] 더미 fallback 제거
-- [x] 액션 실패 숨김 제거 및 성공 후 목록 재조회 연결
-- [ ] 각 액션 실제 상태 변경 확인
-- [ ] 요청 처리 후 결과 로그 반영 확인
+- [x] 목록 API 코드 존재: `/api/hq/requests/leader`
+- [x] 액션 API 코드 존재: approve/reject/review/waiting/request-info
+- [ ] 운영 액션 검증 필요
 
 ### `/hq/requests/partner-by-leader`
-- [x] 라우트 연결
-- [x] 승인/거절/검토/대기/자료요청 API 연결
-- [x] No 정렬 로직 반영
-- [x] 액션 버튼 색상 분리 코드 반영
-- [x] 더미 fallback 제거
-- [x] 액션 실패 숨김 제거 및 성공 후 목록 재조회 연결
-- [ ] 각 액션 실제 상태 변경 확인
-- [ ] 요청 처리 후 결과 로그 반영 확인
+- [x] 목록 API 코드 존재: `/api/hq/requests/partner-by-leader`
+- [x] 액션 API 코드 존재: approve/reject/review/waiting/request-info
+- [ ] 운영 액션 검증 필요
 
 ### `/hq/requests/partner-direct`
-- [x] 라우트 연결
-- [x] 승인/거절/검토/대기/자료요청 API 연결
-- [x] No 정렬 로직 반영
-- [x] 액션 버튼 색상 분리 코드 반영
-- [x] 더미 fallback 제거
-- [x] 액션 실패 숨김 제거 및 성공 후 목록 재조회 연결
-- [ ] 각 액션 실제 상태 변경 확인
-- [ ] 요청 처리 후 결과 로그 반영 확인
+- [x] 목록 API 코드 존재: `/api/hq/requests/partner-direct`
+- [x] 액션 API 코드 존재: approve/reject/review/waiting/request-info
+- [ ] 운영 액션 검증 필요
 
 ### `/hq/requests/merchant-direct`
-- [x] 라우트 연결
-- [x] 승인/거절/검토/대기/자료요청 API 연결
-- [x] No 정렬 로직 반영
-- [x] 액션 버튼 색상 분리 코드 반영
-- [x] 더미 fallback 제거
-- [x] 액션 실패 숨김 제거 및 성공 후 목록 재조회 연결
-- [ ] 각 액션 실제 상태 변경 확인
-- [ ] 요청 처리 후 결과 로그 반영 확인
+- [x] 목록 API 코드 존재: `/api/hq/requests/merchant-direct`
+- [x] 액션 API 코드 존재: approve/reject/review/waiting/request-info
+- [ ] 운영 액션 검증 필요
 
 ### `/hq/requests/result-log`
-- [x] 라우트 연결
-- [x] 처리 결과 이력 페이지 연결
-- [x] 더미 fallback 제거
-- [ ] 모든 요청 액션이 실제 이력에 쌓이는지 확인
+- [x] 목록 API 코드 존재: `/api/hq/requests/result-log`
+- [x] 상세 overlay 코드 존재
+- [x] row click 시 선택한 이력 행 기반 상세 overlay 연결
+- [ ] 요청 액션별 이력/상세 데이터 운영 확인
 
-## 리더/파트너/가맹점 관리
+## 리더 관리
 
 ### `/hq/leaders`
-- [x] API 연결 코드 존재
-- [x] 더미 fallback 제거
-- [x] KPI/표 구조 API 기반으로 이동
+- [x] 목록 API 코드 존재: `/api/hq/leaders`
+- [x] KPI 서버 응답 사용 코드 반영
+- [x] 정지/해제 API 코드 존재: `/api/hq/leaders/{leaderCode}/status`
 - [x] row click 상세 이동 코드 반영
-- [x] 정지/해제 액션 API 연결
-- [x] 목록 KPI 프론트 재계산 제거 및 서버 KPI 사용
-- [ ] KPI가 실제 DB 값과 일치하는지 확인
+- [x] 상세 버튼 제거 방향 반영
+- [ ] KPI 실제 DB 값 일치 확인
 - [ ] 정지/해제 후 KPI 즉시 반영 확인
-- [ ] row click 시 기본 탭이 의도한 탭인지 확인
-- [ ] 상세 탭별 실제 데이터 확인
+- [ ] row click 시 상세 기본 탭 확인
+- [ ] 검색/필터/엑셀 확인
 
 ### `/hq/leaders/sales`
-- [x] API 연결 코드 존재
-- [x] 국가 리더 전체 목록 구성 코드 반영
-- [x] row click 상세 이동 코드 반영
-- [ ] row click 시 거래내역 탭으로 진입하는지 확인
-- [ ] 더미가 아닌 실제 API 데이터인지 확인
+- [x] 전체 리더 목록/상세 화면 코드 존재
+- [x] 상세 API 코드 존재: overview/partners/merchants/transactions/settlement
+- [x] 파트너별/가맹점별/거래내역/정산내역/관리자 메모 탭 코드 존재
+- [ ] 목록 row click 시 거래내역 탭으로 진입 확인
+- [ ] 상세 탭별 실제 데이터 확인
+- [ ] 관리자 메모 저장 동작 확인
 
-### 리더 상세 탭
-- [x] 파트너별 탭 코드 반영
-- [x] 가맹점별 탭 코드 반영
-- [x] 거래내역 탭 코드 반영
-- [x] 정산내역 탭 코드 반영
-- [x] 관리자 메모 탭 코드 반영
-- [ ] 각 탭 KPI/표 실제 데이터 확인
-- [ ] 관리자 메모 저장 확인
+## 파트너 관리
 
 ### `/hq/partners`
-- [x] API 연결 코드 존재
-- [x] 더미 fallback 제거
-- [x] KPI/표 구조 API 기반으로 이동
+- [x] 목록 API 코드 존재: `/api/hq/partners`
+- [x] KPI 서버 응답 사용 코드 반영
+- [x] 정지/해제 API 코드 존재: `/api/hq/partners/{partnerCode}/status`
 - [x] row click 상세 이동 코드 반영
-- [x] 정지/해제 액션 API 연결
-- [x] 목록 KPI 프론트 재계산 제거 및 서버 KPI 사용
-- [ ] KPI가 실제 DB 값과 일치하는지 확인
+- [x] 상세 버튼 제거 방향 반영
+- [ ] KPI 실제 DB 값 일치 확인
 - [ ] 정지/해제 후 KPI 즉시 반영 확인
-- [ ] row click 시 기본 탭이 의도한 탭인지 확인
+- [ ] row click 시 상세 기본 탭 확인
+- [ ] 검색/필터/엑셀 확인
 
 ### `/hq/partners/sales`
-- [x] API 연결 코드 존재
-- [x] 파트너 목록 row click 상세 이동 코드 반영
-- [ ] row click 시 거래내역 탭으로 진입하는지 확인
-- [ ] 실제 API 데이터인지 확인
-
-### 파트너 상세 탭
-- [x] 가맹점별 탭 코드 반영
-- [x] 거래내역 탭 코드 반영
-- [x] 정산내역 탭 코드 반영
-- [x] 관리자 메모 탭 코드 반영
-- [ ] 각 탭 KPI/표 실제 데이터 확인
+- [x] 파트너 목록/상세 화면 코드 존재
+- [x] 상세 API 코드 존재: overview/merchants/transactions/settlement/memo
+- [x] 가맹점별/거래내역/정산내역/관리자 메모 탭 코드 존재
+- [ ] 목록 row click 시 거래내역 탭으로 진입 확인
+- [ ] 상세 탭별 실제 데이터 확인
 - [ ] 거래내역 row 상세 modal 확인
 - [ ] 관리자 메모 저장 확인
 
+## 가맹점 관리
+
 ### `/hq/merchants`
-- [x] API 연결 코드 존재
-- [x] 더미 fallback 제거
-- [x] KPI/표 구조 API 기반으로 이동
+- [x] 목록 API 코드 존재: `/api/hq/merchants`
+- [x] KPI 서버 응답 사용 코드 반영
+- [x] 정지/해제/블랙 관련 status API 코드 존재: `/api/hq/merchants/{merchantCode}/status`
 - [x] row click 상세 이동 코드 반영
-- [x] 정지/해제/블랙 상태 액션 API 연결
-- [x] 목록 KPI 프론트 재계산 제거 및 서버 KPI 사용
-- [ ] KPI가 실제 DB 값과 일치하는지 확인
-- [ ] 정지/해제 후 KPI 즉시 반영 확인
-- [ ] row click 시 거래내역 탭으로 진입하는지 확인
+- [x] 상세 버튼 제거 방향 반영
+- [ ] KPI 실제 DB 값 일치 확인
+- [ ] 상태 액션 후 KPI 즉시 반영 확인
+- [ ] row click 시 거래내역 탭 진입 확인
+- [ ] 검색/필터/엑셀 확인
 
 ### `/hq/merchants/sales`
-- [x] API 연결 코드 존재
-- [x] 가맹점 목록 row click 상세 이동 코드 반영
+- [x] 가맹점 목록/상세 화면 코드 존재
+- [x] 상세 API 코드 존재: sales/settlement/memo
+- [x] 거래내역/정산내역/관리자 메모/요청사항 탭 코드 존재
 - [ ] 거래내역 탭 실제 하부 데이터 확인
-- [ ] row click 상세 modal 확인
-
-### 가맹점 상세 탭
-- [x] 거래내역 탭 코드 반영
-- [x] 정산내역 탭 코드 반영
-- [x] 관리자 메모 탭 코드 반영
-- [x] 요청사항 탭 코드 반영
-- [ ] 각 탭 KPI/표 실제 데이터 확인
 - [ ] 거래내역 row 상세 modal 확인
 - [ ] 관리자 메모 저장 확인
 
 ## 결제/거래 로그
 
 ### `/hq/payments/logs`
-- [x] 라우트 연결
-- [x] KPI API 연결 코드 존재
-- [x] No 컬럼 추가 코드 반영
+- [x] 목록 API 코드 존재: `/api/hq/payments/logs`
+- [x] KPI/표 API 연결 코드 존재
+- [x] No 컬럼 코드 반영
 - [x] 상태 뱃지 코드 반영
-- [x] 지급보류/보류해제 API 연결 코드 존재
+- [x] 지급보류/보류해제 API 코드 존재: `/api/hq/payments/logs/{entryId}/settlement-hold`
 - [x] row click 상세 modal 코드 반영
-- [x] 결제 로그 표 `tableFluid/tableWrapCells` 제거로 가로 스크롤/컬럼 resize 경로 복구
-- [ ] KPI가 실제 거래 데이터와 일치하는지 확인
-- [ ] 지급보류/보류해제 버튼 동작 확인
+- [x] 표 가로 스크롤/컬럼 resize 경로 복구
+- [ ] KPI 실제 거래 데이터 일치 확인
+- [ ] 지급보류/보류해제 버튼 실제 동작 확인
 - [ ] row 상세 내용 충분성 확인
-- [ ] 필터/검색/엑셀 확인
+- [ ] 검색/필터/엑셀 확인
 
 ### `/hq/payments/sync-issues`
-- [x] 라우트 연결
-- [x] KPI/표 API 연결 코드 존재
-- [x] 송신/수신/업로드 상태 기반 표 구성 코드 반영
-- [ ] 401 해결 여부 운영 로그인으로 확인
-- [ ] 실제 sync issue 데이터 반영 확인
+- [x] API 호출 코드 존재: `/api/hq/payments/sync-issues`
+- [x] 송신/수신/업로드 상태 기반 표 코드 존재
+- [ ] 운영 로그인에서 401 재발 여부 확인
+- [ ] 실제 sync issue 데이터 확인
+- [ ] KPI 실제 데이터 확인
 
 ### `/hq/payments/error-codes`
-- [x] 라우트 연결
-- [x] KPI/표 API 연결 코드 존재
-- [x] 오류 코드 등록/상태 관리 코드 존재
-- [ ] 401 해결 여부 운영 로그인으로 확인
+- [x] API 호출 코드 존재: `/api/hq/payments/error-codes`
+- [x] 오류 코드 등록 API 코드 존재
+- [x] export 코드 존재
+- [x] 시스템 오류코드 페이지와 동일 API 사용
+- [ ] 운영 로그인에서 401 재발 여부 확인
 - [ ] 등록/수정/상태 변경 실제 동작 확인
-- [ ] KPI가 등록된 오류 코드 기준으로 반영되는지 확인
+- [ ] KPI가 등록된 오류 코드 기준인지 확인
 
 ## 수수료 / 정산
 
 ### `/hq/settlement/request`
-- [x] 라우트 연결
+- [x] 목록 API 코드 존재: `/api/hq/settlement-requests`
 - [x] KPI API 연결 코드 존재
 - [x] No 컬럼/상태 뱃지 코드 반영
-- [x] 승인/검토/보류/자료요청/거절 액션 API 연결 코드 존재
+- [x] 승인/검토/보류/자료요청/거절 API 코드 존재
 - [x] row click 상세 이동 코드 반영
 - [ ] KPI 실제 데이터 연산 확인
 - [ ] 승인/검토/보류/자료요청/거절 실제 동작 확인
 - [ ] 표 가로 스크롤/컬럼 resize 확인
+- [ ] 신청 ID 생성 규칙 확인
 
 ### `/hq/settlement/request/detail`
-- [x] 라우트 연결
-- [x] 상세 API 연결 코드 존재
+- [x] 상세 API 코드 존재: `/api/hq/settlement-requests/{settlementRequestId}/detail`
+- [x] 액션 API 코드 존재: `/api/hq/settlement-requests/{settlementRequestId}/actions`
 - [x] 체크박스 기본 미체크 코드 반영
-- [x] 승인/검토/보류/자료요청/거절 버튼 코드 존재
-- [ ] 각 버튼 API 실제 동작 확인
+- [ ] 각 버튼 실제 상태 변경 확인
 - [ ] 상세 내역 실제 데이터 확인
+- [ ] 체크박스 문구/필수 조건 운영 확인
 
 ### `/hq/settlement/history`
-- [x] 라우트 연결
+- [x] API 호출 코드 존재: `/api/hq/settlement-history`
 - [x] KPI/표 API 연결 코드 존재
 - [x] No 컬럼/상태 뱃지 코드 반영
 - [x] row click 상세 modal 코드 반영
@@ -316,110 +323,115 @@
 - [ ] 액션 컬럼 제거 여부 확인
 
 ### `/hq/settlement/commission`
-- [x] 라우트 연결
-- [x] KPI/표 API 연결 코드 존재
-- [x] 수수료 추가/수정/삭제 API 연결 코드 존재
-- [x] 국가 드롭다운/이벤트 토글/코인별 수수료 입력 코드 존재
+- [x] API 호출 코드 존재: `/api/hq/commission-fees`
+- [x] 추가/수정/삭제 API 코드 존재
+- [x] export 코드 존재
+- [x] 국가 드롭다운/이벤트 토글/적용범위/코인별 수수료 입력 코드 존재
+- [ ] KPI 실제 데이터 확인
 - [ ] 국가 중복 추가 차단 확인
 - [ ] 이벤트 토글 실제 저장 확인
 - [ ] 코인별 수수료 추가 실제 저장 확인
 - [ ] 액션 버튼 크기/가시성 확인
 
 ### `/hq/settlement/rate-setting`
-- [x] 라우트 연결
-- [x] KPI/표 API 연결 코드 존재
-- [x] 기본 배분율 수정/저장 코드 존재
-- [x] 국가별 배분율 추가/수정/삭제 API 연결 코드 존재
+- [x] API 호출 코드 존재: `/api/hq/distribution-rates`
+- [x] 기본 배분율 수정/저장 API 코드 존재
+- [x] 국가별 배분율 추가/수정/삭제 API 코드 존재
+- [x] export 코드 존재
+- [ ] KPI 실제 데이터 확인
 - [ ] 배분율 저장 실제 반영 확인
 - [ ] 국가 중복 추가 차단 확인
-- [ ] KPI가 저장된 배분율 기준으로 갱신되는지 확인
+- [ ] 숫자 하단 뱃지/상태 뱃지 확인
 
 ## 담보금
 
 ### `/hq/collateral/history`
-- [x] 라우트 연결
-- [x] KPI API 연결 코드 존재
+- [x] API 호출 코드 존재: `/api/hq/collateral-history`
 - [x] 국가/일자 필터 코드 존재
 - [x] 회원 담보금 충전/해제 내역 탭 코드 존재
 - [x] 회원 담보금 정보 탭 코드 존재
 - [x] 회원 정산내역 탭 코드 존재
 - [x] row click 상세 modal 코드 존재
+- [x] 상세 overlay 액션 배지 크기 보정
 - [ ] KPI 실제 데이터 확인
 - [ ] 필터에 맞는 데이터 반영 확인
-- [ ] 담보금 변경 전/후 금액 확인
+- [ ] 충전/해제 전후 담보금 확인
 - [ ] 회원정보 액션 실제 연결 확인
 
 ## 리스크 관리
 
 ### `/hq/risk/fake-applications`
-- [x] 라우트 연결
+- [x] API 호출 코드 존재: `/api/hq/risk/fake-applications`
 - [x] 화면/표/상세 overlay 코드 존재
-- [ ] 실제 API 기반인지 확인
+- [ ] 실제 API 데이터 확인
 - [ ] 액션/상태 처리 실제 동작 확인
 
 ### `/hq/risk/fake-merchants`
-- [x] 라우트 연결
+- [x] API 호출 코드 존재: `/api/hq/risk/fake-merchants`
 - [x] 화면/표/상세 overlay 코드 존재
-- [ ] 실제 API 기반인지 확인
+- [ ] 실제 API 데이터 확인
 - [ ] 액션/상태 처리 실제 동작 확인
 
 ### `/hq/risk/duplicates`
-- [x] 라우트 연결
+- [x] API 호출 코드 존재: `/api/hq/risk/duplicates`
 - [x] 화면/표/상세 overlay 코드 존재
-- [ ] 실제 API 기반인지 확인
+- [ ] 실제 API 데이터 확인
 - [ ] 액션/상태 처리 실제 동작 확인
 
 ### `/hq/risk/settlement-hold`
-- [x] 라우트 연결
+- [x] API 호출 코드 존재: `/api/hq/risk/settlement-hold`
 - [x] 화면/표/상세 overlay 코드 존재
-- [ ] 실제 API 기반인지 확인
+- [ ] 실제 API 데이터 확인
 - [ ] 보류/해제 처리 실제 동작 확인
 
 ### `/hq/risk/blacklist`
-- [x] 라우트 연결
+- [x] API 호출 코드 존재: `/api/hq/risk/blacklist`
 - [x] 화면/표/상세 overlay 코드 존재
-- [ ] 실제 API 기반인지 확인
+- [ ] 실제 API 데이터 확인
 - [ ] 블랙/해제 처리 실제 동작 확인
 
 ## 통계
 
 ### `/hq/stats/country`
-- [x] 라우트 연결
+- [x] API 호출 코드 존재: `/api/hq/stats/country`
 - [x] 화면/표/상세 overlay 코드 존재
-- [ ] 실제 API 기반인지 확인
-- [ ] KPI/차트/표 데이터 정확성 확인
+- [ ] KPI/차트/표 실제 데이터 확인
+- [ ] 필터/기간 조건 확인
 
 ### `/hq/stats/partner`
-- [x] 라우트 연결
+- [x] API 호출 코드 존재: `/api/hq/stats/partner`
 - [x] 화면/표/상세 overlay 코드 존재
-- [ ] 실제 API 기반인지 확인
-- [ ] KPI/차트/표 데이터 정확성 확인
+- [ ] KPI/차트/표 실제 데이터 확인
+- [ ] 필터/기간 조건 확인
 
 ### `/hq/stats/merchant`
-- [x] 라우트 연결
+- [x] API 호출 코드 존재: `/api/hq/stats/merchant`
 - [x] 화면/표/상세 overlay 코드 존재
-- [ ] 실제 API 기반인지 확인
-- [ ] KPI/차트/표 데이터 정확성 확인
+- [ ] KPI/차트/표 실제 데이터 확인
+- [ ] 필터/기간 조건 확인
 
 ### `/hq/stats/payment-method`
-- [x] 라우트 연결
+- [x] API 호출 코드 존재: `/api/hq/stats/payment-method`
 - [x] 화면/표 코드 존재
-- [ ] 실제 API 기반인지 확인
 - [ ] QR/NFC/BLE/온라인 데이터 정확성 확인
+- [ ] 필터/기간 조건 확인
 
 ## 공지사항
 
 ### `/hq/announcements/send`
-- [x] 라우트 연결
+- [x] API 호출 코드 존재: `/api/hq/announcements/send-summary`
+- [x] 전송 API 코드 존재: `/api/hq/announcements/send`
+- [x] 임시저장 API 코드 존재: `/api/hq/announcements/drafts`
 - [x] 파트너/리더 스타일 기반 UI refactor 코드 존재
-- [x] 전송/임시저장 API 연결 코드 존재
-- [x] `noticeSendData.json` fallback 제거/파일 삭제 및 API 실패 시 샘플값 미표시
+- [x] `noticeSendData.json` fallback 제거
 - [ ] 실제 대상 선택/전송 확인
 - [ ] 실패 시 에러 메시지 확인
+- [ ] 예약/즉시 전송 조건 확인
 
 ### `/hq/announcements/history`
-- [x] 라우트 연결
-- [x] KPI/표 API 연결 코드 존재
+- [x] API 호출 코드 존재: `/api/hq/announcements/history`
+- [x] 취소 API 코드 존재: `/api/hq/announcements/{noticeId}/cancel`
+- [x] 수신자 목록 API 코드 존재
 - [x] 국가/일자 필터 코드 존재
 - [x] 상태 뱃지 코드 존재
 - [ ] KPI 실제 데이터 확인
@@ -429,65 +441,61 @@
 ## 관리자 관리
 
 ### `/hq/admin/accounts`
-- [x] 라우트 연결
-- [x] API 기반 관리자 계정 목록 코드 존재
-- [x] 수정 modal/API 연결 코드 존재
+- [x] API 호출 코드 존재: `/api/hq/admin/accounts`
+- [x] 수정 API 코드 존재: `/api/hq/admin/accounts/{adminId}`
 - [ ] 역할/상태 변경 실제 저장 확인
 - [ ] 권한 계층 제한 확인
 
 ### `/hq/admin/permission-groups`
-- [x] 라우트 연결
-- [x] 권한 그룹 목록 코드 존재
-- [x] 수정 modal/API 연결 코드 존재
+- [x] API 호출 코드 존재: `/api/hq/admin/permission-groups`
+- [x] 수정 API 코드 존재: `/api/hq/admin/permission-groups/{roleCode}`
 - [ ] 권한 저장 실제 반영 확인
 
 ### `/hq/admin/country-access`
-- [x] 라우트 연결
-- [x] 국가별 접근 권한 목록 코드 존재
-- [x] 수정 modal/API 연결 코드 존재
+- [x] API 호출 코드 존재: `/api/hq/admin/country-access`
+- [x] 수정 API 코드 존재: `/api/hq/admin/country-access/{adminId}/{countryCode}`
 - [ ] 국가별 메뉴 권한 저장 실제 반영 확인
 
 ### `/hq/admin/login-security`
-- [x] 라우트 연결
-- [x] 로그인 보안 정책 목록 API 연결 코드 존재
-- [x] 수정 modal/API 연결 코드 존재
-- [x] 백엔드 `PUT /api/hq/admin/login-security/{policyKey}` 구현
+- [x] API 호출 코드 존재: `/api/hq/admin/login-security`
+- [x] 수정 API 코드 존재: `/api/hq/admin/login-security/{policyKey}`
 - [ ] 정책 값 저장 실제 반영 확인
-- [ ] app_config 저장값 확인
+- [ ] `app_config` 저장값 확인
 
 ### `/hq/admin/two-factor`
-- [x] 라우트 연결
-- [x] 페이지 데이터 코드 존재
+- [x] API 호출 코드 존재: `/api/hq/admin/two-factor`
+- [x] 수정 API 코드 존재: `/api/hq/admin/two-factor/{policyKey}`
 - [ ] 실제 2FA 상태 데이터 확인
-- [ ] 필요한 액션 존재 여부 확인
+- [ ] 수정 저장 실제 반영 확인
 
 ## 시스템 설정
 
 ### `/hq/system/country`
-- [x] 라우트 연결
-- [x] KPI/표 API 연결 코드 존재
-- [x] 상태 뱃지/액션 버튼 코드 존재
+- [x] API 호출 코드 존재: `/api/hq/system/country`
+- [x] 추가 API 코드 존재
+- [x] export 코드 존재
+- [x] 상태/액션 뱃지 코드 존재
 - [ ] 국가 번호 정렬 확인
 - [ ] 결제 상태 뱃지 확인
-- [ ] 실제 국가 데이터인지 확인
+- [ ] 실제 국가 데이터 확인
 - [ ] 수정/삭제/상세 액션 확인
 
 ### `/hq/system/error-code`
-- [x] 라우트 연결
-- [x] KPI/표 API 연결 코드 존재
+- [x] API 호출 코드 존재: `/api/hq/payments/error-codes`
+- [x] 등록 API 코드 존재
 - [x] 자동처리 상태/액션 뱃지 코드 존재
 - [ ] 번호 정렬 확인
 - [ ] 등록/수정/삭제 실제 동작 확인
 
 ### `/hq/system/security-policy`
-- [x] 라우트 연결
-- [x] 화면 코드 존재
-- [ ] 실제 API 기반인지 확인
+- [x] API 호출 코드 존재: `/api/hq/system/security-policy`
+- [x] 수정 API 코드 존재: `/api/hq/system/security-policy/{policyKey}`
+- [ ] 실제 API 데이터 확인
 - [ ] 정책 변경 저장 동작 확인
 
 ### `/hq/system/maintenance-mode`
-- [x] 라우트 연결
-- [x] KPI/표 API 연결 코드 존재
+- [x] API 호출 코드 존재: `/api/hq/system/maintenance-mode`
+- [x] 수정 API 코드 존재: `/api/hq/system/maintenance-mode/{maintenanceId}`
 - [x] 상태/액션 뱃지 코드 존재
 - [ ] 유지보수 모드 실제 동작 확인
 - [ ] 수정/삭제/상세 액션 확인
@@ -495,39 +503,49 @@
 ## 로그 관리
 
 ### `/hq/logs/admin`
-- [x] 라우트 연결
-- [x] 백엔드 `GET /api/hq/logs/admin` 구현
+- [x] API 호출 코드 존재: `/api/hq/logs/admin`
 - [x] KPI/표 API 연결 코드 존재
-- [ ] 로그인 후 실제 로그 데이터 확인
+- [ ] 실제 로그 데이터 확인
 
 ### `/hq/logs/approval`
-- [x] 라우트 연결
-- [x] 백엔드 `GET /api/hq/logs/approval` 구현
+- [x] API 호출 코드 존재: `/api/hq/logs/approval`
 - [x] KPI/표 API 연결 코드 존재
 - [ ] 승인/거절/보류/자료요청 액션 로그 확인
 
 ### `/hq/logs/settlement`
-- [x] 라우트 연결
-- [x] 백엔드 `GET /api/hq/logs/settlement` 구현
+- [x] API 호출 코드 존재: `/api/hq/logs/settlement`
 - [x] KPI/표 API 연결 코드 존재
 - [ ] 정산 액션 로그 확인
 
 ### `/hq/logs/permission-change`
-- [x] 라우트 연결
-- [x] 백엔드 `GET /api/hq/logs/permission-change` 구현
-- [x] KPI/표 API 연결 코드 존재
-- [ ] 권한/관리자 변경 액션 로그 확인
+- [x] API 호출 코드 존재: `/api/hq/logs/permission-change`
+- [x] 권한/리더/파트너 상태 변경 로그 분류 코드 반영
+- [ ] 권한/관리자/리더/파트너 변경 로그 실제 확인
 
 ### `/hq/logs/security`
-- [x] 라우트 연결
-- [x] 백엔드 `GET /api/hq/logs/security` 구현
-- [x] KPI/표 API 연결 코드 존재
-- [ ] 로그인/보안 이벤트 로그 확인
+- [x] API 호출 코드 존재: `/api/hq/logs/security`
+- [x] 보안/공격/DB 이상 로그 분류 코드 반영
+- [x] 운영 SPA route 200 확인
+- [ ] 로그인/보안/DB 이상 이벤트 로그 실제 확인
 
-## 의심 지점
+## 더미/JSON 잔존 점검
 
-- [ ] 리스크/통계 일부 페이지는 현재 프론트 파일에 JSON 데이터 파일이 남아 있다. 실제 API 기반으로 전환됐는지 별도 확인 필요.
-- [ ] 운영 로그인 토큰으로 401 발생 페이지를 재확인해야 한다.
-- [ ] 모든 KPI가 “화면 표시용 계산”이 아니라 실제 DB 집계인지 쿼리 단위로 검증해야 한다.
-- [ ] 액션 후 프론트 reload/optimistic update가 모든 페이지에서 동일하게 작동하는지 확인해야 한다.
-- [ ] 대량 변경 커밋이므로 페이지별 회귀 테스트를 분리해 진행해야 한다.
+2026-07-15 기준 `src/pages/hq` 하위 TS/TSX의 JSON import는 제거했고, 남아 있던 `src/pages/hq/**/*.json` 샘플 파일도 삭제했다.  
+검증 명령:
+
+- [x] `rg -n "from .*\\.json|import .*\\.json|\\.json" src/pages/hq -S` 결과 없음
+- [x] `find src/pages/hq -name '*.json'` 결과 없음
+- [x] `npm run build` 통과
+
+## 반드시 다시 봐야 할 의심 지점
+
+- [ ] 운영에서 401이 났던 `/hq/payments/sync-issues`, `/hq/payments/error-codes` 재확인
+- [x] 무토큰 401은 정상 보호 동작 확인. 로그인 세션 401 재발 시 토큰/권한/프록시 헤더를 별도 확인
+- [ ] 액션 버튼이 안 눌렸던 신청서/요청/정산/결제 로그 페이지 재확인
+- [ ] 리더/파트너/가맹점 상세 진입 시 기본 탭이 의도와 맞는지 재확인
+- [ ] 리더/파트너/가맹점 KPI가 프론트 계산이 아니라 서버 DB 집계인지 재확인
+- [ ] 정산/수수료/배분율 추가 시 중복 국가 차단 확인
+- [ ] 유지보수 모드 실제 전역 동작 확인
+- [ ] 리스크/통계 페이지가 “구현 예정” 또는 더미 데이터처럼 보이지 않는지 확인
+- [ ] 모든 표에서 긴 컬럼이 잘리지 않고 가로 스크롤/resize가 되는지 확인
+- [ ] 모든 액션 후 활동 로그/처리 결과 로그가 실제로 쌓이는지 확인

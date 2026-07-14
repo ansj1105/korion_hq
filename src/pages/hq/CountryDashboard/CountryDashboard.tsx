@@ -1,6 +1,7 @@
 import PageHeader from '../../../components/organisms/PageHeader'
 import Panel from '../../../components/molecules/Panel'
 import StatCard from '../../../components/molecules/StatCard'
+import Badge from '../../../components/atoms/Badge'
 import DataTable from '../../../components/organisms/DataTable'
 import type { TableRow } from '../../../components/organisms/DataTable'
 import { useTranslation } from '../../../i18n'
@@ -23,6 +24,7 @@ export default function CountryDashboard() {
   const countryRankingRows: TableRow[] = countryRanking.rows.map((r) => ({
     id: r.id,
     cells: {
+      rank: r.rank,
       country: r.country,
       countryCode: r.countryCode,
       totalMembers: r.totalMembers,
@@ -31,7 +33,11 @@ export default function CountryDashboard() {
       merchants: r.merchants,
       monthlyAmount: r.monthlyAmount,
       monthlyCount: r.monthlyCount,
-      status: r.status,
+      status: (
+        <Badge accent={r.statusAccent} size="cell" shape="rect">
+          {r.status}
+        </Badge>
+      ),
     },
   }))
 

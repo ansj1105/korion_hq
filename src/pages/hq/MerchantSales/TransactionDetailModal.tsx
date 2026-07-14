@@ -1,6 +1,5 @@
 import { useTranslation } from '../../../i18n'
 import type { MerchantSalesLogRow } from './useMerchantSales'
-import data from './transactionDetailData.json'
 import styles from './TransactionDetailModal.module.css'
 
 interface FieldRaw {
@@ -21,8 +20,7 @@ interface TransactionDetailModalProps {
  * ------------------------------------------------------------------
  * Figma 81:28685 "거래 내역 상세정보". 좌측 네브바를 제외한 콘텐츠 영역 기준
  * 가운데 정렬(오버레이 left를 --sidebar-width 만큼 밀고, 모바일에선 전체 폭).
- * 데이터는 Figma 샘플값 하드코딩(transactionDetailData.json) — 실데이터 연동 시
- * 클릭한 행의 거래번호로 조회해 채우면 된다.
+ * 선택한 거래 행 데이터를 기반으로 표시한다. 행이 없으면 샘플 대신 빈 값을 표시한다.
  */
 export default function TransactionDetailModal({ transaction, onClose }: TransactionDetailModalProps) {
   const { t } = useTranslation()
@@ -45,7 +43,7 @@ export default function TransactionDetailModal({ transaction, onClose }: Transac
         { labelKey: 'hqMerchantSales.txModal.walletAddress', value: transaction.walletAddress ?? '-', small: true },
         { labelKey: 'hqMerchantSales.txModal.payer', value: transaction.payer ?? '-' },
       ]
-    : (data.fields as FieldRaw[])
+    : []
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -64,12 +62,12 @@ export default function TransactionDetailModal({ transaction, onClose }: Transac
         </dl>
 
         <p className={styles.memoLabel}>{t('hqMerchantSales.txModal.memo')}</p>
-        <textarea className={styles.memoBox} defaultValue={transaction?.memo ?? data.memo} aria-label={t('hqMerchantSales.txModal.memo')} />
+        <textarea className={styles.memoBox} defaultValue={transaction?.memo ?? ''} aria-label={t('hqMerchantSales.txModal.memo')} />
 
         <p className={styles.memoLabel}>{t('hqMerchantSales.txModal.adminMemo')}</p>
         <textarea
           className={styles.memoBox}
-          placeholder={data.adminMemoPlaceholder}
+          placeholder={t('hqMerchantSales.txModal.adminMemo')}
           aria-label={t('hqMerchantSales.txModal.adminMemo')}
         />
 

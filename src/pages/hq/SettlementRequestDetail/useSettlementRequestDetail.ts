@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { Column } from '../../../components/organisms/DataTable'
 import { fetchHqPageData } from '../../../services/korionChongApi'
-import data from './settlementRequestDetailData.json'
 
 interface KpiRaw {
   labelKey: string
@@ -19,6 +18,53 @@ interface FieldRaw {
   editable: boolean
 }
 
+interface GaugeSegment {
+  role: string
+  pct: number
+  label: string
+}
+
+interface SettlementRequestDetailData {
+  header: {
+    no: string
+    contextBadges: string[]
+    statusOk: string
+  }
+  banner: {
+    notice: string
+    lastDate: string
+    period: string
+    exclude: string
+    method: string
+  }
+  kpis: KpiRaw[]
+  calc: {
+    earnLabelKey: string
+    earn: string
+    heldLabelKey: string
+    held: string
+    finalLabelKey: string
+    final: string
+    unit: string
+    gauges: GaugeSegment[][]
+  }
+  feeStructure: string[][]
+  partnerTable: {
+    descKey: string
+    rows: Array<Record<string, string>>
+  }
+  heldTable: {
+    descKey: string
+    rows: Array<Record<string, string>>
+  }
+  form: {
+    fields: FieldRaw[]
+    memoPlaceholder: string
+    replyPlaceholder: string
+  }
+  checks: string[]
+}
+
 /** KPI 요약 카드 (제목 칩 색 포함) */
 export interface KpiItem {
   id: string
@@ -29,6 +75,47 @@ export interface KpiItem {
   chipSolid: boolean
 }
 
+const emptySettlementRequestDetailData: SettlementRequestDetailData = {
+  header: {
+    no: '-',
+    contextBadges: [],
+    statusOk: '-',
+  },
+  banner: {
+    notice: '',
+    lastDate: '-',
+    period: '-',
+    exclude: '-',
+    method: '-',
+  },
+  kpis: [],
+  calc: {
+    earnLabelKey: 'hqSettle.reqDetail.calc.earn',
+    earn: '0',
+    heldLabelKey: 'hqSettle.reqDetail.calc.held',
+    held: '0',
+    finalLabelKey: 'hqSettle.reqDetail.calc.final',
+    final: '0',
+    unit: 'KORI',
+    gauges: [],
+  },
+  feeStructure: [],
+  partnerTable: {
+    descKey: 'hqSettle.reqDetail.pt.desc',
+    rows: [],
+  },
+  heldTable: {
+    descKey: 'hqSettle.reqDetail.ht.desc',
+    rows: [],
+  },
+  form: {
+    fields: [],
+    memoPlaceholder: '',
+    replyPlaceholder: '',
+  },
+  checks: [],
+}
+
 /*
  * useSettlementRequestDetail — 본사어드민 · 정산 신청 상세 검토 데이터 훅
  * ------------------------------------------------------------------
@@ -37,20 +124,20 @@ export interface KpiItem {
  */
 export function useSettlementRequestDetail(settlementRequestId?: string | null) {
   const { t } = useTranslation()
-  const [source, setSource] = useState(data)
+  const [source, setSource] = useState(emptySettlementRequestDetailData)
 
   useEffect(() => {
     if (!settlementRequestId) {
-      setSource(data)
+      setSource(emptySettlementRequestDetailData)
       return
     }
     let alive = true
-    fetchHqPageData<typeof data>(`/api/hq/settlement-requests/${encodeURIComponent(settlementRequestId)}/detail`)
+    fetchHqPageData<SettlementRequestDetailData>(`/api/hq/settlement-requests/${encodeURIComponent(settlementRequestId)}/detail`)
       .then((payload) => {
         if (alive) setSource(payload)
       })
       .catch(() => {
-        if (alive) setSource(data)
+        if (alive) setSource(emptySettlementRequestDetailData)
       })
     return () => {
       alive = false

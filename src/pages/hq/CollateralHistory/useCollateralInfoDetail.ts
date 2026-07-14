@@ -1,5 +1,4 @@
 import { useTranslation } from '../../../i18n'
-import data from './collateralInfoDetailData.json'
 
 /** 메트릭/상태 색조 — Figma 시안의 시안/초록/호박 3색 */
 export type InfoDetailTone = 'cyan' | 'green' | 'amber'
@@ -29,24 +28,23 @@ interface ActivityRow {
 /*
  * useCollateralInfoDetail — "회원 담보금 상세 정보" 오버레이(Figma 81:29553) 데이터 훅
  * ------------------------------------------------------------------
- * collateralInfoDetailData.json(더미)을 읽어 라벨만 번역해 반환한다.
- * Figma 시안이 단일 샘플이라 행과 무관하게 같은 내용을 보여준다 —
- * 추후 실 연동 시 이 훅이 회원 id를 받아 API 조회로 교체되면 오버레이는 그대로 동작한다.
+ * 행 데이터가 없는 예외 상태에서 빈 상세를 반환한다.
+ * 실제 오버레이 값은 CollateralHistory API 행 데이터를 사용한다.
  */
 export function useCollateralInfoDetail() {
   const { t } = useTranslation()
 
-  const fields = (data.fields as FieldRaw[]).map((f) => ({
+  const fields = ([] as FieldRaw[]).map((f) => ({
     label: t(f.labelKey),
     value: f.value,
     newRow: f.newRow,
   }))
 
-  const metrics = (data.metrics as MetricRaw[]).map((m) => ({
+  const metrics = ([] as MetricRaw[]).map((m) => ({
     label: t(m.labelKey),
     value: m.value,
     tone: m.tone,
   }))
 
-  return { fields, metrics, activities: data.activities as ActivityRow[] }
+  return { fields, metrics, activities: [] as ActivityRow[] }
 }

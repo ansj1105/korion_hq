@@ -13,7 +13,7 @@ interface StatRaw {
 /** 리더 상태 — 승인/정지 중 하나만 활성(Figma 액션 토글 배지 기준) */
 export type LeaderStatus = 'approved' | 'suspended'
 
-/** 국가 리더 전체 목록 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
+/** 국가 리더 전체 목록 행 원본 데이터 형태 */
 export interface LeaderListRow {
   no: string
   appliedAt: string
@@ -41,9 +41,7 @@ const emptyLeaderListData: LeaderListPageData = {
 /*
  * useLeaders — 본사어드민 "국가 리더 전체 목록" 데이터 훅
  * ------------------------------------------------------------------
- * leadersData.json(더미)을 읽어 UI 라벨(지표/컬럼명)은 번역해 반환한다.
- * 리더 어드민의 usePartners와 컬럼이 달라(리더 코드/파트너명 등) 별도 화면으로 작성.
- * 추후 실 연동 시 이 훅 내부만 API 호출로 교체.
+ * /api/hq/leaders 응답만 사용한다. 리더 어드민의 usePartners와 컬럼이 달라 별도 화면으로 작성.
  */
 export function useLeaders() {
   const { t } = useTranslation()

@@ -5,7 +5,6 @@ import type { MiniStatCardData } from '../../../components/molecules/MiniStatCar
 import type { Column } from '../../../components/organisms/DataTable'
 import type { AccentKey } from '../../../types'
 import { fetchHqPageData } from '../../../services/korionChongApi'
-import data from './dashboardData.json'
 
 export type HqDashboardRange = 'ALL' | '1D' | '7D' | '14D' | '30D' | '90D' | '180D' | '365D'
 
@@ -35,7 +34,7 @@ interface MiniStatRaw {
 }
 
 /*
- * dashboardData.json의 행 데이터는 accent류 필드만 AccentKey로 단언해 사용한다(나머지는 JSON 추론 타입 그대로).
+ * dashboard 응답의 accent류 필드는 AccentKey로 단언해 사용한다.
  * Figma 실측 결과 상태/액션 셀이 "항상 배지"가 아니라 행마다 배지/평텍스트가 섞여 있어서
  * (예: 진행 중·이례적인 상태만 배지로 강조, 나머지는 평텍스트) accent 필드를 전부 optional로 두고
  * Dashboard.tsx에서 "accent가 있으면 Badge, 없으면 평텍스트"로 분기한다.
@@ -159,6 +158,14 @@ interface TrendBarRaw {
   accent: string
 }
 
+interface PaymentMethodDonutSegment {
+  id: string
+  labelKey: string
+  label?: string
+  pct: number
+  accent: AccentKey
+}
+
 interface RankingPanelRaw {
   id: string
   titleKey: string
@@ -179,6 +186,28 @@ interface AiInsightRaw {
   evidenceCount?: number
   logQuery?: string
   actionRoute?: string
+}
+
+interface DashboardData {
+  kpis: KpiRaw[]
+  rankingPanels: RankingPanelRaw[]
+  realtimePayments: { rows: RealtimePaymentRow[] }
+  offlinePay: { miniStats: MiniStatRaw[]; flowSteps: string[] }
+  settlement: { stats: MiniStatRaw[]; rows: SettlementRow[] }
+  risk: { stats: MiniStatRaw[]; rows: RiskRow[] }
+  countryOps: { rows: CountryOpsRow[]; heatmap: Array<{ code: string; [key: string]: unknown }> }
+  approvalQueue: { stats: MiniStatRaw[]; rows: ApprovalQueueRow[] }
+  networkGrowth: {
+    stats: MiniStatRaw[]
+    trendBars: TrendBarRaw[]
+    topPartners: RankingRowRaw[]
+    topLeaders: RankingRowRaw[]
+    topMerchants: RankingRowRaw[]
+  }
+  paymentMethod: { rows: PaymentMethodRow[]; donut: PaymentMethodDonutSegment[] }
+  activityLogs: { rows: ActivityLogRow[] }
+  aiInsight: { items: AiInsightRaw[] }
+  quickActions: string[]
 }
 
 const ALL_COUNTRIES = 'all'
@@ -242,6 +271,33 @@ const RANGE_SENSITIVE_MINI_STATS = new Set([
   'problemPartners',
 ])
 
+const DASHBOARD_QUICK_ACTION_KEYS = [
+  'hqDashboard.quickActions.reviewApplications',
+  'hqDashboard.quickActions.approveSettlement',
+  'hqDashboard.quickActions.retrySyncFailures',
+  'hqDashboard.quickActions.addBlacklist',
+  'hqDashboard.quickActions.sendNotice',
+  'hqDashboard.quickActions.maintenanceMode',
+  'hqDashboard.quickActions.viewAdminLogs',
+  'hqDashboard.quickActions.exportReport',
+]
+
+const emptyDashboardData: DashboardData = {
+  kpis: [],
+  rankingPanels: [],
+  realtimePayments: { rows: [] },
+  offlinePay: { miniStats: [], flowSteps: [] },
+  settlement: { stats: [], rows: [] },
+  risk: { stats: [], rows: [] },
+  countryOps: { rows: [], heatmap: [] },
+  approvalQueue: { stats: [], rows: [] },
+  networkGrowth: { stats: [], trendBars: [], topPartners: [], topLeaders: [], topMerchants: [] },
+  paymentMethod: { rows: [], donut: [] },
+  activityLogs: { rows: [] },
+  aiInsight: { items: [] },
+  quickActions: DASHBOARD_QUICK_ACTION_KEYS,
+}
+
 function formatScaledNumber(value: number, hasDecimals: boolean) {
   const maximumFractionDigits = hasDecimals ? 2 : 0
   return new Intl.NumberFormat('en-US', {
@@ -297,7 +353,7 @@ function withRows<T extends { rows?: unknown[] }>(payloadSection: T, fallbackSec
   return {
     ...fallbackSection,
     ...payloadSection,
-    rows: payloadSection.rows && payloadSection.rows.length > 0 ? payloadSection.rows : fallbackSection.rows,
+    rows: Array.isArray(payloadSection.rows) ? payloadSection.rows : fallbackSection.rows,
   }
 }
 
@@ -305,93 +361,93 @@ function withItems<T extends { items?: unknown[] }>(payloadSection: T, fallbackS
   return {
     ...fallbackSection,
     ...payloadSection,
-    items: payloadSection.items && payloadSection.items.length > 0 ? payloadSection.items : fallbackSection.items,
+    items: Array.isArray(payloadSection.items) ? payloadSection.items : fallbackSection.items,
   }
 }
 
 function withNonEmptyArray<T>(payload: T[] | undefined, fallback: T[]): T[] {
-  return payload && payload.length > 0 ? payload : fallback
+  return Array.isArray(payload) ? payload : fallback
 }
 
 function withApiArray<T>(payload: T[] | undefined, fallback: T[]): T[] {
   return Array.isArray(payload) ? payload : fallback
 }
 
-function withDashboardDefaults(payload: typeof data): typeof data {
+function withDashboardDefaults(payload: DashboardData): DashboardData {
   return {
-    ...data,
+    ...emptyDashboardData,
     ...payload,
-    kpis: withNonEmptyArray(payload.kpis, data.kpis),
-    rankingPanels: data.rankingPanels.map((fallbackPanel) => {
+    kpis: withNonEmptyArray(payload.kpis, emptyDashboardData.kpis),
+    rankingPanels: emptyDashboardData.rankingPanels.map((fallbackPanel) => {
       const payloadPanel = payload.rankingPanels.find((panel) => panel.id === fallbackPanel.id)
-      return payloadPanel && payloadPanel.rows && payloadPanel.rows.length > 0 ? payloadPanel : fallbackPanel
+      return payloadPanel && Array.isArray(payloadPanel.rows) ? payloadPanel : fallbackPanel
     }),
-    realtimePayments: withRows(payload.realtimePayments, data.realtimePayments),
+    realtimePayments: withRows(payload.realtimePayments, emptyDashboardData.realtimePayments),
     offlinePay: {
-      ...data.offlinePay,
+      ...emptyDashboardData.offlinePay,
       ...payload.offlinePay,
-      miniStats: withNonEmptyArray(payload.offlinePay?.miniStats, data.offlinePay.miniStats),
-      flowSteps: withNonEmptyArray(payload.offlinePay?.flowSteps, data.offlinePay.flowSteps),
+      miniStats: withNonEmptyArray(payload.offlinePay?.miniStats, emptyDashboardData.offlinePay.miniStats),
+      flowSteps: withNonEmptyArray(payload.offlinePay?.flowSteps, emptyDashboardData.offlinePay.flowSteps),
     },
     settlement: {
-      ...data.settlement,
+      ...emptyDashboardData.settlement,
       ...payload.settlement,
-      stats: withNonEmptyArray(payload.settlement?.stats, data.settlement.stats),
-      rows: withNonEmptyArray(payload.settlement?.rows, data.settlement.rows),
+      stats: withNonEmptyArray(payload.settlement?.stats, emptyDashboardData.settlement.stats),
+      rows: withNonEmptyArray(payload.settlement?.rows, emptyDashboardData.settlement.rows),
     },
     risk: {
-      ...data.risk,
+      ...emptyDashboardData.risk,
       ...payload.risk,
-      stats: withNonEmptyArray(payload.risk?.stats, data.risk.stats),
-      rows: withNonEmptyArray(payload.risk?.rows, data.risk.rows),
+      stats: withNonEmptyArray(payload.risk?.stats, emptyDashboardData.risk.stats),
+      rows: withNonEmptyArray(payload.risk?.rows, emptyDashboardData.risk.rows),
     },
     countryOps: {
-      ...data.countryOps,
+      ...emptyDashboardData.countryOps,
       ...payload.countryOps,
-      rows: withNonEmptyArray(payload.countryOps?.rows, data.countryOps.rows),
-      heatmap: withNonEmptyArray(payload.countryOps?.heatmap, data.countryOps.heatmap),
+      rows: withNonEmptyArray(payload.countryOps?.rows, emptyDashboardData.countryOps.rows),
+      heatmap: withNonEmptyArray(payload.countryOps?.heatmap, emptyDashboardData.countryOps.heatmap),
     },
     approvalQueue: {
-      ...data.approvalQueue,
+      ...emptyDashboardData.approvalQueue,
       ...payload.approvalQueue,
-      stats: withApiArray(payload.approvalQueue?.stats, data.approvalQueue.stats),
-      rows: withApiArray(payload.approvalQueue?.rows, data.approvalQueue.rows),
+      stats: withApiArray(payload.approvalQueue?.stats, emptyDashboardData.approvalQueue.stats),
+      rows: withApiArray(payload.approvalQueue?.rows, emptyDashboardData.approvalQueue.rows),
     },
     networkGrowth: {
-      ...data.networkGrowth,
+      ...emptyDashboardData.networkGrowth,
       ...payload.networkGrowth,
-      stats: withNonEmptyArray(payload.networkGrowth?.stats, data.networkGrowth.stats),
-      trendBars: withNonEmptyArray(payload.networkGrowth?.trendBars, data.networkGrowth.trendBars),
-      topPartners: withNonEmptyArray(payload.networkGrowth?.topPartners, data.networkGrowth.topPartners),
-      topLeaders: withNonEmptyArray(payload.networkGrowth?.topLeaders, data.networkGrowth.topLeaders ?? []),
-      topMerchants: withNonEmptyArray(payload.networkGrowth?.topMerchants, data.networkGrowth.topMerchants ?? []),
+      stats: withNonEmptyArray(payload.networkGrowth?.stats, emptyDashboardData.networkGrowth.stats),
+      trendBars: withNonEmptyArray(payload.networkGrowth?.trendBars, emptyDashboardData.networkGrowth.trendBars),
+      topPartners: withNonEmptyArray(payload.networkGrowth?.topPartners, emptyDashboardData.networkGrowth.topPartners),
+      topLeaders: withNonEmptyArray(payload.networkGrowth?.topLeaders, emptyDashboardData.networkGrowth.topLeaders ?? []),
+      topMerchants: withNonEmptyArray(payload.networkGrowth?.topMerchants, emptyDashboardData.networkGrowth.topMerchants ?? []),
     },
     paymentMethod: {
-      ...data.paymentMethod,
+      ...emptyDashboardData.paymentMethod,
       ...payload.paymentMethod,
-      rows: withNonEmptyArray(payload.paymentMethod?.rows, data.paymentMethod.rows),
-      donut: withNonEmptyArray(payload.paymentMethod?.donut, data.paymentMethod.donut),
+      rows: withNonEmptyArray(payload.paymentMethod?.rows, emptyDashboardData.paymentMethod.rows),
+      donut: withNonEmptyArray(payload.paymentMethod?.donut, emptyDashboardData.paymentMethod.donut),
     },
-    activityLogs: withRows(payload.activityLogs, { ...data.activityLogs, rows: [] }),
-    aiInsight: withItems(payload.aiInsight, data.aiInsight),
-    quickActions: withNonEmptyArray(payload.quickActions, data.quickActions),
+    activityLogs: withRows(payload.activityLogs, emptyDashboardData.activityLogs),
+    aiInsight: withItems(payload.aiInsight, emptyDashboardData.aiInsight),
+    quickActions: withNonEmptyArray(payload.quickActions, emptyDashboardData.quickActions),
   }
 }
 
 /*
  * useDashboard — 본사어드민 "전체 운영 대시보드" 데이터 훅
  * ------------------------------------------------------------------
- * /api/hq/dashboard를 우선 사용하고 실패 시 dashboardData.json을 fallback으로 쓴다.
+ * /api/hq/dashboard 응답만 화면 데이터로 사용한다. 실패 시 샘플 JSON을 노출하지 않는다.
  * UI 라벨(지표명/컬럼명)은 번역해 반환하고, 행 데이터(국가코드/금액/상태)는 API 값을 그대로 통과한다.
  */
 export function useDashboard(filters: UseDashboardFilters = {}) {
   const { t } = useTranslation()
   const range = filters.range ?? 'ALL'
-  const [source, setSource] = useState(data)
+  const [source, setSource] = useState(emptyDashboardData)
 
   useEffect(() => {
     let alive = true
-    fetchHqPageData<typeof data>('/api/hq/dashboard', {
+    fetchHqPageData<DashboardData>('/api/hq/dashboard', {
       countryScope: filters.countryScope ?? ALL_COUNTRIES,
       range,
     })
@@ -399,14 +455,14 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
         if (alive) setSource(withDashboardDefaults(payload))
       })
       .catch(() => {
-        if (alive) setSource(data)
+        if (alive) setSource(emptyDashboardData)
       })
     return () => {
       alive = false
     }
   }, [filters.countryScope, filters.refreshToken, range])
 
-  const rangeMultiplier = source === data && range !== 'ALL' ? RANGE_DAYS[range] : 1
+  const rangeMultiplier = source === emptyDashboardData && range !== 'ALL' ? RANGE_DAYS[range] : 1
   const countryRows = (source.countryOps.rows as CountryOpsRow[]).map((row, index) => ({
     ...row,
     rank: row.rank ?? String(index + 1),
@@ -417,7 +473,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
   ]
   const selectedCountry = countryOptions.some((option) => option.value === filters.countryScope) ? filters.countryScope ?? ALL_COUNTRIES : ALL_COUNTRIES
   const selectedCountryRow = countryRows.find((row) => row.id === selectedCountry)
-  const fallbackRatio = source === data ? fallbackCountryRatio(countryRows, selectedCountry) : 1
+  const fallbackRatio = source === emptyDashboardData ? fallbackCountryRatio(countryRows, selectedCountry) : 1
 
   const kpis: StatCardData[] = (source.kpis as KpiRaw[]).map((k) => ({
     id: k.id,
@@ -433,7 +489,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
               ? selectedCountryRow.partners
               : selectedCountryRow && k.id === 'merchants'
                 ? selectedCountryRow.merchants
-                : source === data && selectedCountryRow && k.id === 'collateralBalance'
+                : source === emptyDashboardData && selectedCountryRow && k.id === 'collateralBalance'
                   ? scaleDisplayValue(k.value, fallbackRatio)
                   : RANGE_SENSITIVE_KPIS.has(k.id)
                   ? scaleDisplayValue(k.value, rangeMultiplier * fallbackRatio)
@@ -626,10 +682,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
       stats: networkGrowthStats,
       trendBars: source.networkGrowth.trendBars as TrendBarRaw[],
       topLeaders: normalizeTopRows(source.networkGrowth.topLeaders as RankingRowRaw[] | undefined),
-      topPartners:
-        source === data && selectedCountryRow
-          ? [{ rank: 1, name: selectedCountryRow.id, meta: selectedCountryRow.id, amount: selectedCountryRow.amount }]
-          : normalizeTopRows(source.networkGrowth.topPartners as RankingRowRaw[] | undefined),
+      topPartners: normalizeTopRows(source.networkGrowth.topPartners as RankingRowRaw[] | undefined),
       topMerchants: normalizeTopRows(source.networkGrowth.topMerchants as RankingRowRaw[] | undefined),
     },
     paymentMethod: { columns: paymentMethodColumns, rows: source.paymentMethod.rows as PaymentMethodRow[], donut: paymentMethodDonut },

@@ -2,7 +2,6 @@ import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import type { InfoItem } from '../../../components/molecules/InfoGrid'
-import data from './partnerDetailData.json'
 
 interface KpiRaw {
   id: string
@@ -10,7 +9,7 @@ interface KpiRaw {
   value: string
 }
 
-/** "가맹점별" 탭 행 원본 데이터 형태 (Figma 81:24063 샘플값 하드코딩) */
+/** "가맹점별" 탭 행 원본 데이터 형태 */
 export interface PartnerMerchantRow {
   no: string
   partnerCode: string
@@ -23,6 +22,36 @@ export interface PartnerMerchantRow {
   fee: string
   lastPaidAt: string
   usage: string
+}
+
+const emptyPartnerDetailData = {
+  profile: {
+    topLabel: '상위 리더 / 해당 국가',
+    parentBadge: '-',
+    country: '-',
+    code: '-',
+  },
+  kpiTop: [] as KpiRaw[],
+  account: {
+    loginId: '-',
+    password: '******',
+    email: '-',
+    telegram: '-',
+    phone: '-',
+    twitter: '-',
+    appliedAt: '-',
+    approvedAt: '-',
+  },
+  basic: {
+    name: '-',
+    country: '-',
+    region: '-',
+    language: '-',
+    directContractReason: '-',
+    walletAddress: '-',
+  },
+  tabKpi: [] as KpiRaw[],
+  merchantRows: [] as PartnerMerchantRow[],
 }
 
 /*
@@ -39,29 +68,30 @@ export function usePartnerDetail() {
   const toStats = (items: KpiRaw[]): StatCardData[] =>
     items.map((s) => ({ id: s.id, label: t(s.labelKey), value: s.value }))
 
-  const kpiTop = toStats(data.kpiTop as KpiRaw[])
-  const tabKpi = toStats(data.tabKpi as KpiRaw[])
+  const source = emptyPartnerDetailData
+  const kpiTop = toStats(source.kpiTop)
+  const tabKpi = toStats(source.tabKpi)
 
   const accountInfo: InfoItem[] = [
-    { label: t('hqPartnerSales.account.loginId'), value: data.account.loginId },
-    { label: t('hqPartnerSales.account.password'), value: data.account.password, actionLabel: t('common.reset') },
-    { label: t('hqPartnerSales.account.email'), value: data.account.email, actionLabel: t('common.change') },
-    { label: t('hqPartnerSales.account.telegram'), value: data.account.telegram },
-    { label: t('hqPartnerSales.account.phone'), value: data.account.phone },
-    { label: t('hqPartnerSales.account.twitter'), value: data.account.twitter },
-    { label: t('hqPartnerSales.account.appliedAt'), value: data.account.appliedAt, valueColor: 'var(--color-accent-green)' },
-    { label: t('hqPartnerSales.account.approvedAt'), value: data.account.approvedAt, valueColor: 'var(--color-accent-green)' },
+    { label: t('hqPartnerSales.account.loginId'), value: source.account.loginId },
+    { label: t('hqPartnerSales.account.password'), value: source.account.password, actionLabel: t('common.reset') },
+    { label: t('hqPartnerSales.account.email'), value: source.account.email, actionLabel: t('common.change') },
+    { label: t('hqPartnerSales.account.telegram'), value: source.account.telegram },
+    { label: t('hqPartnerSales.account.phone'), value: source.account.phone },
+    { label: t('hqPartnerSales.account.twitter'), value: source.account.twitter },
+    { label: t('hqPartnerSales.account.appliedAt'), value: source.account.appliedAt, valueColor: 'var(--color-accent-green)' },
+    { label: t('hqPartnerSales.account.approvedAt'), value: source.account.approvedAt, valueColor: 'var(--color-accent-green)' },
   ]
 
   // 2번째 줄은 본사 직접 계약 사유(1열) 다음 칸을 비우고 KORION WALLET 주소가 3열에 옴(Figma 실측 — 리더 화면과 동일 배치)
   const basicInfo: InfoItem[] = [
-    { label: t('hqPartnerSales.basic.name'), value: data.basic.name },
-    { label: t('hqPartnerSales.basic.country'), value: data.basic.country },
-    { label: t('hqPartnerSales.basic.region'), value: data.basic.region },
-    { label: t('hqPartnerSales.basic.language'), value: data.basic.language },
-    { label: t('hqPartnerSales.basic.directContractReason'), value: data.basic.directContractReason },
+    { label: t('hqPartnerSales.basic.name'), value: source.basic.name },
+    { label: t('hqPartnerSales.basic.country'), value: source.basic.country },
+    { label: t('hqPartnerSales.basic.region'), value: source.basic.region },
+    { label: t('hqPartnerSales.basic.language'), value: source.basic.language },
+    { label: t('hqPartnerSales.basic.directContractReason'), value: source.basic.directContractReason },
     { label: '', value: '' },
-    { label: t('hqPartnerSales.basic.walletAddress'), value: data.basic.walletAddress },
+    { label: t('hqPartnerSales.basic.walletAddress'), value: source.basic.walletAddress },
   ]
 
   // "가맹점별" 탭 컬럼 — 리더 화면(hqLeaderSales.merchants.col.*)과 같은 문구는 재사용, 도시/업종만 파트너 전용 키
@@ -81,12 +111,12 @@ export function usePartnerDetail() {
   ]
 
   return {
-    profile: data.profile,
+    profile: source.profile,
     kpiTop,
     accountInfo,
     basicInfo,
     tabKpi,
     merchantColumns,
-    merchantRows: data.merchantRows as PartnerMerchantRow[],
+    merchantRows: source.merchantRows,
   }
 }

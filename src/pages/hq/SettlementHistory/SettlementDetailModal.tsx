@@ -39,8 +39,7 @@ interface SettlementDetailResponse {
  * Figma 81:29429(내용 80:14460) "거래 내역 상세정보". 좌측 네브바를 제외한
  * 콘텐츠 영역 기준 가운데 정렬(오버레이 left를 --sidebar-width 만큼 밀고,
  * 모바일에선 전체 폭) — 가맹점 거래내역 모달과 동일 패턴.
- * 데이터는 Figma 샘플값 하드코딩(settlementDetailData.json) — 실데이터 연동 시
- * 클릭한 행의 정산 ID로 조회해 채우면 된다.
+ * 클릭한 행의 정산 ID로 상세 API를 조회한다. 샘플 상세 파일을 사용하지 않는다.
  */
 export default function SettlementDetailModal({ settlementRequestId, onClose }: SettlementDetailModalProps) {
   const { t } = useTranslation()

@@ -15,7 +15,7 @@ interface StatRaw {
 /** 관리자 행동 enum — 신청 처리 화면에서 누른 승인/거절/검토/대기/자료요청/보류 액션 이력 */
 export type AdminAction = 'approved' | 'approveCancelled' | 'rejected' | 'rejectCancelled' | 'review' | 'waiting' | 'infoRequested' | 'held'
 
-/** 요청 결과 로그 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
+/** 요청 결과 로그 행 원본 데이터 형태 */
 export interface RequestResultLogRow {
   no: string
   applicationNo: string
@@ -43,9 +43,8 @@ const emptyRequestResultLogData: RequestResultLogPageData = {
 /*
  * useRequestResultLog — 본사어드민 "파트너 요청 관리 - 요청 결과 로그 전체내역" 데이터 훅
  * ------------------------------------------------------------------
- * requestResultLogData.json(더미)을 읽어 UI 라벨(지표/컬럼명/배지)은 번역해 반환한다.
+ * /api/hq/requests/result-log 응답만 사용한다.
  * 관리자 행동 값(승인/거절/취소)은 정산 내역 화면의 상태 컨벤션대로 데이터 값 취급(번역 안 함).
- * 추후 실 연동 시 이 훅 내부만 API 호출로 교체.
  */
 export function useRequestResultLog() {
   const { t } = useTranslation()

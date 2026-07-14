@@ -1,6 +1,5 @@
 import { useTranslation } from '../../../i18n'
 import type { InfoDetailTone } from './useCollateralInfoDetail'
-import data from './collateralSettleDetailData.json'
 
 interface FieldRaw {
   labelKey: string
@@ -22,18 +21,17 @@ interface TxRow {
 /*
  * useCollateralSettleDetail — "회원 정산 상세" 오버레이(Figma 81:29616) 데이터 훅
  * ------------------------------------------------------------------
- * collateralSettleDetailData.json(더미)을 읽어 라벨만 번역해 반환한다.
- * Figma 시안이 단일 샘플이라 행과 무관하게 같은 내용을 보여준다 —
- * 추후 실 연동 시 이 훅이 정산 id를 받아 API 조회로 교체되면 오버레이는 그대로 동작한다.
+ * 행 데이터가 없는 예외 상태에서 빈 상세를 반환한다.
+ * 실제 오버레이 값은 CollateralHistory API 행 데이터를 사용한다.
  */
 export function useCollateralSettleDetail() {
   const { t } = useTranslation()
 
-  const fields = (data.fields as FieldRaw[]).map((f) => ({
+  const fields = ([] as FieldRaw[]).map((f) => ({
     label: t(f.labelKey),
     value: f.value,
     newRow: f.newRow,
   }))
 
-  return { fields, txRows: data.txRows as TxRow[] }
+  return { fields, txRows: [] as TxRow[] }
 }

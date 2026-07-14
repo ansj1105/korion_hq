@@ -13,7 +13,7 @@ interface KpiRaw {
 /** 정산 상태 enum — 검토/완료/보류. 표시 라벨은 데이터 값(번역 대상 아님) */
 export type HistoryStatus = 'review' | 'done' | 'hold' | 'infoRequested' | 'rejected'
 
-/** 정산 내역 행 (Figma 샘플값 하드코딩) */
+/** 정산 내역 행 */
 export interface HistoryRow {
   settlementRequestId?: number
   no?: string
@@ -57,9 +57,9 @@ export interface KpiItem {
 /*
  * useSettlementHistory — 본사어드민 · 수수료/정산 · 정산 내역(목록) 데이터 훅
  * ------------------------------------------------------------------
- * settlementHistoryData.json(더미)을 읽어 UI 라벨(KPI/컬럼명/액션)은 번역해 반환한다.
+ * /api/hq/settlement-history 응답만 목록 데이터로 사용한다.
  * 상태/코드/금액/이름 등 행 데이터 값은 번역하지 않는다(CLAUDE.md 11번).
- * 추후 실 연동 시 이 훅 내부만 API 호출로 교체.
+ * API 실패/빈 응답 시 정적 샘플을 노출하지 않는다.
  */
 export function useSettlementHistory() {
   const { t } = useTranslation()

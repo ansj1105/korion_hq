@@ -3,8 +3,6 @@ import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import type { InfoItem } from '../../../components/molecules/InfoGrid'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './partnerSalesData.json'
-import detailData from './partnerDetailData.json'
 
 interface StatRaw {
   id: string
@@ -12,7 +10,7 @@ interface StatRaw {
   value: string
 }
 
-/** 거래 로그 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
+/** 거래 로그 행 원본 데이터 형태 */
 export interface PartnerSalesLogRow {
   txNo: string
   partnerCode: string
@@ -28,7 +26,76 @@ export interface PartnerSalesLogRow {
   actions: string[]
 }
 
-const emptyPartnerDetailData = {
+interface PartnerSalesOverviewData {
+  miniStats?: StatRaw[]
+  kpiBottom?: StatRaw[]
+  logRows?: PartnerSalesLogRow[]
+  profile?: {
+    code: string
+    country: string
+    parent: string
+    account: {
+      loginId: string
+      password: string
+      email: string
+      telegram: string
+      phone: string
+      twitter: string
+      appliedAt: string
+    }
+  }
+}
+
+const emptyPartnerSalesOverviewData: PartnerSalesOverviewData = {
+  miniStats: [],
+  logRows: [],
+  profile: {
+    code: '-',
+    country: '-',
+    parent: '-',
+    account: {
+      loginId: '-',
+      password: '******',
+      email: '-',
+      telegram: '-',
+      phone: '-',
+      twitter: '-',
+      appliedAt: '-',
+    },
+  },
+}
+
+interface PartnerDetailData {
+  profile: {
+    topLabel: string
+    parentBadge: string
+    country: string
+    code: string
+  }
+  kpiTop: StatRaw[]
+  account: {
+    loginId: string
+    password: string
+    email: string
+    telegram: string
+    phone: string
+    twitter: string
+    appliedAt: string
+    approvedAt: string
+  }
+  basic: {
+    name: string
+    country: string
+    region: string
+    language: string
+    directContractReason: string
+    walletAddress: string
+  }
+  tabKpi: StatRaw[]
+  merchantRows: Array<Record<string, string>>
+}
+
+const emptyPartnerDetailData: PartnerDetailData = {
   profile: {
     topLabel: '상위 리더 / 해당 국가',
     parentBadge: '-',
@@ -56,20 +123,20 @@ const emptyPartnerDetailData = {
   },
   tabKpi: [],
   merchantRows: [],
-} as typeof detailData
+}
 
 /*
  * usePartnerSales (hq) — 본사어드민 "파트너별 거래내역" 데이터 훅
  * ------------------------------------------------------------------
  * LeaderSales와 같은 구조(전체 거래 로그 + 특정 파트너 프로필+탭). 탭 내용은
- * Figma에서 구체 확인 안 돼 UI 전환만 두고 "구현 예정"으로 둠(LeaderSales와 동일 결정).
+ * API 상세 응답만 사용하며, 응답이 없으면 빈 상태를 표시한다.
  */
 export function usePartnerSales() {
   const { t } = useTranslation()
-  const { data: pageData, isLoading, error } = useHqPageData('/api/hq/partners/sales/overview', data)
-  const apiData = pageData as typeof data & { kpiBottom?: StatRaw[] }
+  const { data: pageData, isLoading, error } = useHqPageData('/api/hq/partners/sales/overview', emptyPartnerSalesOverviewData)
+  const apiData = pageData
 
-  const miniStats: StatCardData[] = ((apiData.miniStats ?? apiData.kpiBottom ?? data.miniStats) as StatRaw[]).map((s) => ({
+  const miniStats: StatCardData[] = ((apiData.miniStats ?? apiData.kpiBottom ?? []) as StatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -90,7 +157,7 @@ export function usePartnerSales() {
     { key: 'action', label: t('hqPartnerSales.col.action'), width: '1.6fr' },
   ]
 
-  const profile = apiData.profile ?? data.profile
+  const profile = apiData.profile ?? emptyPartnerSalesOverviewData.profile!
   const accountInfo: InfoItem[] = [
     { label: t('hqPartnerSales.account.loginId'), value: profile.account.loginId },
     { label: t('hqPartnerSales.account.password'), value: profile.account.password },
@@ -104,7 +171,7 @@ export function usePartnerSales() {
   return {
     miniStats,
     logColumns,
-    logRows: (apiData.logRows ?? data.logRows) as PartnerSalesLogRow[],
+    logRows: (apiData.logRows ?? []) as PartnerSalesLogRow[],
     profile: { code: profile.code, country: profile.country, parent: profile.parent },
     accountInfo,
     isLoading,

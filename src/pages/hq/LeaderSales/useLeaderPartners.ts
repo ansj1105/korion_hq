@@ -2,7 +2,6 @@ import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './leaderPartnersData.json'
 
 interface KpiRaw {
   id: string
@@ -24,10 +23,15 @@ export interface LeaderPartnerRow {
   lastActive: string
 }
 
-const emptyLeaderPartnersData = {
+interface LeaderPartnersData {
+  kpi: KpiRaw[]
+  rows: LeaderPartnerRow[]
+}
+
+const emptyLeaderPartnersData: LeaderPartnersData = {
   kpi: [],
   rows: [],
-} as typeof data
+}
 
 /*
  * useLeaderPartners — "국가 리더별 거래내역" 화면의 "파트너별" 탭 데이터 훅

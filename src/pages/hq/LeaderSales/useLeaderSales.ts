@@ -3,7 +3,6 @@ import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import type { InfoItem } from '../../../components/molecules/InfoGrid'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './leaderSalesData.json'
 
 interface KpiRaw {
   id: string
@@ -40,7 +39,43 @@ export interface LeaderSalesLogRow {
   actions: string[]
 }
 
-const emptyLeaderSalesData = {
+interface LeaderSalesData {
+  profile: {
+    topLabel: string
+    parentBadge: string
+    country: string
+    code: string
+  }
+  kpiTop: KpiRaw[]
+  kpiBottom: KpiRaw[]
+  account: {
+    loginId: string
+    password: string
+    email: string
+    telegram: string
+    phone: string
+    twitter: string
+    appliedAt: string
+    approvedAt: string
+  }
+  basic: {
+    name: string
+    country: string
+    region: string
+    language: string
+    directContractReason: string
+    walletAddress: string
+  }
+  logRows: LeaderSalesLogRow[]
+  settlement: {
+    lastSettleDate: string
+    thisRequestAmount: string
+    status: string
+    rows: LeaderSettlementRow[]
+  }
+}
+
+const emptyLeaderSalesData: LeaderSalesData = {
   profile: {
     topLabel: '상위 리더 / 해당 국가',
     parentBadge: '본사',
@@ -74,7 +109,7 @@ const emptyLeaderSalesData = {
     status: '-',
     rows: [],
   },
-} as typeof data
+}
 
 /*
  * useLeaderSales — 본사어드민 "국가 리더별 거래내역" 데이터 훅

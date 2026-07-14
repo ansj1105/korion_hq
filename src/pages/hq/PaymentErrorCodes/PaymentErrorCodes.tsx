@@ -45,9 +45,9 @@ export default function PaymentErrorCodes() {
       severity: <Badge accent={(row.severityAccent as AccentKey) ?? severityAccent[row.severity] ?? 'blue'} size="md" shape="rect">{row.severity}</Badge>,
       flags: (
         <span className={styles.flagList}>
-          {row.retryable && <Badge accent="blue" size="xs" shape="rect">{t('hqPaymentErrorCodes.flag.retryable')}</Badge>}
-          {row.settlementBlocked && <Badge accent="amber" size="xs" shape="rect">{t('hqPaymentErrorCodes.flag.settlementBlocked')}</Badge>}
-          {row.riskHold && <Badge accent="red" size="xs" shape="rect">{t('hqPaymentErrorCodes.flag.riskHold')}</Badge>}
+          {row.retryable && <Badge accent="blue" size="md" shape="rect">{t('hqPaymentErrorCodes.flag.retryable')}</Badge>}
+          {row.settlementBlocked && <Badge accent="amber" size="md" shape="rect">{t('hqPaymentErrorCodes.flag.settlementBlocked')}</Badge>}
+          {row.riskHold && <Badge accent="red" size="md" shape="rect">{t('hqPaymentErrorCodes.flag.riskHold')}</Badge>}
           {!row.retryable && !row.settlementBlocked && !row.riskHold && <span className={styles.emptyFlag}>-</span>}
         </span>
       ),

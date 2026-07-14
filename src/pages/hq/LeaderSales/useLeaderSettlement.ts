@@ -2,7 +2,6 @@ import { useTranslation } from '../../../i18n'
 import type { InfoItem } from '../../../components/molecules/InfoGrid'
 import type { Column } from '../../../components/organisms/DataTable'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './leaderSettlementData.json'
 
 interface FieldRaw {
   labelKey: string
@@ -11,13 +10,21 @@ interface FieldRaw {
   color?: string
 }
 
-const emptyLeaderSettlementData = {
+interface LeaderSettlementData {
+  summary: FieldRaw[]
+  partnerRows: Array<Record<string, string>>
+  merchantRows: Array<Record<string, string>>
+  heldRows: Array<Record<string, string>>
+  historyRows: Array<Record<string, string>>
+}
+
+const emptyLeaderSettlementData: LeaderSettlementData = {
   summary: [],
   partnerRows: [],
   merchantRows: [],
   heldRows: [],
   historyRows: [],
-} as typeof data
+}
 
 /*
  * useLeaderSettlement — "국가 리더별 거래내역" 화면의 "정산내역" 탭 데이터 훅

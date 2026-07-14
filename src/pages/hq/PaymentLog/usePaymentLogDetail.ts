@@ -1,7 +1,7 @@
 import { useTranslation } from '../../../i18n'
 import type { AccentKey } from '../../../types'
 import type { DetailRow } from '../../../components/molecules/DetailSection'
-import detail from './paymentLogDetailData.json'
+import type { PaymentLogRow } from './usePaymentLog'
 
 /** 헤더 상태 배지 1개 */
 export interface DetailStatus {
@@ -21,59 +21,107 @@ export interface FooterAction {
   variant: 'primary' | 'secondary' | 'danger'
 }
 
-interface RawRow {
-  labelKey: string
-  value: string
-}
-
 /*
  * usePaymentLogDetail — 전체 결제 로그 "상세" 드로어 데이터 훅
  * ------------------------------------------------------------------
- * paymentLogDetailData.json(더미)을 읽어 UI 라벨(섹션/필드/버튼)은 번역해 반환한다.
- * 필드 값(코드/해시/금액/상태 enum 등)은 CLAUDE.md 11번 규칙상 번역하지 않고 그대로 통과.
- *
- * 현재는 어느 행의 "상세"를 눌러도 같은 Figma 예시 1건을 보여준다(요구사항). 추후 실 연동 시
- * 인자로 받은 txId로 API를 호출하도록 이 훅 내부만 교체하면 드로어 컴포넌트는 그대로 동작한다.
+ * 선택된 결제 로그 행의 실제 목록 데이터를 상세 드로어로 확장한다.
+ * 행과 무관한 정적 샘플 JSON을 보여주지 않는다.
  */
-export function usePaymentLogDetail(_txId: string | null) {
+export function usePaymentLogDetail(row: PaymentLogRow | null) {
   const { t } = useTranslation()
 
-  // 라벨/값 줄: 라벨만 번역, 값은 데이터 그대로
-  const toRows = (rows: RawRow[]): DetailRow[] => rows.map((r) => ({ label: t(r.labelKey), value: r.value }))
+  const value = (input?: string | number | null) => (input === undefined || input === null || input === '' ? '-' : String(input))
+  const makeRows = (rows: Array<[string, string | number | undefined | null]>): DetailRow[] =>
+    rows.map(([labelKey, rowValue]) => ({ label: t(labelKey), value: value(rowValue) }))
 
-  const statuses: DetailStatus[] = detail.header.statuses as DetailStatus[]
+  const statuses: DetailStatus[] = row
+    ? [{ label: row.statusLabel ?? row.status ?? '-', accent: row.statusAccent }]
+    : []
 
-  const syncSteps = detail.sync.steps as SyncStep[]
+  const syncSteps: SyncStep[] = [
+    { label: 'LOCAL', state: row ? 'done' : 'pending' },
+    { label: 'SYNC', state: row?.syncStatus === '완료' ? 'done' : row ? 'active' : 'pending' },
+    { label: 'VERIFY', state: row?.statusLabel === '정산완료' || row?.status === '완료' ? 'done' : 'pending' },
+  ]
 
-  const footerActions: FooterAction[] = (detail.footerActions as Array<{ labelKey: string; variant: FooterAction['variant'] }>).map(
-    (a) => ({ label: t(a.labelKey), variant: a.variant }),
-  )
+  const footerActions: FooterAction[] = [
+    { label: t('common.confirm'), variant: 'primary' },
+  ]
 
   return {
     title: t('hqPaymentLog.detail.title'),
     // 헤더 식별자 + 메타줄(라벨은 번역, 값은 데이터)
     header: {
-      id: detail.header.id,
+      id: value(row?.txId ?? row?.id),
       statuses,
       meta: [
-        `${t('hqPaymentLog.detail.meta.method')}: ${detail.header.method}`,
-        `${t('hqPaymentLog.detail.meta.connection')}: ${detail.header.connection}`,
-        `${t('hqPaymentLog.detail.meta.country')}: ${detail.header.country}`,
-        `${t('hqPaymentLog.detail.meta.createdAt')}: ${detail.header.createdAt}`,
+        `${t('hqPaymentLog.detail.meta.method')}: ${value(row?.method)}`,
+        `${t('hqPaymentLog.detail.meta.connection')}: ${value(row?.connection)}`,
+        `${t('hqPaymentLog.detail.meta.country')}: ${value(row?.country)}`,
+        `${t('hqPaymentLog.detail.meta.createdAt')}: ${value(row?.datetime)}`,
       ].join(' · '),
     },
     sections: {
-      basic: { title: t('hqPaymentLog.detail.section.a'), rows: toRows(detail.basic) },
-      parties: { title: t('hqPaymentLog.detail.section.b'), rows: toRows(detail.parties) },
-      localBlock: { title: t('hqPaymentLog.detail.section.c'), rows: toRows(detail.localBlock) },
-      proof: { title: t('hqPaymentLog.detail.section.d'), rows: toRows(detail.proof) },
-      sync: { title: t('hqPaymentLog.detail.section.e'), steps: syncSteps, statusLine: detail.sync.statusLine },
-      fee: { title: t('hqPaymentLog.detail.section.f'), rows: toRows(detail.fee) },
-      risk: { title: t('hqPaymentLog.detail.section.g'), rows: toRows(detail.risk) },
+      basic: {
+        title: t('hqPaymentLog.detail.section.a'),
+        rows: makeRows([
+          ['hqPaymentLog.col.txId', row?.txId],
+          ['hqPaymentLog.col.sessionId', row?.sessionId],
+          ['hqPaymentLog.col.datetime', row?.datetime],
+          ['hqPaymentLog.col.method', row?.method],
+          ['hqPaymentLog.col.connection', row?.connection],
+          ['hqPaymentLog.col.status', row?.statusLabel ?? row?.status],
+        ]),
+      },
+      parties: {
+        title: t('hqPaymentLog.detail.section.b'),
+        rows: makeRows([
+          ['hqPaymentLog.col.leaderCode', row?.leaderCode],
+          ['hqPaymentLog.col.partnerCode', row?.partnerCode],
+          ['hqPaymentLog.col.country', row?.country],
+          ['hqPaymentLog.col.merchantName', row?.merchantName],
+          ['hqPaymentLog.col.payer', row?.payer],
+        ]),
+      },
+      localBlock: {
+        title: t('hqPaymentLog.detail.section.c'),
+        rows: makeRows([
+          ['hqPaymentLog.col.no', row?.no],
+          ['hqPaymentLog.col.sessionId', row?.sessionId],
+          ['hqPaymentLog.col.connection', row?.connection],
+        ]),
+      },
+      proof: {
+        title: t('hqPaymentLog.detail.section.d'),
+        rows: makeRows([
+          ['hqPaymentLog.col.txId', row?.txId],
+          ['hqPaymentLog.col.syncStatus', row?.syncStatus],
+        ]),
+      },
+      sync: {
+        title: t('hqPaymentLog.detail.section.e'),
+        steps: syncSteps,
+        statusLine: `${value(row?.syncStatus)} / ${value(row?.statusLabel ?? row?.status)}`,
+      },
+      fee: {
+        title: t('hqPaymentLog.detail.section.f'),
+        rows: makeRows([
+          ['hqPaymentLog.col.amount', row?.amount],
+          ['hqPaymentLog.col.fee', row?.fee],
+          ['hqPaymentLog.col.netAmount', row?.netAmount],
+        ]),
+      },
+      risk: {
+        title: t('hqPaymentLog.detail.section.g'),
+        rows: makeRows([
+          ['hqPaymentLog.col.status', row?.statusLabel ?? row?.status],
+          ['hqPaymentLog.col.action', row?.actions?.join(', ')],
+        ]),
+      },
       memo: {
         title: t('hqPaymentLog.detail.section.h'),
         placeholder: t('hqPaymentLog.detail.memo.placeholder'),
-        logs: detail.memo.logs as string[],
+        logs: [],
       },
     },
     footerActions,

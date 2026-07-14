@@ -24,7 +24,7 @@ const emptyPaymentLogData: PaymentLogPageData = {
   rows: [],
 }
 
-/** 전체 결제 로그 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
+/** 전체 결제 로그 행 원본 데이터 형태 */
 export interface PaymentLogRow {
   no: string
   id: string
@@ -45,6 +45,7 @@ export interface PaymentLogRow {
   /** 결제 상태 값(성공/실패/대기) — enum/데이터라 번역 대상 아님 */
   status?: string
   statusLabel?: string
+  syncStatus?: string
   /** 상태 글자색 강조 (성공=green / 실패=red / 대기=amber) */
   statusAccent: AccentKey
   /** 액션 배지 라벨(정산 처리 + 상세). enum/데이터라 번역 대상 아님 */
@@ -54,9 +55,7 @@ export interface PaymentLogRow {
 /*
  * usePaymentLog (hq) — 본사어드민 "전체 결제 로그" 데이터 훅
  * ------------------------------------------------------------------
- * paymentLogData.json(더미)을 읽어 UI 라벨(지표명/컬럼명)은 번역해 반환한다.
- * 행 데이터(거래ID/세션ID/국가/금액 등)는 CLAUDE.md 11번 규칙상 번역하지 않고 그대로 통과.
- * 추후 실 연동 시 이 훅 내부만 API 호출로 교체하면 화면 컴포넌트는 그대로 동작한다.
+ * /api/hq/payments/logs 응답만 사용한다. 행 데이터(거래ID/세션ID/국가/금액 등)는 번역하지 않고 그대로 통과.
  */
 export function usePaymentLog() {
   const { t } = useTranslation()

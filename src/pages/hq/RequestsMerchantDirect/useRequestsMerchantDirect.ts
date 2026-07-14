@@ -16,7 +16,7 @@ interface StatRaw {
 /** 진행 상태 — 검토중/대기/자료요청 중 하나만 활성(Figma 액션 배지 기준). 신규 접수는 상태 없음(null) */
 export type MerchantDirectRequestStatus = 'review' | 'waiting' | 'infoRequested'
 
-/** 가맹점 승인 요청(다이렉트) 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
+/** 가맹점 승인 요청(다이렉트) 행 원본 데이터 형태 */
 export interface MerchantDirectRequestRow {
   applicationId?: number
   no: string
@@ -45,8 +45,7 @@ const emptyMerchantDirectRequestData: MerchantDirectRequestPageData = {
 /*
  * useRequestsMerchantDirect — 본사어드민 "파트너 요청 관리 - 가맹점 승인 요청 (다이렉트)" 데이터 훅
  * ------------------------------------------------------------------
- * requestsMerchantDirectData.json(더미)을 읽어 UI 라벨(지표/컬럼명/상태명)은 번역해 반환한다.
- * 추후 실 연동 시 이 훅 내부만 API 호출로 교체.
+ * /api/hq/requests/merchant-direct 응답만 사용한다. 실패 시 정적 샘플을 노출하지 않는다.
  * 컬럼명 "파트너명"/"하위 가맹점 수"는 가맹점 화면 문맥과 안 맞아 보이지만 Figma 텍스트 그대로 반영.
  */
 export function useRequestsMerchantDirect() {

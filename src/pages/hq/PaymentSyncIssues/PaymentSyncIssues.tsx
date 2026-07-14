@@ -64,8 +64,8 @@ export default function PaymentSyncIssues() {
       overallStatus: (
         <span className={styles.overallCell}>
           <StatusBadge value={row.overallStatus} accent={row.overallAccent} />
-          {row.longWaiting && <Badge accent="amber" size="xs" shape="rect">{t('hqPaymentSyncIssues.flag.longWaiting')}</Badge>}
-          {row.retryable && <Badge accent="blue" size="xs" shape="rect">{t('hqPaymentSyncIssues.flag.retryable')}</Badge>}
+          {row.longWaiting && <Badge accent="amber" size="md" shape="rect">{t('hqPaymentSyncIssues.flag.longWaiting')}</Badge>}
+          {row.retryable && <Badge accent="blue" size="md" shape="rect">{t('hqPaymentSyncIssues.flag.retryable')}</Badge>}
         </span>
       ),
       action: (
@@ -131,7 +131,7 @@ export default function PaymentSyncIssues() {
         headerExtra={selectedRow && (
           <div className={styles.drawerHead}>
             <StatusBadge value={selectedRow.overallStatus} accent={selectedRow.overallAccent} />
-            {selectedAction && <Badge accent={actionAccent[selectedAction] ?? 'cyan'} size="xs" shape="rect">{selectedAction}</Badge>}
+            {selectedAction && <Badge accent={actionAccent[selectedAction] ?? 'cyan'} size="md" shape="rect">{selectedAction}</Badge>}
             <span className={styles.drawerMeta}>{selectedRow.sessionId} · {selectedRow.connection} · {selectedRow.occurredAt}</span>
           </div>
         )}

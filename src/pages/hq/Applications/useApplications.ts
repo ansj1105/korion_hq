@@ -47,8 +47,8 @@ const emptyApplicationsData: ApplicationsPageData = {
 /*
  * useApplications — 본사어드민 "신청서 관리 - 제휴 / 투자 신청서" 데이터 훅
  * ------------------------------------------------------------------
- * applicationsData.json(더미)을 읽어 UI 라벨(지표/컬럼명)은 번역해 반환한다.
- * 추후 실 연동 시 이 훅 내부만 API 호출로 교체.
+ * /api/hq/applications 응답만 목록 데이터로 사용한다.
+ * API 실패/빈 응답 시 정적 샘플을 노출하지 않는다.
  */
 export function useApplications() {
   const { t } = useTranslation()

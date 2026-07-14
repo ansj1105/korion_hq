@@ -43,7 +43,8 @@ export default function PaymentLog() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [pendingActionId, setPendingActionId] = useState<string | null>(null)
   const [rowOverrides, setRowOverrides] = useState<Record<string, Partial<Pick<PaymentLogRow, 'statusLabel' | 'statusAccent' | 'actions'>>>>({})
-  const detail = usePaymentLogDetail(selectedId)
+  const selectedRow = rawRows.find((row) => row.id === selectedId) ?? null
+  const detail = usePaymentLogDetail(selectedRow)
 
   // Sync 스텝 상태 → 스타일 클래스 매핑(완료/진행/대기)
   const stepStateClass: Record<SyncStep['state'], string> = {
