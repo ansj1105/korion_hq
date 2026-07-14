@@ -17,9 +17,11 @@ import styles from './Dashboard.module.css'
 
 type DashboardTab = 'overview' | 'offline' | 'settlement' | 'risk' | 'growth' | 'payment' | 'logs'
 type HeatmapMetric = 'leaders' | 'partners' | 'merchants' | 'members' | 'amount' | 'syncFail' | 'growth'
+type NetworkTopKind = 'leaders' | 'partners' | 'merchants'
 
 const DASHBOARD_TABS: DashboardTab[] = ['overview', 'offline', 'settlement', 'risk', 'growth', 'payment', 'logs']
 const HEATMAP_METRICS: HeatmapMetric[] = ['amount', 'members', 'merchants', 'partners', 'leaders', 'syncFail', 'growth']
+const NETWORK_TOP_KINDS: NetworkTopKind[] = ['leaders', 'partners', 'merchants']
 
 const RISK_ACTIONS = [
   { action: 'BLOCK', labelKey: 'hqDashboard.risk.action.block', accent: 'red' },
@@ -59,6 +61,7 @@ export default function Dashboard() {
   const [range, setRange] = useState<HqDashboardRange>('ALL')
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview')
   const [heatmapMetric, setHeatmapMetric] = useState<HeatmapMetric>('amount')
+  const [networkTopKind, setNetworkTopKind] = useState<NetworkTopKind>('partners')
   const [riskRefreshToken, setRiskRefreshToken] = useState(0)
   const {
     filters,
@@ -125,6 +128,24 @@ export default function Dashboard() {
     }))
     .sort((a, b) => b.value - a.value || a.code.localeCompare(b.code))
   const heatmapMax = Math.max(1, ...heatmapRows.map((row) => row.value))
+  const networkTopRows =
+    networkTopKind === 'leaders'
+      ? networkGrowth.topLeaders
+      : networkTopKind === 'merchants'
+        ? networkGrowth.topMerchants
+        : networkGrowth.topPartners
+  const donutTotal = paymentMethod.donut.reduce((sum, seg) => sum + seg.pct, 0)
+  let donutCursor = 0
+  const donutBackground =
+    donutTotal > 0
+      ? `conic-gradient(${paymentMethod.donut
+          .map((seg) => {
+            const start = donutCursor
+            donutCursor += (seg.pct / donutTotal) * 100
+            return `var(--color-accent-${seg.accent}) ${start}% ${donutCursor}%`
+          })
+          .join(', ')})`
+      : 'color-mix(in srgb, var(--color-bg-elevated) 70%, transparent)'
 
   const openSettlementDetail = (row: (typeof settlement.rows)[number]) => {
     const params = new URLSearchParams()
@@ -505,13 +526,35 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className={styles.topListBox}>
-                  <h4 className={styles.subBoxTitle}>{t('hqDashboard.networkGrowth.topPartnersTitle')}</h4>
+                  <div className={styles.topListHead}>
+                    <h4 className={styles.subBoxTitle}>{t(`hqDashboard.networkGrowth.top.${networkTopKind}`)}</h4>
+                    <label className={styles.topListFilter}>
+                      <span>{t('hqDashboard.networkGrowth.topFilter')}</span>
+                      <select
+                        className={styles.heatmapSelect}
+                        value={networkTopKind}
+                        onChange={(event) => setNetworkTopKind(event.target.value as NetworkTopKind)}
+                      >
+                        {NETWORK_TOP_KINDS.map((kind) => (
+                          <option key={kind} value={kind}>
+                            {t(`hqDashboard.networkGrowth.top.${kind}`)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
                   <ul className={styles.topList}>
-                    {networkGrowth.topPartners.map((p) => (
-                      <li key={p.id}>
-                        {p.name} · {p.amount}
+                    {networkTopRows.map((p) => (
+                      <li key={`${networkTopKind}-${p.rank}-${p.meta}`}>
+                        <span className={styles.topListRank}>{p.rank}</span>
+                        <span className={styles.topListMain}>
+                          <strong>{p.name}</strong>
+                          <span>{p.meta}</span>
+                        </span>
+                        <span className={styles.topListAmount}>{p.amount}</span>
                       </li>
                     ))}
+                    {networkTopRows.length === 0 && <li className={styles.topListEmpty}>{t('common.noData')}</li>}
                   </ul>
                 </div>
               </div>
@@ -525,9 +568,9 @@ export default function Dashboard() {
           <div className={styles.sideBySide}>
             <DataTable columns={paymentMethod.columns} rows={paymentMethodRows} largeText navyZebra bare fluid />
             <div className={styles.donutBox}>
-              {/* 결제수단 비율 — Figma: 단색 시안 링(가운데) + 결제수단별 비율 막대 범례(오른쪽). 제목은 하단. */}
+              {/* 결제수단 비율 — API pct를 누적한 conic-gradient 원그래프와 수단별 범례. */}
               <div className={styles.donutBody}>
-                <div className={styles.donutRing} aria-hidden="true" />
+                <div className={styles.donutRing} style={{ background: donutBackground }} aria-hidden="true" />
                 <ul className={styles.donutLegend}>
                   {paymentMethod.donut.map((seg) => (
                     <li key={seg.id} className={styles.donutLegendItem}>

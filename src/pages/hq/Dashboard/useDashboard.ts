@@ -150,6 +150,12 @@ interface RankingRowRaw {
   amount: string
 }
 
+interface TrendBarRaw {
+  height: number
+  count?: number
+  accent: string
+}
+
 interface RankingPanelRaw {
   id: string
   titleKey: string
@@ -267,6 +273,15 @@ function scaleMiniStats(stats: MiniStatRaw[], multiplier: number): MiniStatRaw[]
   )
 }
 
+function normalizeTopRows(rows: RankingRowRaw[] | undefined): RankingRowRaw[] {
+  return (rows ?? []).map((row, index) => ({
+    rank: row.rank ?? index + 1,
+    name: row.name,
+    meta: row.meta ?? row.name,
+    amount: row.amount,
+  }))
+}
+
 function withRows<T extends { rows?: unknown[] }>(payloadSection: T, fallbackSection: T): T {
   return {
     ...fallbackSection,
@@ -285,6 +300,10 @@ function withItems<T extends { items?: unknown[] }>(payloadSection: T, fallbackS
 
 function withNonEmptyArray<T>(payload: T[] | undefined, fallback: T[]): T[] {
   return payload && payload.length > 0 ? payload : fallback
+}
+
+function withApiArray<T>(payload: T[] | undefined, fallback: T[]): T[] {
+  return Array.isArray(payload) ? payload : fallback
 }
 
 function withDashboardDefaults(payload: typeof data): typeof data {
@@ -324,8 +343,8 @@ function withDashboardDefaults(payload: typeof data): typeof data {
     approvalQueue: {
       ...data.approvalQueue,
       ...payload.approvalQueue,
-      stats: withNonEmptyArray(payload.approvalQueue?.stats, data.approvalQueue.stats),
-      rows: withNonEmptyArray(payload.approvalQueue?.rows, data.approvalQueue.rows),
+      stats: withApiArray(payload.approvalQueue?.stats, data.approvalQueue.stats),
+      rows: withApiArray(payload.approvalQueue?.rows, data.approvalQueue.rows),
     },
     networkGrowth: {
       ...data.networkGrowth,
@@ -333,6 +352,8 @@ function withDashboardDefaults(payload: typeof data): typeof data {
       stats: withNonEmptyArray(payload.networkGrowth?.stats, data.networkGrowth.stats),
       trendBars: withNonEmptyArray(payload.networkGrowth?.trendBars, data.networkGrowth.trendBars),
       topPartners: withNonEmptyArray(payload.networkGrowth?.topPartners, data.networkGrowth.topPartners),
+      topLeaders: withNonEmptyArray(payload.networkGrowth?.topLeaders, data.networkGrowth.topLeaders ?? []),
+      topMerchants: withNonEmptyArray(payload.networkGrowth?.topMerchants, data.networkGrowth.topMerchants ?? []),
     },
     paymentMethod: {
       ...data.paymentMethod,
@@ -589,11 +610,13 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     },
     networkGrowth: {
       stats: networkGrowthStats,
-      trendBars: source.networkGrowth.trendBars,
+      trendBars: source.networkGrowth.trendBars as TrendBarRaw[],
+      topLeaders: normalizeTopRows(source.networkGrowth.topLeaders as RankingRowRaw[] | undefined),
       topPartners:
         source === data && selectedCountryRow
-          ? [{ id: selectedCountryRow.id, name: selectedCountryRow.id, amount: selectedCountryRow.amount }]
-          : source.networkGrowth.topPartners,
+          ? [{ rank: 1, name: selectedCountryRow.id, meta: selectedCountryRow.id, amount: selectedCountryRow.amount }]
+          : normalizeTopRows(source.networkGrowth.topPartners as RankingRowRaw[] | undefined),
+      topMerchants: normalizeTopRows(source.networkGrowth.topMerchants as RankingRowRaw[] | undefined),
     },
     paymentMethod: { columns: paymentMethodColumns, rows: source.paymentMethod.rows as PaymentMethodRow[], donut: paymentMethodDonut },
     activityLogs: { columns: activityLogColumns, rows: source.activityLogs.rows as ActivityLogRow[] },

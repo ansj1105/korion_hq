@@ -156,19 +156,29 @@
       { "id": "problemPartners", "labelKey": "hqDashboard.networkGrowth.problemPartners", "value": "9명", "accent": "red" }
     ],
     "trendBars": [
-      { "height": 24.5, "accent": "cyan" },
-      { "height": 36.4, "accent": "purple" },
-      { "height": 33.6, "accent": "green" },
-      { "height": 52.5, "accent": "cyan" },
-      { "height": 43.4, "accent": "purple" },
-      { "height": 61.6, "accent": "green" },
-      { "height": 51.8, "accent": "cyan" }
+      { "height": 24.5, "count": 8, "accent": "cyan" },
+      { "height": 36.4, "count": 12, "accent": "purple" },
+      { "height": 33.6, "count": 11, "accent": "green" },
+      { "height": 52.5, "count": 18, "accent": "cyan" },
+      { "height": 43.4, "count": 15, "accent": "purple" },
+      { "height": 61.6, "count": 21, "accent": "green" },
+      { "height": 51.8, "count": 17, "accent": "cyan" }
+    ],
+    "topLeaders": [
+      { "rank": 1, "name": "NG-LEAD-001", "meta": "NG / NG-LEAD-001", "amount": "620,000 KORI" },
+      { "rank": 2, "name": "KR-LEAD-003", "meta": "KR / KR-LEAD-003", "amount": "540,000 KORI" },
+      { "rank": 3, "name": "PH-LEAD-002", "meta": "PH / PH-LEAD-002", "amount": "410,000 KORI" }
     ],
     "topPartners": [
-      { "id": "t1", "name": "Samuel O.", "amount": "₩620K" },
-      { "id": "t2", "name": "Lagos Team", "amount": "₩540K" },
-      { "id": "t3", "name": "Minh Tran", "amount": "₩410K" },
-      { "id": "t4", "name": "Seoul Direct", "amount": "₩390K" }
+      { "rank": 1, "name": "NG-SP-0008", "meta": "NG / NG-SP-0008", "amount": "620,000 KORI" },
+      { "rank": 2, "name": "KR-SP-0015", "meta": "KR / KR-SP-0015", "amount": "540,000 KORI" },
+      { "rank": 3, "name": "PH-SP-0004", "meta": "PH / PH-SP-0004", "amount": "410,000 KORI" },
+      { "rank": 4, "name": "KR-SP-0006", "meta": "KR / KR-SP-0006", "amount": "390,000 KORI" }
+    ],
+    "topMerchants": [
+      { "rank": 1, "name": "KR-MER-0001", "meta": "KR / KR-MER-0001", "amount": "420,000 KORI" },
+      { "rank": 2, "name": "NG-MER-0024", "meta": "NG / NG-MER-0024", "amount": "360,000 KORI" },
+      { "rank": 3, "name": "PH-MER-0010", "meta": "PH / PH-MER-0010", "amount": "310,000 KORI" }
     ]
   },
   "paymentMethod": {

@@ -528,6 +528,74 @@
   color: var(--color-text-muted);
 }
 
+.topListHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.topListFilter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-bold);
+}
+
+.topList li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 36px;
+}
+
+.topListRank {
+  color: var(--color-accent-cyan);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+}
+
+.topListMain {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.topListMain strong {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topListMain span {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-10);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topListAmount {
+  color: var(--color-text);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.topListEmpty {
+  display: block !important;
+  color: var(--color-text-muted);
+}
+
 /*
  * 결제수단 비율 — Figma 실측: 좌측에 시안 링(원), 우측에 결제수단별 범례.
  * 범례 각 줄 = "라벨 %" 텍스트 + 비율만큼 길이가 다른 가로 막대(결제수단별 색).
@@ -552,18 +620,24 @@
   gap: 20px; /* Figma 실측 링↔범례 간격 */
 }
 
-/*
- * 결제수단 비율 링 — Figma 실측: 62px 원 + 시안 테두리(단색), 가운데는 다크 네이비.
- * (색이 나뉜 도넛이 아니라 단색 링) 바깥의 옅은 86px 링은 box-shadow로 은은하게 표현.
- */
+/* 결제수단 비율 도넛 — API pct를 conic-gradient로 주입하고 가운데 구멍은 ::after로 만든다. */
 .donutRing {
+  position: relative;
   flex-shrink: 0;
-  width: 62px;
-  height: 62px;
+  width: 86px;
+  height: 86px;
   border-radius: 50%;
-  border: 2px solid color-mix(in srgb, var(--color-accent-cyan) 85%, transparent);
-  background: color-mix(in srgb, var(--color-bg) 55%, transparent);
-  box-shadow: 0 0 0 12px color-mix(in srgb, var(--color-accent-cyan) 8%, transparent);
+  border: 1px solid color-mix(in srgb, #fff 10%, transparent);
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-accent-cyan) 7%, transparent);
+}
+
+.donutRing::after {
+  position: absolute;
+  inset: 22px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 35%, transparent);
+  content: "";
 }
 
 /* flex:1을 주지 않는다 — 남은 폭을 다 먹으면 링이 왼쪽에 고정돼 가운데 정렬(donutBody)이 안 됨 */
