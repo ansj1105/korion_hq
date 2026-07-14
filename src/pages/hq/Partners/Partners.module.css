@@ -1,0 +1,47 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.searchInput,
+.select {
+  height: 34px;
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 70%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-12);
+}
+
+.searchInput {
+  width: 260px;
+  padding: 0 var(--space-3);
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-muted);
+}
+
+.select {
+  min-width: 128px;
+  padding: 0 var(--space-3);
+}
+
+.excelButton {
+  height: 34px;
+  min-width: 74px;
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 70%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+}
+
+.actionStop {
+  display: inline-flex;
+  justify-content: center;
+}

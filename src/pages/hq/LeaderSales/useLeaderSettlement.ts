@@ -1,6 +1,7 @@
 import { useTranslation } from '../../../i18n'
 import type { InfoItem } from '../../../components/molecules/InfoGrid'
 import type { Column } from '../../../components/organisms/DataTable'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 import data from './leaderSettlementData.json'
 
 interface FieldRaw {
@@ -19,10 +20,15 @@ interface FieldRaw {
  * 파일을 분리한 이유는 파트너별/가맹점별 탭과 동일 — 기존 훅(useLeaderSales)의
  * API 연동 작업이 다른 브랜치에서 병렬 진행 중이라 반환 구조를 건드리면 안 됨.
  */
-export function useLeaderSettlement() {
+export function useLeaderSettlement(leaderCode?: string) {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useHqPageData(
+    `/api/hq/leaders/${encodeURIComponent(leaderCode ?? '')}/sales/settlement`,
+    data,
+    { leaderCode },
+  )
 
-  const summary: InfoItem[] = (data.summary as FieldRaw[]).map((f) => ({
+  const summary: InfoItem[] = (pageData.summary as FieldRaw[]).map((f) => ({
     label: t(f.labelKey),
     value: f.value,
     valueColor: f.color,
@@ -73,12 +79,14 @@ export function useLeaderSettlement() {
   return {
     summary,
     partnerColumns,
-    partnerRows: data.partnerRows as Array<Record<string, string>>,
+    partnerRows: pageData.partnerRows as Array<Record<string, string>>,
     merchantColumns,
-    merchantRows: data.merchantRows as Array<Record<string, string>>,
+    merchantRows: pageData.merchantRows as Array<Record<string, string>>,
     heldColumns,
-    heldRows: data.heldRows as Array<Record<string, string>>,
+    heldRows: pageData.heldRows as Array<Record<string, string>>,
     historyColumns,
-    historyRows: data.historyRows as Array<Record<string, string>>,
+    historyRows: pageData.historyRows as Array<Record<string, string>>,
+    isLoading,
+    error,
   }
 }

@@ -1,13 +1,17 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
+import { fetchHqPageData } from '../../../services/korionChongApi'
 import data from './applicationsData.json'
 
 interface StatRaw {
   id: string
   labelKey: string
   value: string
+  delta?: string
   deltaKey?: string
+  deltaBadge?: boolean
   deltaTone?: 'cyan' | 'red'
 }
 
@@ -20,10 +24,15 @@ export interface ApplicationListRow {
   appliedAt: string
   type: string
   country: string
+  region?: string
+  city?: string
   contact: string
   company: string
   email: string
+  phone?: string
+  website?: string
   interest: string
+  proposal?: string
   status: ApplicationStatus
 }
 
@@ -35,17 +44,35 @@ export interface ApplicationListRow {
  */
 export function useApplications() {
   const { t } = useTranslation()
+  const [pageData, setPageData] = useState(data)
 
-  const stats: StatCardData[] = (data.stats as StatRaw[]).map((s) => ({
+  useEffect(() => {
+    let cancelled = false
+
+    fetchHqPageData<typeof data>('/api/hq/applications')
+      .then((response) => {
+        if (!cancelled) setPageData(response)
+      })
+      .catch(() => {
+        if (!cancelled) setPageData(data)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
-    delta: s.deltaKey ? t(s.deltaKey) : undefined,
+    delta: s.delta ?? (s.deltaKey ? t(s.deltaKey) : undefined),
+    deltaBadge: s.deltaBadge,
     deltaTone: s.deltaTone,
   }))
 
   const columns: Column[] = [
-    { key: 'no', label: t('hqApplications.col.no'), width: '0.8fr' },
+    { key: 'no', label: t('hqApplications.col.no'), width: '0.85fr' },
     { key: 'appliedAt', label: t('hqApplications.col.appliedAt'), width: '0.8fr' },
     { key: 'type', label: t('hqApplications.col.type'), width: '1fr' },
     { key: 'country', label: t('hqApplications.col.country'), width: '0.9fr' },
@@ -70,7 +97,7 @@ export function useApplications() {
   return {
     stats,
     columns,
-    rows: data.rows as ApplicationListRow[],
+    rows: pageData.rows as ApplicationListRow[],
     statusMeta,
     deleteLabel: t('hqApplications.action.delete'),
   }

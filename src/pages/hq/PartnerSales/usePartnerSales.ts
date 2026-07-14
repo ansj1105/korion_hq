@@ -2,7 +2,9 @@ import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import type { InfoItem } from '../../../components/molecules/InfoGrid'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 import data from './partnerSalesData.json'
+import detailData from './partnerDetailData.json'
 
 interface StatRaw {
   id: string
@@ -34,8 +36,10 @@ export interface PartnerSalesLogRow {
  */
 export function usePartnerSales() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useHqPageData('/api/hq/partners/sales/overview', data)
+  const apiData = pageData as typeof data & { kpiBottom?: StatRaw[] }
 
-  const miniStats: StatCardData[] = (data.miniStats as StatRaw[]).map((s) => ({
+  const miniStats: StatCardData[] = ((apiData.miniStats ?? apiData.kpiBottom ?? data.miniStats) as StatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
@@ -56,7 +60,7 @@ export function usePartnerSales() {
     { key: 'action', label: t('hqPartnerSales.col.action'), width: '1.6fr' },
   ]
 
-  const profile = data.profile
+  const profile = apiData.profile ?? data.profile
   const accountInfo: InfoItem[] = [
     { label: t('hqPartnerSales.account.loginId'), value: profile.account.loginId },
     { label: t('hqPartnerSales.account.password'), value: profile.account.password },
@@ -70,8 +74,53 @@ export function usePartnerSales() {
   return {
     miniStats,
     logColumns,
-    logRows: data.logRows as PartnerSalesLogRow[],
+    logRows: (apiData.logRows ?? data.logRows) as PartnerSalesLogRow[],
     profile: { code: profile.code, country: profile.country, parent: profile.parent },
     accountInfo,
+    isLoading,
+    error,
+  }
+}
+
+export function usePartnerOverview(partnerCode?: string) {
+  const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useHqPageData(
+    `/api/hq/partners/${encodeURIComponent(partnerCode ?? '')}/sales/overview`,
+    detailData,
+    { partnerCode },
+  )
+
+  const toStats = (items: StatRaw[]): StatCardData[] => items.map((s) => ({ id: s.id, label: t(s.labelKey), value: s.value }))
+  const account = pageData.account ?? detailData.account
+  const basic = pageData.basic ?? detailData.basic
+
+  const accountInfo: InfoItem[] = [
+    { label: t('hqPartnerSales.account.loginId'), value: account.loginId },
+    { label: t('hqPartnerSales.account.password'), value: account.password, actionLabel: t('common.reset') },
+    { label: t('hqPartnerSales.account.email'), value: account.email, actionLabel: t('common.change') },
+    { label: t('hqPartnerSales.account.telegram'), value: account.telegram },
+    { label: t('hqPartnerSales.account.phone'), value: account.phone },
+    { label: t('hqPartnerSales.account.twitter'), value: account.twitter },
+    { label: t('hqPartnerSales.account.appliedAt'), value: account.appliedAt, valueColor: 'var(--color-accent-green)' },
+    { label: t('hqPartnerSales.account.approvedAt'), value: account.approvedAt, valueColor: 'var(--color-accent-green)' },
+  ]
+
+  const basicInfo: InfoItem[] = [
+    { label: t('hqPartnerSales.basic.name'), value: basic.name },
+    { label: t('hqPartnerSales.basic.country'), value: basic.country },
+    { label: t('hqPartnerSales.basic.region'), value: basic.region },
+    { label: t('hqPartnerSales.basic.language'), value: basic.language },
+    { label: t('hqPartnerSales.basic.directContractReason'), value: basic.directContractReason },
+    { label: '', value: '' },
+    { label: t('hqPartnerSales.basic.walletAddress'), value: basic.walletAddress },
+  ]
+
+  return {
+    profile: pageData.profile ?? detailData.profile,
+    kpiTop: toStats((pageData.kpiTop ?? detailData.kpiTop) as StatRaw[]),
+    accountInfo,
+    basicInfo,
+    isLoading,
+    error,
   }
 }

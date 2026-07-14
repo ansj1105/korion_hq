@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import PageHeader from '../../organisms/PageHeader'
 import StatSection from '../../organisms/StatSection'
 import DataTable, { type Column, type TableRow } from '../../organisms/DataTable'
@@ -21,6 +22,8 @@ interface RequestListPageProps {
   tableTitle?: string
   /** 테이블 툴바 버튼 라벨 */
   toolbar?: string[]
+  /** 테이블 툴바 뒤에 붙는 화면 전용 컨트롤 */
+  toolbarExtra?: ReactNode
   /** 행 클릭 콜백 (지정 시 행 전체 클릭 가능 — 예: 상세로 이동) */
   onRowClick?: (id: string) => void
   /** true면 지표 카드를 Card 박스 없이 그리드만 표시(sectionTitle/sectionDesc 무시됨) */
@@ -53,6 +56,7 @@ export default function RequestListPage({
   rows,
   tableTitle,
   toolbar,
+  toolbarExtra,
   onRowClick,
   statsBare,
   toolbarInline,
@@ -70,6 +74,7 @@ export default function RequestListPage({
         columns={columns}
         rows={rows}
         toolbar={toolbar}
+        toolbarExtra={toolbarExtra}
         fill
         onRowClick={onRowClick}
         inlineToolbar={toolbarInline}

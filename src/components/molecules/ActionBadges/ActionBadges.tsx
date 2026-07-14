@@ -12,7 +12,9 @@ interface ActionBadgesProps {
    */
   accentByLabel?: Record<string, AccentKey>
   /** 배지 크기. 안 주면 기존처럼 'sm'(65% 진한 틴트). 거래 로그 표는 'xs'(17% 옅은 틴트) */
-  size?: 'sm' | 'xs'
+  size?: 'sm' | 'xs' | 'md'
+  /** 배지 형태. 기본은 기존 pill, partners 계열 표 액션은 rect를 쓴다. */
+  shape?: 'pill' | 'rect'
   /**
    * true면 틴트 없이 색을 100% 채운다(신청서 관리처럼 활성 상태 하나만 색이 있고
    * 나머지는 중립으로 진하게 깔리는 화면용). 안 주면 기존처럼 옅은 틴트.
@@ -39,7 +41,7 @@ interface ActionBadgesProps {
  * ------------------------------------------------------------------
  * 테이블 액션 컬럼에 들어가는 작은 배지 묶음. 동작 없는 UI(표시 전용).
  */
-export default function ActionBadges({ labels, accentByLabel, size = 'sm', solid, solidByLabel, equalWidth, onLabelClick }: ActionBadgesProps) {
+export default function ActionBadges({ labels, accentByLabel, size = 'sm', shape = 'pill', solid, solidByLabel, equalWidth, onLabelClick }: ActionBadgesProps) {
   const className = equalWidth ? `${styles.actions} ${styles.equalWidth}` : styles.actions
   return (
     <div className={className}>
@@ -48,6 +50,7 @@ export default function ActionBadges({ labels, accentByLabel, size = 'sm', solid
           key={label}
           accent={accentByLabel ? accentByLabel[label] : 'cyan'}
           size={size}
+          shape={shape}
           solid={solidByLabel ? solidByLabel[label] : solid}
           onClick={onLabelClick ? () => onLabelClick(label) : undefined}
         >

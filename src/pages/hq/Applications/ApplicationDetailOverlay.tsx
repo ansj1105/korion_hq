@@ -1,10 +1,16 @@
 import { useTranslation } from '../../../i18n'
-import { useApplicationDetail, type DetailField } from '../ApplicationDetail/useApplicationDetail'
+import type { ApplicationListRow } from './useApplications'
 import styles from './ApplicationDetailOverlay.module.css'
 
 interface Props {
-  open: boolean
+  application: ApplicationListRow | null
   onClose: () => void
+}
+
+interface DetailField {
+  label: string
+  value: string
+  placeholder?: string
 }
 
 /*
@@ -14,11 +20,26 @@ interface Props {
  * 별도 라우트 없이 open prop으로만 제어한다.
  * backdrop 클릭 또는 4개 버튼(확인·검토·위험·삭제) 클릭 시 닫힘.
  */
-export default function ApplicationDetailOverlay({ open, onClose }: Props) {
+export default function ApplicationDetailOverlay({ application, onClose }: Props) {
   const { t } = useTranslation()
-  const { fields, textFields } = useApplicationDetail()
 
-  if (!open) return null
+  if (!application) return null
+
+  const fields: DetailField[] = [
+    { label: t('hqApplicationDetail.field.type'), value: application.type },
+    { label: t('hqApplicationDetail.field.contact'), value: application.contact },
+    { label: t('hqApplicationDetail.field.company'), value: application.company },
+    { label: t('hqApplicationDetail.field.email'), value: application.email },
+    { label: t('hqApplicationDetail.field.phone'), value: application.phone ?? '', placeholder: t('hqApplicationDetail.field.phonePlaceholder') },
+    { label: t('hqApplicationDetail.field.website'), value: application.website ?? '', placeholder: t('hqApplicationDetail.field.websitePlaceholder') },
+    { label: t('hqApplicationDetail.field.country'), value: application.country },
+    { label: t('hqApplicationDetail.field.region'), value: application.region ?? '' },
+    { label: t('hqApplicationDetail.field.district'), value: application.city ?? '' },
+    { label: t('hqApplicationDetail.field.interest'), value: application.interest },
+  ]
+  const textFields: DetailField[] = [
+    { label: t('hqApplicationDetail.field.proposal'), value: application.proposal ?? '', placeholder: t('hqApplicationDetail.field.proposalPlaceholder') },
+  ]
 
   // Figma 원본에 '지역' 라벨이 두 번 나와 key는 인덱스 기준
   const renderField = (f: DetailField, index: number) => (
@@ -29,6 +50,7 @@ export default function ApplicationDetailOverlay({ open, onClose }: Props) {
         type="text"
         defaultValue={f.value || undefined}
         placeholder={f.placeholder}
+        readOnly
       />
     </div>
   )
@@ -51,6 +73,7 @@ export default function ApplicationDetailOverlay({ open, onClose }: Props) {
               className={styles.textarea}
               defaultValue={f.value || undefined}
               placeholder={f.placeholder}
+              readOnly
             />
           </div>
         ))}

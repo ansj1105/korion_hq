@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import PageHeader from '../../../components/organisms/PageHeader'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
 import Card from '../../../components/atoms/Card'
@@ -8,27 +9,49 @@ import FilterTabs from '../../../components/molecules/FilterTabs'
 import ActionBadges from '../../../components/molecules/ActionBadges'
 import { useTranslation } from '../../../i18n'
 import { useLeaderSales } from './useLeaderSales'
+import { useLeaderPartners } from './useLeaderPartners'
+import { useLeaderMerchants } from './useLeaderMerchants'
+import { useLeaderTransactions } from './useLeaderTransactions'
+import { useLeaderSettlement } from './useLeaderSettlement'
+import Leaders from '../Leaders'
 import styles from './LeaderSales.module.css'
 
-/* 탭 인덱스 — "거래내역"이 Figma 기본 선택 탭(인덱스 2), "정산내역"은 3 */
+/* 탭 인덱스 — row 진입 상세는 Figma 기준 "파트너별"을 기본으로 연다. */
+const PARTNER_TAB_INDEX = 0
+const MERCHANT_TAB_INDEX = 1
 const HISTORY_TAB_INDEX = 2
 const SETTLEMENT_TAB_INDEX = 3
+const MEMO_TAB_INDEX = 4
 
 /*
  * LeaderSales (page) — 본사어드민 · 국가 리더 관리 · 국가 리더별 거래내역
  * ------------------------------------------------------------------
  * Figma 좌표를 끝까지 따라가 보니 전체가 하나의 패널(Card) 안에 다음 순서로
  * 들어있었다: 큰 제목 "리더 정보" → 코드 미리보기 → KPI 4개 → A.계정정보 →
- * B.기본/소속정보 → 탭 5개(기본 선택: 거래내역) → [거래내역 탭 전용] KPI 5개 +
- * 전체 거래 로그 표 → 하단 액션 버튼. 탭별 콘텐츠를 다 확인하지 못해 "거래내역"
- * 외 4개 탭은 전환 UI만 두고 내용은 "구현 예정"으로 둔다(사용자 확인됨).
+ * B.기본/소속정보 → 탭 5개 → 탭별 KPI/표/메모 영역 → 하단 확인 버튼.
  */
 export default function LeaderSales() {
-  const { t } = useTranslation()
-  const { profile, kpiTop, accountInfo, basicInfo, kpiBottom, logColumns, logRows, settlement, settlementColumns } = useLeaderSales()
-  const [tab, setTab] = useState(HISTORY_TAB_INDEX)
+  const [searchParams] = useSearchParams()
+  const leaderCode = searchParams.get('leaderCode') ?? undefined
 
-  const rows: TableRow[] = logRows.map((r) => ({
+  if (!leaderCode) {
+    return <Leaders />
+  }
+
+  return <LeaderSalesDetail leaderCode={leaderCode} />
+}
+
+function LeaderSalesDetail({ leaderCode }: { leaderCode: string }) {
+  const { t } = useTranslation()
+  const { profile, kpiTop, accountInfo, basicInfo } = useLeaderSales(leaderCode)
+  const leaderPartners = useLeaderPartners(leaderCode)
+  const leaderMerchants = useLeaderMerchants(leaderCode)
+  const leaderTransactions = useLeaderTransactions(leaderCode)
+  const leaderSettlement = useLeaderSettlement(leaderCode)
+  const [tab, setTab] = useState(PARTNER_TAB_INDEX)
+  const [memo, setMemo] = useState('')
+
+  const rows: TableRow[] = leaderTransactions.rows.map((r) => ({
     id: r.txNo,
     cells: {
       txNo: r.txNo,
@@ -46,19 +69,89 @@ export default function LeaderSales() {
     },
   }))
 
-  const settlementRows: TableRow[] = settlement.rows.map((r, i) => ({
-    id: `${r.period}-${i}`,
+  const partnerRows: TableRow[] = leaderPartners.rows.map((r) => ({
+    id: r.code,
+    cells: {
+      no: r.no,
+      code: r.code,
+      partnerName: r.partnerName,
+      telegramId: r.telegramId,
+      region: r.region,
+      subMerchantCount: r.subMerchantCount,
+      monthVolume: r.monthVolume,
+      monthTxCount: r.monthTxCount,
+      unsettledFee: r.unsettledFee,
+      lastActive: r.lastActive,
+      action: <ActionBadges labels={[t('common.detail')]} size="xs" />,
+    },
+  }))
+
+  const merchantRows: TableRow[] = leaderMerchants.rows.map((r) => ({
+    id: r.merchantCode,
+    cells: {
+      no: r.no,
+      partnerCode: r.partnerCode,
+      merchantCode: r.merchantCode,
+      merchantName: r.merchantName,
+      monthVolume: r.monthVolume,
+      monthTxCount: r.monthTxCount,
+      fee: r.fee,
+      lastPaidAt: r.lastPaidAt,
+      usage: r.usage,
+      action: <ActionBadges labels={[t('common.detail')]} size="xs" />,
+    },
+  }))
+
+  const settlementPartnerRows: TableRow[] = leaderSettlement.partnerRows.map((r, index) => ({
+    id: `${r.code}-${index}`,
+    cells: {
+      name: r.name,
+      code: r.code,
+      amount: r.amount,
+      fee: r.fee,
+      status: <span className={styles.statusGood}>{r.status}</span>,
+      paidDate: r.paidDate,
+      detail: <ActionBadges labels={[t('common.detail')]} size="xs" />,
+    },
+  }))
+
+  const settlementMerchantRows: TableRow[] = leaderSettlement.merchantRows.map((r, index) => ({
+    id: `${r.code}-${index}`,
+    cells: {
+      name: r.name,
+      code: r.code,
+      amount: r.amount,
+      fee: r.fee,
+      status: <span className={styles.statusGood}>{r.status}</span>,
+      detail: <ActionBadges labels={[t('common.detail')]} size="xs" />,
+    },
+  }))
+
+  const heldRows: TableRow[] = leaderSettlement.heldRows.map((r, index) => ({
+    id: `${r.txNo}-${index}`,
+    cells: {
+      txNo: r.txNo,
+      merchant: r.merchant,
+      partner: r.partner,
+      reason: r.reason,
+      amount: r.amount,
+      heldFee: r.heldFee,
+      status: <span className={styles.statusHold}>{r.status}</span>,
+    },
+  }))
+
+  const settlementHistoryRows: TableRow[] = leaderSettlement.historyRows.map((r, index) => ({
+    id: `${r.no}-${index}`,
     cells: {
       no: r.no,
       appliedDate: r.appliedDate,
       period: r.period,
       totalAmount: r.totalAmount,
-      leaderAmount: r.leaderAmount,
       partnerAmount: r.partnerAmount,
       held: r.held,
-      status: r.status,
+      status: r.status === '본사 검토중' ? <span className={styles.statusReview}>{r.status}</span> : r.status,
       paidDate: r.paidDate,
-      action: <ActionBadges labels={[t('common.detail')]} size="sm" />,
+      action: <ActionBadges labels={[t('common.detail')]} size="xs" />,
     },
   }))
 
@@ -108,18 +201,55 @@ export default function LeaderSales() {
           <InfoGrid items={basicInfo} />
         </div>
 
-        <FilterTabs labels={tabLabels} activeIndex={tab} onChange={setTab} variant="outline" />
+        <div className={styles.tabBar}>
+          <FilterTabs labels={tabLabels} activeIndex={tab} onChange={setTab} variant="outline" />
+          <button type="button" className={styles.rangeButton}>
+            {t('hqLeaderSales.range1d')}
+          </button>
+        </div>
 
-        {tab === HISTORY_TAB_INDEX ? (
+        {tab === PARTNER_TAB_INDEX ? (
           <>
             <div className={styles.kpiRow5}>
-              {kpiBottom.map((s) => (
+              {leaderPartners.kpi.map((s) => (
+                <StatCard key={s.id} {...s} dense />
+              ))}
+            </div>
+            <DataTable
+              title={t('hqLeaderSales.partners.tableTitle')}
+              columns={leaderPartners.columns}
+              rows={partnerRows}
+              toolbar={[t('common.search'), t('common.filter'), t('common.excel')]}
+              inlineToolbar
+              largeText
+            />
+          </>
+        ) : tab === MERCHANT_TAB_INDEX ? (
+          <>
+            <div className={styles.kpiRow5}>
+              {leaderMerchants.kpi.map((s) => (
+                <StatCard key={s.id} {...s} dense />
+              ))}
+            </div>
+            <DataTable
+              title={t('hqLeaderSales.merchants.tableTitle')}
+              columns={leaderMerchants.columns}
+              rows={merchantRows}
+              toolbar={[t('common.search'), t('common.filter'), t('common.excel')]}
+              inlineToolbar
+              largeText
+            />
+          </>
+        ) : tab === HISTORY_TAB_INDEX ? (
+          <>
+            <div className={styles.kpiRow5}>
+              {leaderTransactions.kpi.map((s) => (
                 <StatCard key={s.id} {...s} dense />
               ))}
             </div>
             <DataTable
               title={t('hqLeaderSales.logTitle')}
-              columns={logColumns}
+              columns={leaderTransactions.columns}
               rows={rows}
               toolbar={[t('common.search'), t('common.filter'), t('common.excel')]}
               inlineToolbar
@@ -128,26 +258,53 @@ export default function LeaderSales() {
           </>
         ) : tab === SETTLEMENT_TAB_INDEX ? (
           <>
-            {/* Figma에 이 탭 전용 디자인이 없어, 리더 본인용 "정산 내역" 화면과 동일한 요약 카드+표를 재사용(사용자 확인됨) */}
-            <div className={styles.settleTopRow}>
-              <div className={styles.settleCard}>
-                <span className={`${styles.settleChip} ${styles.settleChipGray}`}>{t('settle.hist.lastDate')}</span>
-                <span className={styles.settleValue}>{settlement.lastSettleDate}</span>
-              </div>
-              <div className={`${styles.settleCard} ${styles.settleCardCurrent}`}>
-                <div className={styles.settleCardHead}>
-                  <span className={`${styles.settleChip} ${styles.settleChipTeal}`}>{t('settle.hist.thisRequest')}</span>
-                  <span className={styles.settleStatusBadge}>{settlement.status}</span>
-                </div>
-                <span className={`${styles.settleValue} ${styles.settleValueTeal}`}>{settlement.thisRequestAmount}</span>
-              </div>
+            <div className={styles.settlementSection}>
+              <h3 className={styles.settlementTitle}>{t('hqLeaderSales.settle.sec1')}</h3>
+              <InfoGrid items={leaderSettlement.summary} />
+            </div>
+            <div className={styles.settlementSection}>
+              <h3 className={styles.settlementTitle}>{t('hqLeaderSales.settle.sec2')}</h3>
+              <p className={styles.settlementDesc}>파트너명, 코드, 거래금액, 파트너 수수료, 상태 등을 확인합니다.</p>
+              <DataTable columns={leaderSettlement.partnerColumns} rows={settlementPartnerRows} bare mutedText fluid />
+            </div>
+            <div className={styles.settlementSection}>
+              <h3 className={styles.settlementTitle}>{t('hqLeaderSales.settle.sec3')}</h3>
+              <p className={styles.settlementDesc}>직계약 가맹점의 코드와 수수료 정산 내역입니다.</p>
+              <DataTable columns={leaderSettlement.merchantColumns} rows={settlementMerchantRows} bare mutedText fluid />
+            </div>
+            <div className={styles.settlementSection}>
+              <h3 className={styles.settlementTitle}>{t('hqLeaderSales.settle.sec4')}</h3>
+              <p className={styles.settlementDesc}>보류 사유, 거래금액, 보류 수수료와 처리 상태를 확인합니다.</p>
+              <DataTable columns={leaderSettlement.heldColumns} rows={heldRows} bare mutedText fluid />
             </div>
             <DataTable
               title={t('settle.hist.tableTitle')}
-              columns={settlementColumns}
-              rows={settlementRows}
+              columns={leaderSettlement.historyColumns}
+              rows={settlementHistoryRows}
               toolbar={[t('common.search'), t('common.filter'), t('common.excel')]}
+              inlineToolbar
+              largeText
             />
+          </>
+        ) : tab === MEMO_TAB_INDEX ? (
+          <>
+            <div className={styles.memoPanel}>
+              <h3 className={styles.memoTitle}>{t('hqLeaderSales.memo.title')}</h3>
+              <p className={styles.memoDesc}>{t('hqLeaderSales.memo.desc')}</p>
+              <textarea
+                className={styles.memoTextarea}
+                value={memo}
+                maxLength={200}
+                onChange={(event) => setMemo(event.target.value)}
+                aria-label={t('hqLeaderSales.memo.title')}
+              />
+              <div className={styles.memoFooter}>
+                <button type="button" className={styles.memoSaveButton}>
+                  {t('common.save')}
+                </button>
+                <span className={styles.memoCount}>{memo.length} / 200</span>
+              </div>
+            </div>
           </>
         ) : (
           <p className={styles.tabPlaceholder}>{t('common.comingSoon')}</p>

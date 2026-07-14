@@ -1,6 +1,7 @@
 import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 import data from './leaderPartnersData.json'
 
 interface KpiRaw {
@@ -30,10 +31,15 @@ export interface LeaderPartnerRow {
  * API 연동 작업이 병렬 진행 중이라 기존 훅의 반환 구조를 건드리면 안 됨.
  * 추후 실데이터 연동 시 이 훅 내부만 API 호출로 교체하면 된다.
  */
-export function useLeaderPartners() {
+export function useLeaderPartners(leaderCode?: string) {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useHqPageData(
+    `/api/hq/leaders/${encodeURIComponent(leaderCode ?? '')}/sales/partners`,
+    data,
+    { leaderCode },
+  )
 
-  const kpi: StatCardData[] = (data.kpi as KpiRaw[]).map((s) => ({ id: s.id, label: t(s.labelKey), value: s.value }))
+  const kpi: StatCardData[] = (pageData.kpi as KpiRaw[]).map((s) => ({ id: s.id, label: t(s.labelKey), value: s.value }))
 
   const columns: Column[] = [
     { key: 'no', label: t('hqLeaderSales.partners.col.no'), width: '0.5fr' },
@@ -49,5 +55,5 @@ export function useLeaderPartners() {
     { key: 'action', label: t('hqLeaderSales.partners.col.action'), width: '0.7fr' },
   ]
 
-  return { kpi, columns, rows: data.rows as LeaderPartnerRow[] }
+  return { kpi, columns, rows: pageData.rows as LeaderPartnerRow[], isLoading, error }
 }

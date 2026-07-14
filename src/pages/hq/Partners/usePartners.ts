@@ -1,14 +1,19 @@
 import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 import data from './partnersData.json'
 
 interface StatRaw {
   id: string
   labelKey: string
   value: string
+  delta?: string
   deltaKey?: string
+  deltaBadge?: boolean
 }
+
+export type HqPartnerStatus = 'approved' | 'suspended'
 
 /** 파트너 전체 목록(본사) 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
 export interface HqPartnerListRow {
@@ -22,7 +27,7 @@ export interface HqPartnerListRow {
   monthVolume: string
   monthTxCount: string
   unsettledFee: string
-  actions: string[]
+  status?: HqPartnerStatus
 }
 
 /*
@@ -33,12 +38,14 @@ export interface HqPartnerListRow {
  */
 export function usePartners() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useHqPageData('/api/hq/partners', data)
 
-  const stats: StatCardData[] = (data.stats as StatRaw[]).map((s) => ({
+  const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
-    delta: s.deltaKey ? t(s.deltaKey) : undefined,
+    delta: s.delta ?? (s.deltaKey ? t(s.deltaKey) : undefined),
+    deltaBadge: s.deltaBadge ?? Boolean(s.delta ?? s.deltaKey),
   }))
 
   const columns: Column[] = [
@@ -52,8 +59,14 @@ export function usePartners() {
     { key: 'monthVolume', label: t('hqPartnerList.col.monthVolume'), width: '1fr' },
     { key: 'monthTxCount', label: t('hqPartnerList.col.monthTxCount'), width: '0.9fr' },
     { key: 'unsettledFee', label: t('hqPartnerList.col.unsettledFee'), width: '1fr' },
-    { key: 'action', label: t('hqPartnerList.col.action'), width: '1.3fr' },
+    { key: 'status', label: t('hqPartnerList.col.status'), width: '0.8fr', align: 'center' },
+    { key: 'action', label: t('hqPartnerList.col.action'), width: '0.8fr', align: 'center' },
   ]
 
-  return { stats, columns, rows: data.rows as HqPartnerListRow[] }
+  const statusMeta: Record<HqPartnerStatus, { label: string; accent: 'green' | 'red'; solid: boolean }> = {
+    approved: { label: t('hqPartnerList.status.approved'), accent: 'green', solid: false },
+    suspended: { label: t('hqPartnerList.status.suspended'), accent: 'red', solid: true },
+  }
+
+  return { stats, columns, rows: pageData.rows as HqPartnerListRow[], statusMeta, isLoading, error }
 }

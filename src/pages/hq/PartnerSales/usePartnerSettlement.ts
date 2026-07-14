@@ -1,36 +1,28 @@
 import { useTranslation } from '../../../i18n'
+import type { InfoItem } from '../../../components/molecules/InfoGrid'
 import type { Column } from '../../../components/organisms/DataTable'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 import data from './partnerSettlementData.json'
 
 interface FieldRaw {
-  labelKey: string
-  value: string
-  /** 강조 값 색 (예: 청록 #24e6b8) — JSON에서 지정 */
-  color?: string
-}
-
-/** "정산내역" 탭 요약 항목 — 1행 5열 그리드(Figma 81:25829 실측, InfoGrid 4열과 달라 페이지에서 직접 렌더) */
-export interface PartnerSettleSummaryItem {
-  label: string
+  labelKey?: string
+  label?: string
   value: string
   color?: string
 }
 
-/*
- * usePartnerSettlement — "파트너별 거래내역" 화면의 "정산내역" 탭 데이터 훅
- * ------------------------------------------------------------------
- * Figma 81:25829 기준: 1)정산 금액 요약(1행 5항목) → 2)보류·제외 거래 →
- * 정산 내역 표(리더 버전에서 "총 거래금액" 열이 빠진 8컬럼). 라벨은 문구가 같은
- * 기존 키(settle.detail.*, settle.hist.*, hqLeaderSales.settle.sec1)를 재사용.
- * 파일 분리 이유는 다른 탭과 동일 — 기존 훅의 API 연동 병렬 작업과 충돌 방지.
- */
-export function usePartnerSettlement() {
+export function usePartnerSettlement(partnerCode?: string) {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useHqPageData(
+    `/api/hq/partners/${encodeURIComponent(partnerCode ?? '')}/sales/settlement`,
+    data,
+    { partnerCode },
+  )
 
-  const summary: PartnerSettleSummaryItem[] = (data.summary as FieldRaw[]).map((f) => ({
-    label: t(f.labelKey),
+  const summary: InfoItem[] = (pageData.summary as FieldRaw[]).map((f) => ({
+    label: f.labelKey ? t(f.labelKey) : f.label ?? '-',
     value: f.value,
-    color: f.color,
+    valueColor: f.color,
   }))
 
   const heldColumns: Column[] = [
@@ -57,8 +49,10 @@ export function usePartnerSettlement() {
   return {
     summary,
     heldColumns,
-    heldRows: data.heldRows as Array<Record<string, string>>,
+    heldRows: pageData.heldRows as Array<Record<string, string>>,
     historyColumns,
-    historyRows: data.historyRows as Array<Record<string, string>>,
+    historyRows: pageData.historyRows as Array<Record<string, string>>,
+    isLoading,
+    error,
   }
 }
