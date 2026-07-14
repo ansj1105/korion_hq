@@ -3,6 +3,7 @@ import PageHeader from '../../../components/organisms/PageHeader'
 import StatSection from '../../../components/organisms/StatSection'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
 import ActionBadges from '../../../components/molecules/ActionBadges'
+import Badge from '../../../components/atoms/Badge'
 import { useTranslation } from '../../../i18n'
 import { useRequestResultLog, type AdminAction } from './useRequestResultLog'
 import RequestDetailOverlay from './RequestDetailOverlay'
@@ -14,6 +15,13 @@ const ADMIN_ACTION_CLASS: Record<AdminAction, string> = {
   approveCancelled: styles.aaGreen,
   rejected: styles.aaRed,
   rejectCancelled: styles.aaRed,
+}
+
+const ADMIN_ACTION_ACCENT: Record<AdminAction, 'green' | 'orange' | 'red'> = {
+  approved: 'green',
+  approveCancelled: 'orange',
+  rejected: 'red',
+  rejectCancelled: 'orange',
 }
 
 /*
@@ -32,32 +40,37 @@ export default function RequestResultLog() {
 
   const detailLabel = t('hqRequestResultLog.action.detail')
 
-  const rows: TableRow[] = rawRows.map((r, index) => ({
-    // no 값이 Figma 샘플 데이터상 중복돼 있어(복붙 흔적) index를 더해 key를 구분
-    id: `${r.no}-${index}`,
-    cells: {
-      no: r.no,
-      appliedAt: r.appliedAt,
-      paidAt: r.paidAt,
-      requestType: r.requestType,
-      parentCode: r.parentCode,
-      applicantCode: r.applicantCode,
-      country: r.country,
-      partnerName: r.partnerName,
-      adminAction: <span className={ADMIN_ACTION_CLASS[r.adminAction]}>{adminActionLabel[r.adminAction]}</span>,
-      action: (
-        <ActionBadges
-          labels={actionBadges[r.adminAction]}
-          accentByLabel={{}}
-          size="xs"
-          solid
-          equalWidth
-          // '상세정보'만 동작(오버레이 열기) — 승인/거절 취소는 표시 전용
-          onLabelClick={(label) => label === detailLabel && setDetailOpen(true)}
-        />
-      ),
-    },
-  }))
+  const rows: TableRow[] = rawRows.map((r, index) => {
+    const status = r.status ?? r.adminAction
+
+    return {
+      // no 값이 Figma 샘플 데이터상 중복돼 있어(복붙 흔적) index를 더해 key를 구분
+      id: `${r.no}-${index}`,
+      cells: {
+        no: r.no,
+        appliedAt: r.appliedAt,
+        paidAt: r.paidAt,
+        requestType: r.requestType,
+        parentCode: r.parentCode,
+        applicantCode: r.applicantCode,
+        country: r.country,
+        partnerName: r.partnerName,
+        adminAction: <span className={ADMIN_ACTION_CLASS[r.adminAction]}>{adminActionLabel[r.adminAction]}</span>,
+        status: <Badge accent={ADMIN_ACTION_ACCENT[status]} size="md" shape="rect">{adminActionLabel[status]}</Badge>,
+        action: (
+          <ActionBadges
+            labels={actionBadges[r.adminAction]}
+            accentByLabel={{}}
+            size="xs"
+            solid
+            equalWidth
+            // '상세정보'만 동작(오버레이 열기) — 승인/거절 취소는 표시 전용
+            onLabelClick={(label) => label === detailLabel && setDetailOpen(true)}
+          />
+        ),
+      },
+    }
+  })
 
   return (
     <div className={styles.page}>

@@ -82,10 +82,10 @@ export function useRequestResultLog() {
 
   /** 관리자 행동 enum → 표시 라벨(데이터 값이라 번역 안 함, Figma 텍스트 그대로) */
   const adminActionLabel: Record<AdminAction, string> = {
-    approved: '승인',
-    approveCancelled: '승인 취소',
-    rejected: '거절',
-    rejectCancelled: '거절 취소',
+    approved: t('hqRequestResultLog.status.approved'),
+    approveCancelled: t('hqRequestResultLog.status.approveCancelled'),
+    rejected: t('hqRequestResultLog.status.rejected'),
+    rejectCancelled: t('hqRequestResultLog.status.rejectCancelled'),
   }
 
   /** 관리자 행동 enum → 행 액션 배지 라벨(번역 UI). 취소된 건은 상세정보만 남는다 */
