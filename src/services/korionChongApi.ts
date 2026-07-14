@@ -71,6 +71,27 @@ export function fetchHqPageData<T>(path: string, query?: Record<string, string |
   return getJson<T>(path, query, hqHeaders())
 }
 
+export async function downloadHqExport(path: string, fallbackFilename: string) {
+  const response = await fetch(buildUrl(path), {
+    headers: hqHeaders(),
+  })
+  if (!response.ok) {
+    throw new Error(`KORION Chong export ${response.status}`)
+  }
+  const blob = await response.blob()
+  const disposition = response.headers.get('Content-Disposition') ?? response.headers.get('content-disposition') ?? ''
+  const match = disposition.match(/filename="?([^";]+)"?/i)
+  const filename = match?.[1] ?? fallbackFilename
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = filename
+  document.body.appendChild(anchor)
+  anchor.click()
+  anchor.remove()
+  URL.revokeObjectURL(url)
+}
+
 async function postJson<T>(path: string, body: unknown, headers?: Headers) {
   const response = await fetch(buildUrl(path), {
     method: 'POST',

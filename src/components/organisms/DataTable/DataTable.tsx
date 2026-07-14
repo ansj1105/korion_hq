@@ -1,4 +1,5 @@
 import { isValidElement, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
+import { downloadHqExport } from '../../../services/korionChongApi'
 import styles from './DataTable.module.css'
 
 /** 테이블 컬럼 정의 */
@@ -63,6 +64,12 @@ interface DataTableProps {
   tallToolbar?: boolean
   /** true면 헤더 경계 드래그로 열 폭을 조절한다. 기본 true */
   resizable?: boolean
+  /** 지정하면 Excel 버튼 클릭 시 현재 화면 행 CSV 대신 서버 export API에서 파일을 내려받는다 */
+  exportUrl?: string
+  /** true면 필터링된 행을 pageSize 단위로 나눠 하단 페이지네이션을 표시한다 */
+  paginated?: boolean
+  /** paginated=true일 때 한 페이지에 표시할 행 수. 기본 10 */
+  pageSize?: number
 }
 
 /*
@@ -73,11 +80,12 @@ interface DataTableProps {
  * - 액션 버튼·상태 배지 등은 행 데이터의 셀에 React 노드로 직접 넣어 유연하게 표현.
  * - 정렬/검색/필터 등 동작은 작업 범위 밖(정적 표시).
  */
-export default function DataTable({ columns, rows, title, titleRight, toolbar, toolbarExtra, searchKeys, filterKeys, fill, bare, onRowClick, inlineToolbar, mutedText, largeText, navyZebra, zebra, fluid, wrapCells, headerBar, tallToolbar, resizable = true }: DataTableProps) {
+export default function DataTable({ columns, rows, title, titleRight, toolbar, toolbarExtra, searchKeys, filterKeys, fill, bare, onRowClick, inlineToolbar, mutedText, largeText, navyZebra, zebra, fluid, wrapCells, headerBar, tallToolbar, resizable = true, exportUrl, paginated, pageSize = 10 }: DataTableProps) {
   const [searchDraft, setSearchDraft] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [filterOpen, setFilterOpen] = useState(false)
   const [filters, setFilters] = useState<Record<string, string>>({})
+  const [currentPage, setCurrentPage] = useState(1)
   const [columnWidthOverrides, setColumnWidthOverrides] = useState<Record<string, number>>({})
   const columnKeySignature = columns.map((column) => column.key).join('|')
   const resizeStateRef = useRef<{
@@ -116,6 +124,8 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
       })
     })
   }, [filterOptions, filters, rows, searchTerm, searchableKeys])
+  const totalPages = paginated ? Math.max(1, Math.ceil(displayRows.length / pageSize)) : 1
+  const visibleRows = paginated ? displayRows.slice((currentPage - 1) * pageSize, currentPage * pageSize) : displayRows
 
   const wrapClass = [
     styles.wrap,
@@ -168,6 +178,14 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
       document.body.style.userSelect = ''
     }
   }, [])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, filters, pageSize, paginated])
+
+  useEffect(() => {
+    setCurrentPage((page) => Math.min(page, totalPages))
+  }, [totalPages])
 
   const beginColumnResize = (event: ReactMouseEvent, column: Column) => {
     event.preventDefault()
@@ -229,6 +247,10 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
                         return
                       }
                       if (isExcel) {
+                        if (exportUrl) {
+                          void downloadHqExport(exportUrl, buildCsvFilename(title))
+                          return
+                        }
                         downloadTableCsv({ columns, rows: displayRows, filename: buildCsvFilename(title) })
                       }
                     }}
@@ -297,7 +319,7 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
       </div>
 
       {/* 데이터 행들 (onRowClick 지정 시 행 전체가 클릭 가능) */}
-      {displayRows.map((row) => (
+      {visibleRows.map((row) => (
         <div
           key={row.id}
           className={onRowClick ? `${styles.row} ${styles.rowClickable}` : styles.row}
@@ -311,8 +333,47 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
           ))}
         </div>
       ))}
+      {paginated && totalPages > 1 && (
+        <nav className={styles.pagination} aria-label="Pagination">
+          <button
+            type="button"
+            className={styles.pageButton}
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+          >
+            ‹
+          </button>
+          {paginationPages(currentPage, totalPages).map((page) => (
+            <button
+              key={page}
+              type="button"
+              className={page === currentPage ? `${styles.pageButton} ${styles.pageButtonActive}` : styles.pageButton}
+              aria-current={page === currentPage ? 'page' : undefined}
+              aria-label={`Page ${page}`}
+              onClick={() => setCurrentPage(page)}
+            >
+              {page}
+            </button>
+          ))}
+          <button
+            type="button"
+            className={styles.pageButton}
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+          >
+            ›
+          </button>
+        </nav>
+      )}
     </div>
   )
+}
+
+function paginationPages(currentPage: number, totalPages: number) {
+  const pages = new Set<number>([1, totalPages, currentPage])
+  if (currentPage > 1) pages.add(currentPage - 1)
+  if (currentPage < totalPages) pages.add(currentPage + 1)
+  return Array.from(pages).sort((a, b) => a - b)
 }
 
 interface FilterOption {

@@ -42,7 +42,7 @@ export default function RequestsMerchantDirect() {
         monthVolume: r.monthVolume,
         monthTxCount: r.monthTxCount,
         status: activeStatus ? <Badge accent={activeStatus.accent} size="md" shape="rect">{activeStatus.label}</Badge> : '-',
-        action: <ActionBadges labels={labels} accentByLabel={accentByLabel} size="xs" solidByLabel={solidByLabel} equalWidth />,
+        action: <ActionBadges labels={labels} accentByLabel={accentByLabel} size="md" shape="rect" solidByLabel={solidByLabel} />,
       },
     }
   })
@@ -56,6 +56,9 @@ export default function RequestsMerchantDirect() {
         columns={columns}
         rows={rows}
         toolbar={[t('common.search'), t('common.filter'), t('common.excel')]}
+        exportUrl="/api/hq/requests/merchant-direct/export"
+        paginated
+        pageSize={10}
         fill
         inlineToolbar
         mutedText

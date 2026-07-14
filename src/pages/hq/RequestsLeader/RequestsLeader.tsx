@@ -18,7 +18,7 @@ import styles from './RequestsLeader.module.css'
  */
 export default function RequestsLeader() {
   const { t } = useTranslation()
-  const { stats, columns, rows: rawRows, statusMeta, approveLabel, rejectLabel } = useRequestsLeader()
+  const { stats, columns, rows: rawRows, statusMeta, approveLabel, rejectLabel, runAction, loadingActionId } = useRequestsLeader()
 
   const rows: TableRow[] = rawRows.map((r, index) => {
     const labels = [approveLabel, rejectLabel, statusMeta.review.label, statusMeta.waiting.label, statusMeta.infoRequested.label]
@@ -27,6 +27,33 @@ export default function RequestsLeader() {
     const accentByLabel: Record<string, AccentKey> = activeLabel ? { [activeLabel]: statusMeta[r.status!].accent } : {}
     // Figma 액션 토글: 현재 상태 하나만 시안 틴트로 "켜지고"(solid=false), 나머지는 회색으로 꽉 채운다(solid=true)
     const solidByLabel: Record<string, boolean> = Object.fromEntries(labels.map((label) => [label, label !== activeLabel]))
+    const disabled = Boolean(r.applicationId && loadingActionId === r.applicationId)
+    const handleAction = (label: string) => {
+      if (disabled) return
+      if (label === approveLabel) {
+        void runAction(r, 'approve')
+        return
+      }
+      if (label === rejectLabel) {
+        const reason = window.prompt(t('hqRequestLeader.prompt.rejectReason'))
+        if (reason === null) return
+        void runAction(r, 'reject', reason.trim())
+        return
+      }
+      if (label === statusMeta.review.label) {
+        void runAction(r, 'review')
+        return
+      }
+      if (label === statusMeta.waiting.label) {
+        void runAction(r, 'waiting')
+        return
+      }
+      if (label === statusMeta.infoRequested.label) {
+        const reason = window.prompt(t('hqRequestLeader.prompt.infoReason'))
+        if (!reason?.trim()) return
+        void runAction(r, 'requestInfo', reason.trim())
+      }
+    }
 
     return {
       // no 값이 Figma 샘플 데이터상 중복돼 있어(복붙 흔적) index를 더해 key를 구분
@@ -42,7 +69,7 @@ export default function RequestsLeader() {
         monthVolume: r.monthVolume,
         monthTxCount: r.monthTxCount,
         status: activeStatus ? <Badge accent={activeStatus.accent} size="md" shape="rect">{activeStatus.label}</Badge> : '-',
-        action: <ActionBadges labels={labels} accentByLabel={accentByLabel} size="xs" solidByLabel={solidByLabel} equalWidth />,
+        action: <ActionBadges labels={labels} accentByLabel={accentByLabel} size="md" shape="rect" solidByLabel={solidByLabel} onLabelClick={handleAction} />,
       },
     }
   })
@@ -56,6 +83,9 @@ export default function RequestsLeader() {
         columns={columns}
         rows={rows}
         toolbar={[t('common.search'), t('common.filter'), t('common.excel')]}
+        exportUrl="/api/hq/requests/leader/export"
+        paginated
+        pageSize={10}
         fill
         inlineToolbar
         mutedText

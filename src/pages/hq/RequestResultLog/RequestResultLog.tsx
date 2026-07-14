@@ -61,7 +61,8 @@ export default function RequestResultLog() {
           <ActionBadges
             labels={actionBadges[r.adminAction]}
             accentByLabel={{}}
-            size="xs"
+            size="md"
+            shape="rect"
             solid
             equalWidth
             // '상세정보'만 동작(오버레이 열기) — 승인/거절 취소는 표시 전용
@@ -81,6 +82,9 @@ export default function RequestResultLog() {
         columns={columns}
         rows={rows}
         toolbar={[t('common.search'), t('common.filter'), t('common.excel')]}
+        exportUrl="/api/hq/requests/result-log/export"
+        paginated
+        pageSize={10}
         fill
         inlineToolbar
         mutedText
