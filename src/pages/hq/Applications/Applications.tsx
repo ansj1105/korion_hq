@@ -22,7 +22,9 @@ export default function Applications() {
   const [selectedApplication, setSelectedApplication] = useState<ApplicationListRow | null>(null)
   const [searchText, setSearchText] = useState('')
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus | 'all'>('all')
+  const [page, setPage] = useState(1)
   const { stats, columns, rows: rawRows, statusMeta, deleteLabel } = useApplications()
+  const pageSize = 10
 
   const sortedRows = useMemo(() => {
     const noValue = (value: string) => Number(value.replace(/\D/g, '')) || 0
@@ -44,10 +46,14 @@ export default function Applications() {
     })
   }, [searchText, sortedRows, statusFilter])
 
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize))
+  const currentPage = Math.min(page, totalPages)
+  const pagedRows = filteredRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
   const exportCsv = () => {
     const headers = columns.filter((column) => column.key !== 'action').map((column) => column.label)
     const csvRows = filteredRows.map((row) =>
-      [row.no, row.appliedAt, row.type, row.country, row.contact, row.company, row.email, row.interest]
+      [row.no, row.appliedAt, row.type, row.country, row.contact, row.company, row.email, row.interest, statusMeta[row.status].label]
         .map((value) => `"${String(value ?? '').replace(/"/g, '""')}"`)
         .join(','),
     )
@@ -60,8 +66,8 @@ export default function Applications() {
     URL.revokeObjectURL(url)
   }
 
-  const rows: TableRow[] = filteredRows.map((r, index) => {
-    const labels = [statusMeta.confirmed.label, statusMeta.review.label, statusMeta.risk.label, deleteLabel]
+  const rows: TableRow[] = pagedRows.map((r, index) => {
+    const labels = [statusMeta.waiting.label, statusMeta.review.label, statusMeta.confirmed.label, statusMeta.risk.label, deleteLabel]
     const active = statusMeta[r.status]
     const accentByLabel: Record<string, AccentKey> = { [active.label]: active.accent }
     // 활성 배지만 상태별 solid 규칙을 따르고, 비활성·삭제 배지는 항상 solid 회색(Figma 기준)
@@ -70,7 +76,7 @@ export default function Applications() {
     )
 
     return {
-      id: `${r.no}-${index}`,
+      id: `${r.no}-${(currentPage - 1) * pageSize + index}`,
       cells: {
         no: r.no,
         appliedAt: r.appliedAt,
@@ -80,6 +86,7 @@ export default function Applications() {
         company: r.company,
         email: r.email,
         interest: <Badge accent="purple" size="md" shape="rect">{r.interest}</Badge>,
+        status: <Badge accent={active.accent} size="md" shape="rect" solid={active.solid}>{active.label}</Badge>,
         action: (
           <span onClick={(event) => event.stopPropagation()}>
             <ActionBadges labels={labels} accentByLabel={accentByLabel} solidByLabel={solidByLabel} size="md" shape="rect" />
@@ -104,7 +111,10 @@ export default function Applications() {
               className={styles.searchInput}
               type="search"
               value={searchText}
-              onChange={(event) => setSearchText(event.target.value)}
+              onChange={(event) => {
+                setSearchText(event.target.value)
+                setPage(1)
+              }}
               placeholder={t('hqApplications.search.placeholder')}
               aria-label={t('hqApplications.search.placeholder')}
             />
@@ -114,15 +124,22 @@ export default function Applications() {
             <select
               className={styles.filterSelect}
               value={statusFilter}
-              onChange={(event) => setStatusFilter(event.target.value as ApplicationStatus | 'all')}
+              onChange={(event) => {
+                setStatusFilter(event.target.value as ApplicationStatus | 'all')
+                setPage(1)
+              }}
               aria-label={t('hqApplications.filter.status')}
             >
               <option value="all">{t('hqApplications.filter.all')}</option>
-              <option value="confirmed">{statusMeta.confirmed.label}</option>
+              <option value="waiting">{statusMeta.waiting.label}</option>
               <option value="review">{statusMeta.review.label}</option>
+              <option value="confirmed">{statusMeta.confirmed.label}</option>
               <option value="risk">{statusMeta.risk.label}</option>
             </select>
-            <button type="button" className={styles.toolbarButton} onClick={() => setStatusFilter('all')}>
+            <button type="button" className={styles.toolbarButton} onClick={() => {
+              setStatusFilter('all')
+              setPage(1)
+            }}>
               {t('common.filter')}
             </button>
             <button type="button" className={styles.toolbarButton} onClick={exportCsv}>
@@ -138,6 +155,23 @@ export default function Applications() {
           if (selected) setSelectedApplication(selected)
         }}
       />
+      <nav className={styles.pagination} aria-label={t('hqApplications.pagination.label')}>
+        {Array.from({ length: totalPages }, (_, index) => {
+          const nextPage = index + 1
+          return (
+            <button
+              key={nextPage}
+              type="button"
+              className={`${styles.pageButton} ${nextPage === currentPage ? styles.pageButtonActive : ''}`}
+              aria-current={nextPage === currentPage ? 'page' : undefined}
+              aria-label={`${t('hqApplications.pagination.page')} ${nextPage}`}
+              onClick={() => setPage(nextPage)}
+            >
+              {nextPage}
+            </button>
+          )
+        })}
+      </nav>
       <ApplicationDetailOverlay application={selectedApplication} onClose={() => setSelectedApplication(null)} />
     </>
   )

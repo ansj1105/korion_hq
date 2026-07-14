@@ -1,8 +1,8 @@
 {
   "stats": [
-    { "id": "new", "labelKey": "hqRequestLeader.kpi.new", "value": "5", "deltaKey": "hqRequestLeader.kpi.delta5" },
-    { "id": "review", "labelKey": "hqRequestLeader.kpi.review", "value": "5", "deltaKey": "hqRequestLeader.kpi.delta5" },
-    { "id": "waiting", "labelKey": "hqRequestLeader.kpi.waiting", "value": "2", "deltaKey": "hqRequestLeader.kpi.delta5" }
+    { "id": "new", "labelKey": "hqRequestLeader.kpi.new", "value": "5", "deltaKey": "hqRequestLeader.kpi.delta5", "deltaBadge": true },
+    { "id": "review", "labelKey": "hqRequestLeader.kpi.review", "value": "5", "deltaKey": "hqRequestLeader.kpi.delta5", "deltaBadge": true },
+    { "id": "waiting", "labelKey": "hqRequestLeader.kpi.waiting", "value": "2", "deltaKey": "hqRequestLeader.kpi.delta5", "deltaBadge": true }
   ],
   "rows": [
     { "no": "APP-2401", "appliedAt": "2026.06.13", "parentCode": "NG-LEAD-0001", "applicantCode": "NG-SP-0001", "country": "나이지리아", "partnerName": "Nova", "subMerchantCount": "50", "monthVolume": "250 KORI", "monthTxCount": "150", "status": null },

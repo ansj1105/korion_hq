@@ -3,7 +3,7 @@
     { "id": "new", "labelKey": "hqApplications.kpi.new", "value": "5", "deltaKey": "hqApplications.kpi.delta5" },
     { "id": "risk", "labelKey": "hqApplications.kpi.risk", "value": "17건", "deltaKey": "hqApplications.kpi.delta15", "deltaTone": "red" },
     { "id": "total", "labelKey": "hqApplications.kpi.total", "value": "105", "deltaKey": "hqApplications.kpi.delta5" },
-    { "id": "statusSum", "labelKey": "hqApplications.kpi.statusSum", "value": "42 / 20 / 10", "deltaKey": "hqApplications.kpi.statusCaption" }
+    { "id": "statusSum", "labelKey": "hqApplications.kpi.statusSum", "value": "2 / 20 / 42 / 10", "deltaKey": "hqApplications.kpi.statusCaption" }
   ],
   "rows": [
     {
@@ -26,7 +26,7 @@
       "company": "Nova Capital",
       "email": "c@nova.vc1",
       "interest": "지갑",
-      "status": "review"
+      "status": "waiting"
     },
     {
       "no": "APP-2398",

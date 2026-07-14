@@ -2,6 +2,7 @@ import PageHeader from '../../../components/organisms/PageHeader'
 import StatSection from '../../../components/organisms/StatSection'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
 import ActionBadges from '../../../components/molecules/ActionBadges'
+import Badge from '../../../components/atoms/Badge'
 import type { AccentKey } from '../../../types'
 import { useTranslation } from '../../../i18n'
 import { useRequestsMerchantDirect } from './useRequestsMerchantDirect'
@@ -22,6 +23,7 @@ export default function RequestsMerchantDirect() {
   const rows: TableRow[] = rawRows.map((r, index) => {
     const labels = [approveLabel, rejectLabel, statusMeta.review.label, statusMeta.waiting.label, statusMeta.infoRequested.label]
     const activeLabel = r.status ? statusMeta[r.status].label : null
+    const activeStatus = r.status ? statusMeta[r.status] : null
     const accentByLabel: Record<string, AccentKey> = activeLabel ? { [activeLabel]: statusMeta[r.status!].accent } : {}
     // Figma 액션 토글: 현재 상태 하나만 시안 틴트로 "켜지고"(solid=false), 나머지는 회색으로 꽉 채운다(solid=true)
     const solidByLabel: Record<string, boolean> = Object.fromEntries(labels.map((label) => [label, label !== activeLabel]))
@@ -39,6 +41,7 @@ export default function RequestsMerchantDirect() {
         subMerchantCount: r.subMerchantCount,
         monthVolume: r.monthVolume,
         monthTxCount: r.monthTxCount,
+        status: activeStatus ? <Badge accent={activeStatus.accent} size="md" shape="rect">{activeStatus.label}</Badge> : '-',
         action: <ActionBadges labels={labels} accentByLabel={accentByLabel} size="xs" solidByLabel={solidByLabel} equalWidth />,
       },
     }

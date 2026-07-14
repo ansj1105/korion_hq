@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { type CSSProperties, useState } from 'react'
 import RequestListPage from '../../../components/templates/RequestListPage'
 import DetailSection from '../../../components/molecules/DetailSection'
 import DetailDrawer from '../../../components/organisms/DetailDrawer'
@@ -10,12 +10,14 @@ import { useTranslation } from '../../../i18n'
 import { postHqPageData } from '../../../services/korionChongApi'
 import { usePaymentLog, type PaymentLogRow } from './usePaymentLog'
 import { usePaymentLogDetail, type SyncStep } from './usePaymentLogDetail'
+import { PAYMENT_STATUS_ACTION_POLICIES, PAYMENT_STATUS_EXAMPLES } from './paymentLogStatusPolicy'
 import styles from './PaymentLog.module.css'
 
 /** 액션 컬럼에서 드로어를 여는 배지(데이터 enum). 나머지는 정산 처리 배지. */
 const DETAIL_LABEL = '상세'
 /** 정산 처리 배지 색: 지급완료=초록 / 보류해제=주황 / 지급보류=빨강 */
 const SETTLE_ACCENT: Record<string, AccentKey> = { 지급완료: 'green', 보류해제: 'amber', 지급보류: 'red' }
+const statusAccentStyle = (accent: AccentKey): CSSProperties => ({ '--status-accent': `var(--color-accent-${accent})` }) as CSSProperties
 
 interface PaymentSettlementHoldResponse {
   statusLabel: string
@@ -191,6 +193,35 @@ export default function PaymentLog() {
 
         <DetailSection title={sections.fee.title} rows={sections.fee.rows} />
         <DetailSection title={sections.risk.title} rows={sections.risk.rows} />
+
+        <DetailSection title={t('hqPaymentLog.detail.section.statusExamples')}>
+          <div className={styles.statusExampleList}>
+            {PAYMENT_STATUS_EXAMPLES.map((example) => (
+              <div key={example.no} className={styles.statusExampleCard} style={statusAccentStyle(example.accent)}>
+                <span className={styles.statusExampleNo}>{example.no}</span>
+                <strong className={styles.statusExampleTitle}>{example.title}</strong>
+                <span className={styles.statusExampleCodes}>{example.statuses.join(' / ')}</span>
+              </div>
+            ))}
+          </div>
+        </DetailSection>
+
+        <DetailSection title={t('hqPaymentLog.detail.section.actionPolicy')}>
+          <div className={styles.actionPolicyList}>
+            {PAYMENT_STATUS_ACTION_POLICIES.map((policy) => (
+              <div key={policy.status} className={styles.actionPolicyRow} style={statusAccentStyle(policy.accent)}>
+                <span className={styles.actionPolicyStatus}>{policy.status}</span>
+                <div className={styles.actionPolicyActions}>
+                  {policy.actions.map((action) => (
+                    <span key={action} className={styles.actionPolicyChip}>
+                      {action}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </DetailSection>
 
         {/* H. 관리자 메모 — 입력칸(정적, 동작 없음) + 메모 로그 */}
         <DetailSection title={sections.memo.title}>

@@ -114,6 +114,84 @@
   color: var(--color-text-muted);
 }
 
+/* ── 상태 enum 예시 / 액션 정책 ── */
+.statusExampleList,
+.actionPolicyList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.statusExampleCard {
+  display: grid;
+  grid-template-columns: 86px 1fr minmax(260px, 1.8fr);
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 42px;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--status-accent) 70%, transparent);
+  background: color-mix(in srgb, var(--status-accent) 8%, var(--color-bg-elevated));
+}
+
+.statusExampleNo,
+.actionPolicyStatus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 74px;
+  min-height: 24px;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--status-accent) 80%, transparent);
+  background: color-mix(in srgb, var(--status-accent) 18%, transparent);
+  color: var(--color-text);
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-bold);
+}
+
+.statusExampleTitle {
+  color: var(--color-text);
+  font-size: var(--font-size-12);
+}
+
+.statusExampleCodes {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-10);
+  font-family: var(--font-family-mono);
+  word-break: break-word;
+}
+
+.actionPolicyRow {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--status-accent) 70%, transparent);
+  background: color-mix(in srgb, var(--status-accent) 7%, var(--color-bg-elevated));
+}
+
+.actionPolicyActions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(116px, 1fr));
+  gap: var(--space-3);
+}
+
+.actionPolicyChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-accent-blue) 13%, var(--color-bg-elevated));
+  color: var(--color-text);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+}
+
 /* ── H. 관리자 메모 ── */
 .memoInput {
   width: 100%;
@@ -142,4 +220,15 @@
 .memoLogs li {
   font-size: var(--font-size-11);
   color: var(--color-text-muted);
+}
+
+@media (max-width: 720px) {
+  .statusExampleCard,
+  .actionPolicyRow {
+    grid-template-columns: 1fr;
+  }
+
+  .actionPolicyActions {
+    grid-template-columns: 1fr;
+  }
 }

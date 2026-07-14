@@ -1,13 +1,17 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
+import { fetchHqPageData } from '../../../services/korionChongApi'
 import data from './requestResultLogData.json'
 
 interface StatRaw {
   id: string
   labelKey: string
   value: string
+  delta?: string
   deltaKey?: string
+  deltaBadge?: boolean
 }
 
 /** 관리자 행동 enum — 승인/거절과 각각의 취소. 취소된 건은 되돌리기 배지가 없다(상세정보만) */
@@ -25,6 +29,7 @@ export interface RequestResultLogRow {
   country: string
   partnerName: string
   adminAction: AdminAction
+  status?: AdminAction
 }
 
 /*
@@ -36,12 +41,28 @@ export interface RequestResultLogRow {
  */
 export function useRequestResultLog() {
   const { t } = useTranslation()
+  const [pageData, setPageData] = useState(data)
 
-  const stats: StatCardData[] = (data.stats as StatRaw[]).map((s) => ({
+  useEffect(() => {
+    let cancelled = false
+    fetchHqPageData<typeof data>('/api/hq/requests/result-log')
+      .then((response) => {
+        if (!cancelled) setPageData(response)
+      })
+      .catch(() => {
+        if (!cancelled) setPageData(data)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
-    delta: s.deltaKey ? t(s.deltaKey) : undefined,
+    delta: s.delta ?? (s.deltaKey ? t(s.deltaKey) : undefined),
+    deltaBadge: s.deltaBadge,
   }))
 
   const columns: Column[] = [
@@ -54,8 +75,9 @@ export function useRequestResultLog() {
     { key: 'country', label: t('hqRequestResultLog.col.country'), width: '0.9fr' },
     { key: 'partnerName', label: t('hqRequestResultLog.col.partnerName'), width: '1fr' },
     { key: 'adminAction', label: t('hqRequestResultLog.col.adminAction'), width: '0.9fr' },
+    { key: 'status', label: t('hqRequestResultLog.col.status'), width: '0.8fr' },
     // 배지 2개(취소 + 상세정보) 영문 라벨까지 들어가도록 넉넉히
-    { key: 'action', label: t('hqRequestResultLog.col.action'), width: '1.6fr' },
+    { key: 'action', label: t('hqRequestResultLog.col.action'), width: '1.4fr' },
   ]
 
   /** 관리자 행동 enum → 표시 라벨(데이터 값이라 번역 안 함, Figma 텍스트 그대로) */
@@ -77,7 +99,7 @@ export function useRequestResultLog() {
   return {
     stats,
     columns,
-    rows: data.rows as RequestResultLogRow[],
+    rows: pageData.rows as RequestResultLogRow[],
     adminActionLabel,
     actionBadges,
     section: t('hqRequestResultLog.section'),

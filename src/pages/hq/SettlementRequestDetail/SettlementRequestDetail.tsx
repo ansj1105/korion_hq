@@ -1,16 +1,25 @@
-import { type CSSProperties } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import PageHeader from '../../../components/organisms/PageHeader'
-import Button from '../../../components/atoms/Button'
 import InfoGrid from '../../../components/molecules/InfoGrid'
 import ActionBadges from '../../../components/molecules/ActionBadges'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
 import { useTranslation } from '../../../i18n'
+import { postHqPageData } from '../../../services/korionChongApi'
 import { useSettlementRequestDetail } from './useSettlementRequestDetail'
 import styles from './SettlementRequestDetail.module.css'
 
 /** 분배 게이지 세그먼트 색 (본사/리더/파트너) */
 const ROLE_COLOR: Record<string, string> = { hq: '#7c5cff', leader: '#24e6b8', partner: '#f6c85a' }
+type DetailAction = 'APPROVE' | 'REVIEW' | 'HOLD' | 'REQUEST_INFO' | 'REJECT'
+
+const DETAIL_ACTIONS: Array<{ code: DetailAction; labelKey: string; className: string }> = [
+  { code: 'APPROVE', labelKey: 'hqSettle.reqDetail.btn.approve', className: styles.approveBtn },
+  { code: 'REVIEW', labelKey: 'hqSettle.reqDetail.btn.review', className: styles.reviewBtn },
+  { code: 'HOLD', labelKey: 'hqSettle.reqDetail.btn.hold', className: styles.holdBtn },
+  { code: 'REQUEST_INFO', labelKey: 'hqSettle.reqDetail.btn.requestInfo', className: styles.requestInfoBtn },
+  { code: 'REJECT', labelKey: 'hqSettle.reqDetail.btn.reject', className: styles.rejectBtn },
+]
 
 /** 수수료 구조 — 카테고리(첫 항목) 칩 색: 파트너 경유(보라) / 직계약(파랑) */
 function feeCatClass(label: string, styleMap: typeof styles) {
@@ -62,6 +71,10 @@ export default function HqSettlementRequestDetail() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const settlementRequestId = searchParams.get('settlementRequestId')
+  const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({})
+  const [actionMessage, setActionMessage] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [pendingAction, setPendingAction] = useState<DetailAction | null>(null)
   const { header, banner, kpis, calc, feeStructure, partnerTable, heldTable, formFields, memoPlaceholder, replyPlaceholder, checks } =
     useSettlementRequestDetail(settlementRequestId)
   const targetType = searchParams.get('type')
@@ -83,6 +96,26 @@ export default function HqSettlementRequestDetail() {
     // '정산 보류' 값은 주황으로 강조
     cells: { ...r, status: <span className={styles.heldTag}>{r.status}</span>, detail: detailCell },
   }))
+  const allChecked = checks.length > 0 && checks.every((_, index) => checkedItems[index])
+
+  const handleDetailAction = async (action: DetailAction) => {
+    if (!settlementRequestId) return
+    setPendingAction(action)
+    setActionError(null)
+    setActionMessage(null)
+    try {
+      await postHqPageData(`/api/hq/settlement-requests/${encodeURIComponent(settlementRequestId)}/actions`, {
+        action,
+        reason: `HQ settlement request detail action: ${action}`,
+        requestId: `hq-settlement-detail-${Date.now()}`,
+      })
+      setActionMessage(t(`hqSettle.reqDetail.result.${action}`))
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'API error')
+    } finally {
+      setPendingAction(null)
+    }
+  }
 
   return (
     <div className={styles.page}>
@@ -230,18 +263,31 @@ export default function HqSettlementRequestDetail() {
         <div className={styles.checks}>
           {checks.map((c, i) => (
             <label key={i} className={styles.check}>
-              <input type="checkbox" defaultChecked /> {c}
+              <input
+                type="checkbox"
+                checked={Boolean(checkedItems[i])}
+                onChange={(event) => setCheckedItems((prev) => ({ ...prev, [i]: event.target.checked }))}
+              /> {c}
             </label>
           ))}
         </div>
 
-        {/* 액션 버튼 — 승인(그라데이션) + 보조 버튼들. 취소는 목록 복귀 */}
+        {actionMessage && <p className={styles.successText}>{actionMessage}</p>}
+        {actionError && <p className={styles.errorText}>{actionError}</p>}
+
+        {/* 액션 버튼 — 승인/검토/보류/자료요청/거절은 공통 정산 액션 API 호출, 취소는 목록 복귀 */}
         <div className={styles.actionRow}>
-          <Button variant="primary">{t('hqSettle.reqDetail.btn.approve')}</Button>
-          <button type="button" className={styles.subBtn}>{t('hqSettle.reqDetail.btn.review')}</button>
-          <button type="button" className={styles.subBtn}>{t('hqSettle.reqDetail.btn.hold')}</button>
-          <button type="button" className={styles.subBtnOutline}>{t('hqSettle.reqDetail.btn.requestInfo')}</button>
-          <button type="button" className={styles.subBtnOutline}>{t('hqSettle.reqDetail.btn.reject')}</button>
+          {DETAIL_ACTIONS.map((action) => (
+            <button
+              key={action.code}
+              type="button"
+              className={`${styles.actionButton} ${action.className}`}
+              disabled={!settlementRequestId || !allChecked || pendingAction !== null}
+              onClick={() => void handleDetailAction(action.code)}
+            >
+              {pendingAction === action.code ? t('common.loading') : t(action.labelKey)}
+            </button>
+          ))}
           <button type="button" className={styles.subBtn} onClick={() => navigate('..')}>{t('hqSettle.reqDetail.btn.cancel')}</button>
         </div>
       </div>

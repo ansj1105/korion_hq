@@ -1,14 +1,18 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { AccentKey } from '../../../types'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
+import { fetchHqPageData } from '../../../services/korionChongApi'
 import data from './requestsPartnerDirectData.json'
 
 interface StatRaw {
   id: string
   labelKey: string
   value: string
+  delta?: string
   deltaKey?: string
+  deltaBadge?: boolean
 }
 
 /** 진행 상태 — 검토중/대기/자료요청 중 하나만 활성(Figma 액션 배지 기준). 신규 접수는 상태 없음(null) */
@@ -37,12 +41,28 @@ export interface PartnerDirectRequestRow {
  */
 export function useRequestsPartnerDirect() {
   const { t } = useTranslation()
+  const [pageData, setPageData] = useState(data)
 
-  const stats: StatCardData[] = (data.stats as StatRaw[]).map((s) => ({
+  useEffect(() => {
+    let cancelled = false
+    fetchHqPageData<typeof data>('/api/hq/requests/partner-direct')
+      .then((response) => {
+        if (!cancelled) setPageData(response)
+      })
+      .catch(() => {
+        if (!cancelled) setPageData(data)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
     label: t(s.labelKey),
     value: s.value,
-    delta: s.deltaKey ? t(s.deltaKey) : undefined,
+    delta: s.delta ?? (s.deltaKey ? t(s.deltaKey) : undefined),
+    deltaBadge: s.deltaBadge,
   }))
 
   const columns: Column[] = [
@@ -55,21 +75,22 @@ export function useRequestsPartnerDirect() {
     { key: 'subMerchantCount', label: t('hqRequestPartnerDirect.col.subMerchantCount'), width: '0.8fr' },
     { key: 'monthVolume', label: t('hqRequestPartnerDirect.col.monthVolume'), width: '0.9fr' },
     { key: 'monthTxCount', label: t('hqRequestPartnerDirect.col.monthTxCount'), width: '0.8fr' },
+    { key: 'status', label: t('hqRequestPartnerDirect.col.status'), width: '0.8fr' },
     // 영문 모드 라벨(Approve/Reject/Reviewing/Waiting/Info Requested)까지 한 줄에 들어가도록 넉넉히
-    { key: 'action', label: t('hqRequestPartnerDirect.col.action'), width: '3fr' },
+    { key: 'action', label: t('hqRequestPartnerDirect.col.action'), width: '2.7fr' },
   ]
 
   /** 상태 키 → 표시 라벨(번역) + 액션 배지 강조색(Figma 기준 셋 다 cyan) */
   const statusMeta: Record<PartnerDirectRequestStatus, { label: string; accent: AccentKey }> = {
     review: { label: t('hqRequestPartnerDirect.status.review'), accent: 'cyan' },
-    waiting: { label: t('hqRequestPartnerDirect.status.waiting'), accent: 'cyan' },
-    infoRequested: { label: t('hqRequestPartnerDirect.status.infoRequested'), accent: 'cyan' },
+    waiting: { label: t('hqRequestPartnerDirect.status.waiting'), accent: 'orange' },
+    infoRequested: { label: t('hqRequestPartnerDirect.status.infoRequested'), accent: 'purple' },
   }
 
   return {
     stats,
     columns,
-    rows: data.rows as PartnerDirectRequestRow[],
+    rows: pageData.rows as PartnerDirectRequestRow[],
     statusMeta,
     approveLabel: t('hqRequestPartnerDirect.action.approve'),
     rejectLabel: t('hqRequestPartnerDirect.action.reject'),

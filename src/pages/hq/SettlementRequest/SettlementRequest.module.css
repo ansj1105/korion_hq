@@ -22,6 +22,18 @@
   color: #a8b6e8;
   line-height: 1.6;
 }
+
+.stateText,
+.errorText {
+  margin: 4px 0 0;
+  font-size: var(--font-size-12);
+  color: #a8b6e8;
+}
+
+.errorText {
+  color: #ff6b8a;
+}
+
 .chips {
   display: flex;
   flex-shrink: 0;
@@ -90,6 +102,11 @@
 .stHold {
   color: #ffad33;
   font-weight: var(--font-weight-semibold);
+}
+
+.actionStop {
+  display: inline-flex;
+  max-width: 100%;
 }
 
 /* 반응형: 좁은 화면에서 KPI 4열 → 2열 → 1열, 부제/칩 세로 정렬 */

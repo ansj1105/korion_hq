@@ -15,8 +15,8 @@ interface StatRaw {
   deltaTone?: 'cyan' | 'red'
 }
 
-/** 신청 상태 — 확인/검토중/위험 중 하나만 활성(Figma 액션 배지 기준) */
-export type ApplicationStatus = 'confirmed' | 'review' | 'risk'
+/** 신청 상태 — 대기/검토중/확인/위험 중 하나만 활성(Figma 액션 배지 기준) */
+export type ApplicationStatus = 'waiting' | 'review' | 'confirmed' | 'risk'
 
 /** 제휴 / 투자 신청 목록 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
 export interface ApplicationListRow {
@@ -80,15 +80,17 @@ export function useApplications() {
     { key: 'company', label: t('hqApplications.col.company'), width: '1fr' },
     { key: 'email', label: t('hqApplications.col.email'), width: '1.1fr' },
     { key: 'interest', label: t('hqApplications.col.interest'), width: '0.9fr' },
-    { key: 'action', label: t('hqApplications.col.action'), width: '1.4fr' },
+    { key: 'status', label: t('hqApplications.col.status'), width: '0.8fr' },
+    { key: 'action', label: t('hqApplications.col.action'), width: '1.6fr' },
   ]
 
   /*
    * 상태 키 → 표시 라벨(번역) + 액션 배지 강조색 + solid 여부.
-   * Figma 기준: 활성 "확인/검토"는 시안 틴트(solid=false), 활성 "위험"은 빨강 솔리드(solid=true).
+   * Figma 기준: 활성 "대기/확인/검토"는 시안 틴트(solid=false), 활성 "위험"은 빨강 솔리드(solid=true).
    * (비활성·삭제 배지는 호출부에서 항상 solid 회색으로 처리)
    */
-  const statusMeta: Record<ApplicationStatus, { label: string; accent: 'cyan' | 'red'; solid: boolean }> = {
+  const statusMeta: Record<ApplicationStatus, { label: string; accent: 'cyan' | 'orange' | 'red'; solid: boolean }> = {
+    waiting: { label: t('hqApplications.status.waiting'), accent: 'orange', solid: false },
     confirmed: { label: t('hqApplications.status.confirmed'), accent: 'cyan', solid: false },
     review: { label: t('hqApplications.status.review'), accent: 'cyan', solid: false },
     risk: { label: t('hqApplications.status.risk'), accent: 'red', solid: true },

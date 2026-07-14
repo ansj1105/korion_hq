@@ -422,6 +422,21 @@
   color: var(--color-text-muted);
 }
 
+.successText,
+.errorText {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+}
+
+.successText {
+  color: #24e6b8;
+}
+
+.errorText {
+  color: #ff4d70;
+}
+
 /* ===== 액션 버튼 줄 ===== */
 .actionRow {
   display: flex;
@@ -430,6 +445,49 @@
   gap: var(--space-3);
   margin-top: var(--space-2);
 }
+
+.actionButton {
+  height: 34px;
+  min-width: 88px;
+  padding: 0 var(--space-4);
+  border-radius: 8px;
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: #fff;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.actionButton:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.approveBtn {
+  background: linear-gradient(135deg, #6c4cff 0%, #22e2c2 100%);
+  border-color: color-mix(in srgb, #24e6b8 72%, transparent);
+}
+
+.reviewBtn {
+  background-color: color-mix(in srgb, #1ad1ff 30%, #130c24 70%);
+  border-color: color-mix(in srgb, #1ad1ff 72%, transparent);
+}
+
+.holdBtn {
+  background-color: color-mix(in srgb, #ff8a3d 34%, #130c24 66%);
+  border-color: color-mix(in srgb, #ff8a3d 76%, transparent);
+}
+
+.requestInfoBtn {
+  background-color: color-mix(in srgb, #8f47ff 34%, #130c24 66%);
+  border-color: color-mix(in srgb, #8f47ff 76%, transparent);
+}
+
+.rejectBtn {
+  background-color: color-mix(in srgb, #ff4d70 34%, #130c24 66%);
+  border-color: color-mix(in srgb, #ff4d70 76%, transparent);
+}
+
 /* 보조 버튼 — 회보라 솔리드 */
 .subBtn {
   height: 32px;

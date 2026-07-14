@@ -46,6 +46,8 @@ import HqLeaderSales from './pages/hq/LeaderSales'
 import HqPartnerSales from './pages/hq/PartnerSales'
 import HqMerchantSales from './pages/hq/MerchantSales'
 import HqPaymentLog from './pages/hq/PaymentLog'
+import HqPaymentSyncIssues from './pages/hq/PaymentSyncIssues'
+import HqPaymentErrorCodes from './pages/hq/PaymentErrorCodes'
 import HqSettlementRequest from './pages/hq/SettlementRequest'
 import HqSettlementRequestDetail from './pages/hq/SettlementRequestDetail'
 import HqSettlementHistory from './pages/hq/SettlementHistory'
@@ -83,6 +85,8 @@ const HQ_PAGES: Record<string, JSX.Element> = {
   merchants: <HqMerchants />,
   'merchants/sales': <HqMerchantSales />,
   'payments/logs': <HqPaymentLog />,
+  'payments/sync-issues': <HqPaymentSyncIssues />,
+  'payments/error-codes': <HqPaymentErrorCodes />,
   'settlement/request': <HqSettlementRequest />,
   'settlement/history': <HqSettlementHistory />,
   'settlement/commission': <HqCommissionManagement />,

@@ -1,20 +1,23 @@
 {
   "kpis": [
-    { "labelKey": "hqSettle.req.kpi.totalRequests", "value": "12 건", "noteKey": "hqSettle.req.note.totalRequests" },
-    { "labelKey": "hqSettle.req.kpi.pendingAmount", "value": "42,800 KORI", "noteKey": "hqSettle.req.note.pendingAmount" },
-    { "labelKey": "hqSettle.req.kpi.heldExcluded", "value": "6,420 KORI", "noteKey": "hqSettle.req.note.heldExcluded" },
-    { "labelKey": "hqSettle.req.kpi.payable", "value": "36,380 KORI", "noteKey": "hqSettle.req.note.payable" },
-    { "labelKey": "hqSettle.req.kpi.autoPartner", "value": "18,950 KORI", "noteKey": "hqSettle.req.note.autoPartner" },
-    { "labelKey": "hqSettle.req.kpi.heldRequests", "value": "3건", "noteKey": "hqSettle.req.note.heldRequests" },
-    { "labelKey": "hqSettle.req.kpi.todayNew", "value": "4건", "noteKey": "hqSettle.req.note.todayNew" },
-    { "labelKey": "hqSettle.req.kpi.avgTime", "value": "2.5일", "noteKey": "hqSettle.req.note.avgTime" }
+    { "id": "totalRequests", "labelKey": "hqSettle.req.kpi.totalRequests", "value": "12건", "noteKey": "hqSettle.req.note.totalRequests" },
+    { "id": "pendingAmount", "labelKey": "hqSettle.req.kpi.pendingAmount", "value": "42,800 KORI", "noteKey": "hqSettle.req.note.pendingAmount" },
+    { "id": "heldExcluded", "labelKey": "hqSettle.req.kpi.heldExcluded", "value": "6,420 KORI", "noteKey": "hqSettle.req.note.heldExcluded" },
+    { "id": "payable", "labelKey": "hqSettle.req.kpi.payable", "value": "36,380 KORI", "noteKey": "hqSettle.req.note.payable" },
+    { "id": "autoPartner", "labelKey": "hqSettle.req.kpi.autoPartner", "value": "18,950 KORI", "noteKey": "hqSettle.req.note.autoPartner" },
+    { "id": "heldRequests", "labelKey": "hqSettle.req.kpi.heldRequests", "value": "3건", "noteKey": "hqSettle.req.note.heldRequests" },
+    { "id": "todayNew", "labelKey": "hqSettle.req.kpi.todayNew", "value": "4건", "noteKey": "hqSettle.req.note.todayNew" },
+    { "id": "avgTime", "labelKey": "hqSettle.req.kpi.avgTime", "value": "2.5일", "noteKey": "hqSettle.req.note.avgTime" }
   ],
   "rows": [
     {
       "id": "SET-LD-20260614-001",
+      "settlementRequestId": 101,
+      "no": "5",
       "date": "2026.06.14",
-      "applicant": "NG-SP-0001",
+      "applicant": "NG-LEAD-0004",
       "partnerName": "Richard jang",
+      "recipientType": "LEADER",
       "country": "나이지리아",
       "period": "2026.05.02~2026.06.01",
       "totalAmount": "1,842,000",
@@ -23,13 +26,19 @@
       "partnerSettle": "2,950",
       "held": "640",
       "finalAmount": "2,950",
-      "status": "review"
+      "status": "review",
+      "statusAccent": "cyan",
+      "sourceStatus": "REVIEWING",
+      "actions": ["APPROVE", "REVIEW", "HOLD", "REQUEST_INFO", "REJECT"]
     },
     {
       "id": "SET-LD-20260614-001",
+      "settlementRequestId": 102,
+      "no": "4",
       "date": "2026.06.14",
       "applicant": "NG-SP-0002",
-      "partnerName": "Richard jang",
+      "partnerName": "Lagos Partner 02",
+      "recipientType": "PARTNER",
       "country": "나이지리아",
       "period": "2026.05.02~2026.06.01",
       "totalAmount": "1,842,000",
@@ -38,13 +47,19 @@
       "partnerSettle": "2,950",
       "held": "640",
       "finalAmount": "2,950",
-      "status": "done"
+      "status": "done",
+      "statusAccent": "green",
+      "sourceStatus": "PAID",
+      "actions": ["APPROVE", "REVIEW", "HOLD", "REQUEST_INFO", "REJECT"]
     },
     {
       "id": "SET-LD-20260614-001",
+      "settlementRequestId": 103,
+      "no": "3",
       "date": "2026.06.14",
-      "applicant": "NG-READ-0001",
+      "applicant": "NG-LEAD-0001",
       "partnerName": "Richard jang",
+      "recipientType": "LEADER",
       "country": "나이지리아",
       "period": "2026.05.02~2026.06.01",
       "totalAmount": "1,842,000",
@@ -53,13 +68,19 @@
       "partnerSettle": "2,950",
       "held": "640",
       "finalAmount": "3,960",
-      "status": "done"
+      "status": "done",
+      "statusAccent": "green",
+      "sourceStatus": "APPROVED",
+      "actions": ["APPROVE", "REVIEW", "HOLD", "REQUEST_INFO", "REJECT"]
     },
     {
       "id": "SET-LD-20260614-001",
+      "settlementRequestId": 104,
+      "no": "2",
       "date": "2026.06.14",
-      "applicant": "NG-READ-0001",
-      "partnerName": "Richard jang",
+      "applicant": "NG-SP-0007",
+      "partnerName": "Abuja Sales Partner",
+      "recipientType": "PARTNER",
       "country": "나이지리아",
       "period": "2026.05.02~2026.06.01",
       "totalAmount": "1,842,000",
@@ -68,13 +89,19 @@
       "partnerSettle": "2,950",
       "held": "640",
       "finalAmount": "3,960",
-      "status": "hold"
+      "status": "hold",
+      "statusAccent": "orange",
+      "sourceStatus": "HELD",
+      "actions": ["APPROVE", "REVIEW", "HOLD", "REQUEST_INFO", "REJECT"]
     },
     {
       "id": "SET-LD-20260614-001",
+      "settlementRequestId": 105,
+      "no": "1",
       "date": "2026.06.14",
-      "applicant": "NG-READ-0001",
+      "applicant": "NG-LEAD-0001",
       "partnerName": "Richard jang",
+      "recipientType": "LEADER",
       "country": "나이지리아",
       "period": "2026.05.02~2026.06.01",
       "totalAmount": "1,842,000",
@@ -83,7 +110,10 @@
       "partnerSettle": "2,950",
       "held": "640",
       "finalAmount": "3,960",
-      "status": "done"
+      "status": "infoRequested",
+      "statusAccent": "purple",
+      "sourceStatus": "NEED_MORE_INFO",
+      "actions": ["APPROVE", "REVIEW", "HOLD", "REQUEST_INFO", "REJECT"]
     }
   ]
 }

@@ -1,22 +1,28 @@
 import { useTranslation } from '../../../i18n'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 import type { Column } from '../../../components/organisms/DataTable'
+import type { AccentKey } from '../../../types'
 import data from './settlementRequestData.json'
 
 interface KpiRaw {
+  id?: string
   labelKey: string
   value: string
   noteKey: string
 }
 
-/** 정산 신청 상태 enum — 검토/완료/보류. 표시 라벨은 데이터 값(번역 대상 아님) */
-export type RequestStatus = 'review' | 'done' | 'hold'
+/** 정산 신청 상태 enum — 백엔드 UI 상태값 */
+export type RequestStatus = 'review' | 'done' | 'hold' | 'infoRequested' | 'rejected'
 
 /** 리더 정산 신청 행 (Figma 샘플값 하드코딩) */
 export interface RequestRow {
+  settlementRequestId?: number
+  no?: string
   id: string
   date: string
   applicant: string
   partnerName: string
+  recipientType?: string
   country: string
   period: string
   totalAmount: string
@@ -26,6 +32,16 @@ export interface RequestRow {
   held: string
   finalAmount: string
   status: RequestStatus
+  statusAccent?: AccentKey
+  sourceStatus?: string
+  actions?: SettlementRequestActionCode[]
+}
+
+export type SettlementRequestActionCode = 'APPROVE' | 'REVIEW' | 'HOLD' | 'REQUEST_INFO' | 'REJECT'
+
+interface SettlementRequestPageData {
+  kpis: KpiRaw[]
+  rows: RequestRow[]
 }
 
 /** KPI 카드 (라벨만 번역) */
@@ -45,15 +61,20 @@ export interface KpiItem {
  */
 export function useSettlementRequest() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useHqPageData<SettlementRequestPageData>(
+    '/api/hq/settlement-requests',
+    data as SettlementRequestPageData,
+  )
 
-  const kpis: KpiItem[] = (data.kpis as KpiRaw[]).map((k) => ({
-    id: k.labelKey,
+  const kpis: KpiItem[] = pageData.kpis.map((k) => ({
+    id: k.id ?? k.labelKey,
     label: t(k.labelKey),
     value: k.value,
     note: t(k.noteKey),
   }))
 
   const columns: Column[] = [
+    { key: 'no', label: t('hqSettle.req.col.no'), width: '0.5fr', align: 'center' },
     { key: 'id', label: t('hqSettle.req.col.id'), width: '1.5fr' },
     { key: 'date', label: t('hqSettle.req.col.date'), width: '0.9fr' },
     { key: 'applicant', label: t('hqSettle.req.col.applicant'), width: '1fr' },
@@ -70,28 +91,32 @@ export function useSettlementRequest() {
     { key: 'action', label: t('hqSettle.req.col.action'), width: '1.2fr' },
   ]
 
-  /** 상태 enum → 표시 라벨(데이터 값) + 행 액션 2번째 버튼 라벨(번역) */
   const statusLabel: Record<RequestStatus, string> = {
-    review: '정산검토',
-    done: '정산완료',
-    hold: '정산보류',
+    review: t('hqSettle.req.status.review'),
+    done: t('hqSettle.req.status.done'),
+    hold: t('hqSettle.req.status.hold'),
+    infoRequested: t('hqSettle.req.status.infoRequested'),
+    rejected: t('hqSettle.req.status.rejected'),
   }
-  const statusAction: Record<RequestStatus, string> = {
-    review: t('hqSettle.req.action.review'),
-    done: t('hqSettle.req.action.review'),
-    hold: t('hqSettle.req.action.hold'),
+  const actionLabel: Record<SettlementRequestActionCode, string> = {
+    APPROVE: t('hqSettle.req.action.approve'),
+    REVIEW: t('hqSettle.req.action.review'),
+    HOLD: t('hqSettle.req.action.hold'),
+    REQUEST_INFO: t('hqSettle.req.action.requestInfo'),
+    REJECT: t('hqSettle.req.action.reject'),
   }
 
   return {
     kpis,
     columns,
-    rows: data.rows as RequestRow[],
+    rows: pageData.rows,
     statusLabel,
-    statusAction,
-    detailLabel: t('hqSettle.req.action.detail'),
+    actionLabel,
     chipAutoInclude: t('hqSettle.req.chip.autoInclude'),
     chipExcludeToday: t('hqSettle.req.chip.excludeToday'),
     section: t('hqSettle.req.section'),
     subtitle: t('hqSettle.req.subtitle'),
+    isLoading,
+    error,
   }
 }
