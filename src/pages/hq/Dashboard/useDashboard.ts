@@ -378,10 +378,7 @@ function withDashboardDefaults(payload: DashboardData): DashboardData {
     ...emptyDashboardData,
     ...payload,
     kpis: withNonEmptyArray(payload.kpis, emptyDashboardData.kpis),
-    rankingPanels: emptyDashboardData.rankingPanels.map((fallbackPanel) => {
-      const payloadPanel = payload.rankingPanels.find((panel) => panel.id === fallbackPanel.id)
-      return payloadPanel && Array.isArray(payloadPanel.rows) ? payloadPanel : fallbackPanel
-    }),
+    rankingPanels: withNonEmptyArray(payload.rankingPanels, emptyDashboardData.rankingPanels),
     realtimePayments: withRows(payload.realtimePayments, emptyDashboardData.realtimePayments),
     offlinePay: {
       ...emptyDashboardData.offlinePay,

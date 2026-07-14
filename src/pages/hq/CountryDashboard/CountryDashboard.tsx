@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import PageHeader from '../../../components/organisms/PageHeader'
 import Panel from '../../../components/molecules/Panel'
 import StatCard from '../../../components/molecules/StatCard'
@@ -5,13 +6,13 @@ import Badge from '../../../components/atoms/Badge'
 import DataTable from '../../../components/organisms/DataTable'
 import type { TableRow } from '../../../components/organisms/DataTable'
 import { useTranslation } from '../../../i18n'
-import { useCountryDashboard } from './useCountryDashboard'
+import { useCountryDashboard, type HqCountryDashboardRange } from './useCountryDashboard'
 import styles from './CountryDashboard.module.css'
 
 /*
  * CountryDashboard (page) — 본사어드민 · 대시보드 · 국가별 대시보드
  * ------------------------------------------------------------------
- * Figma 실측 결과 KPI 19장 + 순위 패널 3개(나라별/파트너별/가맹점별)가
+ * Figma 실측 결과 KPI 19장 + 순위 패널(국가별/리더별/파트너별/가맹점별)이
  * "전체 운영 대시보드"(src/pages/hq/Dashboard)와 라벨·값·증감 텍스트까지
  * 완전히 동일한 복붙이라(차이는 1번 카드 "활성국가"의 값이 숫자 대신 국가명
  * "나이지리아"로 바뀌고 증감줄이 빠진 것뿐) 같은 i18n 키/구조를 그대로 재사용했다.
@@ -19,7 +20,10 @@ import styles from './CountryDashboard.module.css'
  */
 export default function CountryDashboard() {
   const { t } = useTranslation()
-  const { kpis, rankingPanels, countryRanking } = useCountryDashboard()
+  const [countryScope, setCountryScope] = useState('all')
+  const [range, setRange] = useState<HqCountryDashboardRange>('ALL')
+  const { filters, kpis, rankingPanels, countryRanking, isLoading, error } = useCountryDashboard({ countryScope, range })
+  const getRangeLabel = (option: HqCountryDashboardRange) => (option === 'ALL' ? t('hqDashboard.filter.allPeriod') : option)
 
   const countryRankingRows: TableRow[] = countryRanking.rows.map((r) => ({
     id: r.id,
@@ -44,10 +48,27 @@ export default function CountryDashboard() {
   return (
     <div className={styles.page}>
       <PageHeader title={t('hqCountryDashboard.title')}>
-        {/* Figma의 국가/날짜 필터칩 — 동작 없는 UI 표시만 (CLAUDE.md 1번 규칙: 인터랙션은 협의 전까지 보류) */}
-        <div className={styles.filterChips}>
-          <span className={styles.chip}>{t('hqDashboard.filter.allCountries')}</span>
-          <span className={styles.chip}>{t('hqDashboard.filter.today')}</span>
+        <div className={styles.filterControls}>
+          <label className={styles.filterField}>
+            <span>{t('hqDashboard.filter.country')}</span>
+            <select className={styles.filterSelect} value={filters.selectedCountry} onChange={(event) => setCountryScope(event.target.value)}>
+              {filters.countryOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={styles.filterField}>
+            <span>{t('hqDashboard.filter.period')}</span>
+            <select className={styles.filterSelect} value={filters.selectedRange} onChange={(event) => setRange(event.target.value as HqCountryDashboardRange)}>
+              {filters.rangeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {getRangeLabel(option)}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </PageHeader>
 
@@ -57,11 +78,30 @@ export default function CountryDashboard() {
           <StatCard key={kpi.id} {...kpi} />
         ))}
       </div>
+      {isLoading && <p className={styles.stateText}>{t('common.loading')}</p>}
+      {error && <p className={styles.errorText}>{error}</p>}
 
-      {/* 대시보드 요약 패널 — 전체 운영 대시보드와 동일하게 제목만 있고 내용 미정의. 빈 채로 자리만 확보 */}
+      {/* 국가별 순위 요약 패널 — /api/hq/stats/country rankingPanels 응답을 그대로 표시 */}
       <div className={styles.rankingGrid}>
         {rankingPanels.map((panel) => (
-          <Panel key={panel.id} title={panel.title} />
+          <Panel key={panel.id} title={panel.title}>
+            {panel.rows.length ? (
+              <ol className={styles.rankList}>
+                {panel.rows.map((row) => (
+                  <li key={`${panel.id}-${row.rank}-${row.meta}`} className={styles.rankItem}>
+                    <span className={styles.rankNo}>{row.rank}</span>
+                    <span className={styles.rankMain}>
+                      <strong className={styles.rankName}>{row.name}</strong>
+                      <span className={styles.rankMeta}>{row.meta}</span>
+                    </span>
+                    <span className={styles.rankAmount}>{row.amount}</span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <span className={styles.rankEmpty}>{t('common.noData')}</span>
+            )}
+          </Panel>
         ))}
       </div>
 

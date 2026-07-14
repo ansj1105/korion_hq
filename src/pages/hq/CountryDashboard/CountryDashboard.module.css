@@ -5,20 +5,44 @@
   gap: 18px; /* Figma 콘텐츠 세로 간격 18 */
 }
 
-/* 헤더 아래 "전체 국가 / 오늘" 필터칩 — 동작 없는 표시용 */
-.filterChips {
+/* 헤더 필터 드롭다운 */
+.filterControls {
   display: flex;
-  gap: var(--space-2);
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
 }
 
-.chip {
-  padding: var(--space-1) var(--space-3);
+.filterField {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-bold);
+}
+
+.filterSelect {
+  min-width: 124px;
+  height: 30px;
+  appearance: none;
+  -webkit-appearance: none;
+  padding: var(--space-1) var(--space-6) var(--space-1) var(--space-3);
+  border: 1px solid var(--color-accent-purple);
   border-radius: var(--radius-pill);
-  border: 1px solid color-mix(in srgb, var(--color-accent-cyan) 45%, transparent);
-  background: color-mix(in srgb, var(--color-accent-cyan) 12%, transparent);
+  background-color: color-mix(in srgb, var(--color-accent-purple) 17%, transparent);
   color: var(--color-text);
   font-size: var(--font-size-10);
   font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'><path d='M1 2.5L4 5.5L7 2.5' stroke='%23f2f0ff' stroke-width='1.2' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right var(--space-3) center;
+}
+
+.filterSelect option {
+  color: #1a122a;
+  background-color: #f2f0ff;
 }
 
 /*
@@ -32,11 +56,80 @@
   gap: 14px 12px;
 }
 
-/* 대시보드 요약 패널(나라별/파트너별/가맹점별 순위) */
+/* 대시보드 요약 패널(국가별/리더별/파트너별/가맹점별 순위) */
 .rankingGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-6);
+}
+
+.rankList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rankItem {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 36px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-bg-elevated) 58%, transparent);
+}
+
+.rankNo {
+  color: var(--color-accent-cyan);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+}
+
+.rankMain {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rankName,
+.rankMeta,
+.rankAmount {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rankName {
+  color: var(--color-text);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
+}
+
+.rankMeta {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-10);
+}
+
+.rankAmount {
+  color: var(--color-text);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-bold);
+}
+
+.rankEmpty,
+.stateText,
+.errorText {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-12);
+}
+
+.errorText {
+  color: var(--color-accent-red);
 }
 
 /* 반응형: 좁은 화면에서 열 수 축소해 카드가 너무 작아지지 않게 함 */

@@ -33,9 +33,14 @@ export interface StatCardData {
 }
 
 const STATUS_BADGE_ACCENTS: Array<{ pattern: RegExp; accent: AccentKey }> = [
+  { pattern: /-\d|감소|하락|실패|오류|위험|risk|fail|error|restricted|suspend/i, accent: 'red' },
+  { pattern: /\+\d|증가|상승|운영|완료|성공|active|running|success/i, accent: 'green' },
   { pattern: /운영|active|running/i, accent: 'green' },
-  { pattern: /검토|review|pending/i, accent: 'orange' },
-  { pattern: /제한|정지|위험|risk|restricted|suspend/i, accent: 'red' },
+  { pattern: /검토|대기|보류|pending|review|hold/i, accent: 'orange' },
+  { pattern: /리더|leader|수신자/i, accent: 'cyan' },
+  { pattern: /파트너|partner|송신자/i, accent: 'purple' },
+  { pattern: /가맹점|merchant|회원|member/i, accent: 'green' },
+  { pattern: /중복|검증|버그|차단|block|duplicate|verify/i, accent: 'orange' },
 ]
 
 function parseDeltaBadges(delta?: string) {
