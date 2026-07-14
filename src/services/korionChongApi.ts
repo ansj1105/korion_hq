@@ -71,11 +71,12 @@ export function fetchHqPageData<T>(path: string, query?: Record<string, string |
   return getJson<T>(path, query, hqHeaders())
 }
 
-async function postJson<T>(path: string, body: unknown) {
+async function postJson<T>(path: string, body: unknown, headers?: Headers) {
   const response = await fetch(buildUrl(path), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      ...(headers ?? {}),
     },
     body: JSON.stringify(body),
   })
@@ -92,6 +93,10 @@ async function postJson<T>(path: string, body: unknown) {
     throw new KorionChongApiError(code || `HTTP_${response.status}`, detail || `KORION Chong API ${response.status}`)
   }
   return response.json() as Promise<T>
+}
+
+export function postHqPageData<T>(path: string, body: unknown) {
+  return postJson<T>(path, body, hqHeaders())
 }
 
 function requestId(prefix: string) {

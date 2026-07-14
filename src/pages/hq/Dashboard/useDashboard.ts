@@ -7,11 +7,12 @@ import type { AccentKey } from '../../../types'
 import { fetchHqPageData } from '../../../services/korionChongApi'
 import data from './dashboardData.json'
 
-export type HqDashboardRange = '1D' | '7D' | '14D' | '30D' | '90D' | '180D' | '365D'
+export type HqDashboardRange = 'ALL' | '1D' | '7D' | '14D' | '30D' | '90D' | '180D' | '365D'
 
 interface UseDashboardFilters {
   countryScope?: string
   range?: HqDashboardRange
+  refreshToken?: number
 }
 
 interface KpiRaw {
@@ -55,6 +56,8 @@ interface RealtimePaymentRow {
 
 interface SettlementRow {
   id: string
+  settlementRequestId?: string | number
+  requestNo?: string
   type: string
   name: string
   country: string
@@ -70,13 +73,20 @@ interface SettlementRow {
 interface RiskRow {
   id: string
   type: string
+  typeKey?: string
+  typeCode?: string
   targetId: string
   wallet: string
   country: string
   relatedTx: string
   score: string
   scoreAccent?: AccentKey
+  scoreCriteriaKey?: string
   held: string
+  actionStatus?: string
+  actionStatusCode?: string
+  actionStatusKey?: string
+  actionStatusAccent?: AccentKey
   action: string
   actionAccent?: AccentKey
 }
@@ -104,6 +114,18 @@ interface PaymentMethodRow {
   sync: string
   syncAccent?: AccentKey
   failReason: string
+}
+
+interface CountryOpsRow {
+  rank?: string
+  id: string
+  leaders: string
+  partners: string
+  merchants: string
+  members: string
+  amount: string
+  syncFail: string
+  growth: string
 }
 
 interface ActivityLogRow {
@@ -143,7 +165,8 @@ interface AiInsightRaw {
 }
 
 const ALL_COUNTRIES = 'all'
-const RANGE_DAYS: Record<HqDashboardRange, number> = {
+const RANGE_OPTIONS: HqDashboardRange[] = ['ALL', '1D', '7D', '14D', '30D', '90D', '180D', '365D']
+const RANGE_DAYS: Record<Exclude<HqDashboardRange, 'ALL'>, number> = {
   '1D': 1,
   '7D': 7,
   '14D': 14,
@@ -331,7 +354,7 @@ function withDashboardDefaults(payload: typeof data): typeof data {
  */
 export function useDashboard(filters: UseDashboardFilters = {}) {
   const { t } = useTranslation()
-  const range = filters.range ?? '1D'
+  const range = filters.range ?? 'ALL'
   const [source, setSource] = useState(data)
 
   useEffect(() => {
@@ -349,10 +372,13 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     return () => {
       alive = false
     }
-  }, [filters.countryScope, range])
+  }, [filters.countryScope, filters.refreshToken, range])
 
-  const rangeMultiplier = source === data ? RANGE_DAYS[range] : 1
-  const countryRows = source.countryOps.rows
+  const rangeMultiplier = source === data && range !== 'ALL' ? RANGE_DAYS[range] : 1
+  const countryRows = (source.countryOps.rows as CountryOpsRow[]).map((row, index) => ({
+    ...row,
+    rank: row.rank ?? String(index + 1),
+  }))
   const countryOptions = [
     { value: ALL_COUNTRIES, label: t('hqDashboard.filter.allCountries') },
     ...countryRows.map((row) => ({ value: row.id, label: row.id })),
@@ -448,11 +474,13 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     { key: 'relatedTx', label: t('hqDashboard.risk.col.relatedTx'), width: '1fr' },
     { key: 'score', label: t('hqDashboard.risk.col.score'), width: '1fr' },
     { key: 'held', label: t('hqDashboard.risk.col.held'), width: '1fr' },
-    { key: 'action', label: t('hqDashboard.risk.col.action'), width: '1fr' },
+    { key: 'actionStatus', label: t('hqDashboard.risk.col.actionStatus'), width: '1fr' },
+    { key: 'action', label: t('hqDashboard.risk.col.action'), width: '1.6fr' },
   ]
 
   // Figma 실측(80:566~): 8개 컬럼이 x=64부터 76.5px 등간격으로 균등 배치 → 전부 동일 폭(1fr)
   const countryOpsColumns: Column[] = [
+    { key: 'rank', label: t('hqDashboard.countryOps.col.rank'), width: '0.7fr' },
     { key: 'id', label: t('hqDashboard.countryOps.col.country'), width: '1fr' },
     { key: 'leaders', label: t('hqDashboard.countryOps.col.leaders'), width: '1fr' },
     { key: 'partners', label: t('hqDashboard.countryOps.col.partners'), width: '1fr' },
@@ -526,7 +554,7 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
   return {
     filters: {
       countryOptions,
-      rangeOptions: Object.keys(RANGE_DAYS) as HqDashboardRange[],
+      rangeOptions: RANGE_OPTIONS,
       selectedCountry,
       selectedRange: range,
     },
@@ -545,11 +573,11 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     risk: {
       stats: riskStats,
       columns: riskColumns,
-      rows: (source.risk.rows as RiskRow[]).filter((row) => countryMatches(row.country, selectedCountry)),
+    rows: (source.risk.rows as RiskRow[]).filter((row) => countryMatches(row.country, selectedCountry)),
     },
     countryOps: {
       columns: countryOpsColumns,
-      rows: selectedCountryRow ? [selectedCountryRow] : source.countryOps.rows,
+      rows: selectedCountryRow ? [selectedCountryRow] : countryRows,
       heatmap: selectedCountryRow
         ? source.countryOps.heatmap.filter((item) => item.code === (COUNTRY_CODE_BY_NAME[selectedCountryRow.id] ?? selectedCountryRow.id))
         : source.countryOps.heatmap,

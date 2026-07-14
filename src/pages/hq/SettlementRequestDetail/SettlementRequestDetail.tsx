@@ -1,5 +1,5 @@
 import { type CSSProperties } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import PageHeader from '../../../components/organisms/PageHeader'
 import Button from '../../../components/atoms/Button'
 import InfoGrid from '../../../components/molecules/InfoGrid'
@@ -60,8 +60,17 @@ function AmountCard({ variant, label, value, unit }: { variant: 'earn' | 'held' 
 export default function HqSettlementRequestDetail() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const settlementRequestId = searchParams.get('settlementRequestId')
   const { header, banner, kpis, calc, feeStructure, partnerTable, heldTable, formFields, memoPlaceholder, replyPlaceholder, checks } =
-    useSettlementRequestDetail()
+    useSettlementRequestDetail(settlementRequestId)
+  const targetType = searchParams.get('type')
+  const targetName = searchParams.get('name')
+  const targetCountry = searchParams.get('country')
+  const targetStatus = searchParams.get('status')
+  const contextBadges = targetName
+    ? [targetName, targetType, targetCountry, targetStatus].filter((value): value is string => Boolean(value))
+    : header.contextBadges
 
   const detailCell = <ActionBadges labels={[t('hqSettle.reqDetail.view')]} accentByLabel={{}} size="xs" solid />
   const ptRows: TableRow[] = partnerTable.rows.map((r) => ({
@@ -86,7 +95,7 @@ export default function HqSettlementRequestDetail() {
             {t('hqSettle.reqDetail.panel')} · {header.no}
           </h2>
           <div className={styles.ctxBadges}>
-            {header.contextBadges.map((b) => (
+            {contextBadges.map((b) => (
               <span key={b} className={styles.ctxBadge}>{b}</span>
             ))}
           </div>

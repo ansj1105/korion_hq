@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { Column } from '../../../components/organisms/DataTable'
+import { fetchHqPageData } from '../../../services/korionChongApi'
 import data from './settlementRequestDetailData.json'
 
 interface KpiRaw {
@@ -33,10 +35,29 @@ export interface KpiItem {
  * 목록의 ‘상세’에서 진입. 요약 카드/계산/수수료 구조/서브 테이블/본사 정산 요청 폼 데이터를 제공.
  * UI 라벨은 번역, 값/설명/상태 값은 데이터 그대로. 추후 API 연동 시 이 훅 내부만 교체.
  */
-export function useSettlementRequestDetail() {
+export function useSettlementRequestDetail(settlementRequestId?: string | null) {
   const { t } = useTranslation()
+  const [source, setSource] = useState(data)
 
-  const kpis: KpiItem[] = (data.kpis as KpiRaw[]).map((k) => ({
+  useEffect(() => {
+    if (!settlementRequestId) {
+      setSource(data)
+      return
+    }
+    let alive = true
+    fetchHqPageData<typeof data>(`/api/hq/settlement-requests/${encodeURIComponent(settlementRequestId)}/detail`)
+      .then((payload) => {
+        if (alive) setSource(payload)
+      })
+      .catch(() => {
+        if (alive) setSource(data)
+      })
+    return () => {
+      alive = false
+    }
+  }, [settlementRequestId])
+
+  const kpis: KpiItem[] = (source.kpis as KpiRaw[]).map((k) => ({
     id: k.labelKey,
     label: t(k.labelKey),
     value: k.value,
@@ -73,29 +94,29 @@ export function useSettlementRequestDetail() {
   ]
 
   return {
-    header: data.header,
-    banner: data.banner,
+    header: source.header,
+    banner: source.banner,
     kpis,
     calc: {
-      ...data.calc,
-      earnLabel: t(data.calc.earnLabelKey),
-      heldLabel: t(data.calc.heldLabelKey),
-      finalLabel: t(data.calc.finalLabelKey),
+      ...source.calc,
+      earnLabel: t(source.calc.earnLabelKey),
+      heldLabel: t(source.calc.heldLabelKey),
+      finalLabel: t(source.calc.finalLabelKey),
     },
-    feeStructure: data.feeStructure as string[][],
+    feeStructure: source.feeStructure as string[][],
     partnerTable: {
-      desc: t(data.partnerTable.descKey),
+      desc: t(source.partnerTable.descKey),
       columns: partnerColumns,
-      rows: data.partnerTable.rows as Array<Record<string, string>>,
+      rows: source.partnerTable.rows as Array<Record<string, string>>,
     },
     heldTable: {
-      desc: t(data.heldTable.descKey),
+      desc: t(source.heldTable.descKey),
       columns: heldColumns,
-      rows: data.heldTable.rows as Array<Record<string, string>>,
+      rows: source.heldTable.rows as Array<Record<string, string>>,
     },
-    formFields: (data.form.fields as FieldRaw[]).map((f) => ({ label: t(f.labelKey), value: f.value, editable: f.editable })),
-    memoPlaceholder: data.form.memoPlaceholder,
-    replyPlaceholder: data.form.replyPlaceholder,
-    checks: data.checks as string[],
+    formFields: (source.form.fields as FieldRaw[]).map((f) => ({ label: t(f.labelKey), value: f.value, editable: f.editable })),
+    memoPlaceholder: source.form.memoPlaceholder,
+    replyPlaceholder: source.form.replyPlaceholder,
+    checks: source.checks as string[],
   }
 }

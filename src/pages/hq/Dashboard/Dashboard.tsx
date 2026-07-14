@@ -10,13 +10,23 @@ import Badge from '../../../components/atoms/Badge'
 import Button from '../../../components/atoms/Button'
 import type { AccentKey } from '../../../types'
 import { useTranslation } from '../../../i18n'
+import { postHqPageData } from '../../../services/korionChongApi'
 import { useDashboard } from './useDashboard'
 import type { HqDashboardRange } from './useDashboard'
 import styles from './Dashboard.module.css'
 
 type DashboardTab = 'overview' | 'offline' | 'settlement' | 'risk' | 'growth' | 'payment' | 'logs'
+type HeatmapMetric = 'leaders' | 'partners' | 'merchants' | 'members' | 'amount' | 'syncFail' | 'growth'
 
 const DASHBOARD_TABS: DashboardTab[] = ['overview', 'offline', 'settlement', 'risk', 'growth', 'payment', 'logs']
+const HEATMAP_METRICS: HeatmapMetric[] = ['amount', 'members', 'merchants', 'partners', 'leaders', 'syncFail', 'growth']
+
+const RISK_ACTIONS = [
+  { action: 'BLOCK', labelKey: 'hqDashboard.risk.action.block', accent: 'red' },
+  { action: 'HOLD', labelKey: 'hqDashboard.risk.action.hold', accent: 'orange' },
+  { action: 'INVESTIGATE', labelKey: 'hqDashboard.risk.action.investigate', accent: 'purple' },
+  { action: 'REVIEW_COMPLETE', labelKey: 'hqDashboard.risk.action.reviewComplete', accent: 'green' },
+] as const
 
 const QUICK_ACTION_PATHS: Record<string, string> = {
   reviewApplications: '/hq/applications',
@@ -46,8 +56,10 @@ export default function Dashboard() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [countryScope, setCountryScope] = useState('all')
-  const [range, setRange] = useState<HqDashboardRange>('1D')
+  const [range, setRange] = useState<HqDashboardRange>('ALL')
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview')
+  const [heatmapMetric, setHeatmapMetric] = useState<HeatmapMetric>('amount')
+  const [riskRefreshToken, setRiskRefreshToken] = useState(0)
   const {
     filters,
     kpis,
@@ -63,7 +75,7 @@ export default function Dashboard() {
     activityLogs,
     aiInsight,
     quickActions,
-  } = useDashboard({ countryScope, range })
+  } = useDashboard({ countryScope, range, refreshToken: riskRefreshToken })
 
   /*
    * Figma 실측: 상태/액션 류 셀은 "항상 배지"가 아니라 진행 중·이례적인 값만 배지로
@@ -95,6 +107,54 @@ export default function Dashboard() {
     }
   }
 
+  const getRangeLabel = (option: HqDashboardRange) => (option === 'ALL' ? t('hqDashboard.filter.allPeriod') : option)
+
+  const metricValue = (value: unknown) => {
+    if (typeof value === 'number') return value
+    const raw = String(value ?? '0').trim()
+    const multiplier = raw.includes('M') ? 1_000_000 : raw.includes('K') && !raw.includes('KORI') ? 1_000 : 1
+    const normalized = Number(raw.replace(/[^0-9.-]/g, ''))
+    return Number.isFinite(normalized) ? normalized * multiplier : 0
+  }
+
+  const heatmapRows = [...countryOps.rows]
+    .map((row) => ({
+      code: row.id,
+      valueText: String(row[heatmapMetric] ?? '0'),
+      value: metricValue(row[heatmapMetric]),
+    }))
+    .sort((a, b) => b.value - a.value || a.code.localeCompare(b.code))
+  const heatmapMax = Math.max(1, ...heatmapRows.map((row) => row.value))
+
+  const openSettlementDetail = (row: (typeof settlement.rows)[number]) => {
+    const params = new URLSearchParams()
+    if (row.settlementRequestId !== undefined) {
+      params.set('settlementRequestId', String(row.settlementRequestId))
+    }
+    if (row.requestNo) {
+      params.set('requestNo', row.requestNo)
+    }
+    Object.entries({
+      type: row.type,
+      name: row.name,
+      country: row.country,
+      status: row.status,
+    }).forEach(([key, value]) => params.set(key, value))
+    navigate(`/hq/settlement/request/detail?${params.toString()}`)
+  }
+
+  const handleRiskAction = (row: (typeof risk.rows)[number], action: (typeof RISK_ACTIONS)[number]['action']) => {
+    void postHqPageData('/api/hq/dashboard/risk-actions', {
+      targetId: row.targetId,
+      action,
+      reason: row.typeCode ?? row.type,
+    })
+      .then(() => setRiskRefreshToken((token) => token + 1))
+      .catch((error) => {
+        console.error('Failed to apply HQ risk action', error)
+      })
+  }
+
   const settlementRows: TableRow[] = settlement.rows.map((r) => ({
     id: r.id,
     cells: {
@@ -105,7 +165,11 @@ export default function Dashboard() {
       held: r.held,
       payable: r.payable,
       status: badgeOrText(r.status, r.statusAccent),
-      action: badgeOrText(r.action, r.actionAccent),
+      action: (
+        <Badge accent={r.actionAccent ?? 'cyan'} size="cell" onClick={() => openSettlementDetail(r)}>
+          {r.action}
+        </Badge>
+      ),
     },
   }))
 
@@ -132,20 +196,43 @@ export default function Dashboard() {
   const riskRows: TableRow[] = risk.rows.map((r) => ({
     id: r.id,
     cells: {
-      type: r.type,
+      type: r.typeKey ? t(r.typeKey) : r.type,
       targetId: r.targetId,
       wallet: r.wallet,
       country: r.country,
       relatedTx: r.relatedTx,
-      score: badgeOrText(r.score, r.scoreAccent),
+      score: (
+        <div className={styles.riskScoreCell}>
+          {badgeOrText(r.score, r.scoreAccent)}
+          {r.scoreCriteriaKey ? <span className={styles.riskScoreCriteria}>{t(r.scoreCriteriaKey)}</span> : null}
+        </div>
+      ),
       held: r.held,
-      action: badgeOrText(r.action, r.actionAccent),
+      actionStatus: badgeOrText(
+        r.actionStatusKey ? t(r.actionStatusKey) : r.actionStatus ?? t('hqDashboard.risk.actionStatus.unreviewed'),
+        r.actionStatusAccent ?? 'blue',
+      ),
+      action: (
+        <div className={styles.riskActionGroup}>
+          {RISK_ACTIONS.map((item) => (
+            <Badge
+              key={`${r.id}-${item.action}`}
+              accent={item.accent}
+              size="cell"
+              onClick={() => handleRiskAction(r, item.action)}
+            >
+              {t(item.labelKey)}
+            </Badge>
+          ))}
+        </div>
+      ),
     },
   }))
 
   const countryOpsRows: TableRow[] = countryOps.rows.map((r) => ({
     id: r.id,
     cells: {
+      rank: r.rank,
       id: r.id,
       leaders: r.leaders,
       partners: r.partners,
@@ -244,7 +331,7 @@ export default function Dashboard() {
             <select className={styles.filterSelect} value={filters.selectedRange} onChange={(event) => setRange(event.target.value as HqDashboardRange)}>
               {filters.rangeOptions.map((option) => (
                 <option key={option} value={option}>
-                  {option}
+                  {getRangeLabel(option)}
                 </option>
               ))}
             </select>
@@ -336,18 +423,38 @@ export default function Dashboard() {
             <div className={styles.countryOpsLayout}>
               <DataTable columns={countryOps.columns} rows={countryOpsRows} largeText navyZebra bare fluid />
               <div className={styles.heatmapBox}>
-                <h4 className={styles.subBoxTitle}>{t('hqDashboard.countryOps.heatmapTitle')}</h4>
-                <div className={styles.heatmapGrid}>
-                  {countryOps.heatmap.map((c) => (
-                    // 테두리는 전부 시안(CSS), 배경만 국가별로 시안/초록/보라/주황 순환(Figma 실측)
-                    <span
-                      key={c.code}
-                      className={styles.heatmapDot}
-                      style={{ background: `color-mix(in srgb, var(--color-accent-${c.accent}) 24%, transparent)` }}
+                <div className={styles.heatmapHead}>
+                  <h4 className={styles.subBoxTitle}>{t('hqDashboard.countryOps.heatmapTitle')}</h4>
+                  <label className={styles.heatmapFilter}>
+                    <span>{t('hqDashboard.countryOps.heatmapMetric')}</span>
+                    <select
+                      className={styles.heatmapSelect}
+                      value={heatmapMetric}
+                      onChange={(event) => setHeatmapMetric(event.target.value as HeatmapMetric)}
                     >
-                      {c.code}
-                    </span>
-                  ))}
+                      {HEATMAP_METRICS.map((metric) => (
+                        <option key={metric} value={metric}>
+                          {t(`hqDashboard.countryOps.metric.${metric}`)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+                <div className={styles.heatmapGrid} aria-label={t('hqDashboard.countryOps.heatmapTitle')}>
+                  {heatmapRows.map((row, index) => {
+                    const intensity = 18 + Math.round((row.value / heatmapMax) * 54)
+                    return (
+                      <div
+                        key={row.code}
+                        className={styles.heatmapCell}
+                        style={{ background: `color-mix(in srgb, var(--color-accent-cyan) ${intensity}%, transparent)` }}
+                      >
+                        <span className={styles.heatmapRank}>{index + 1}</span>
+                        <strong className={styles.heatmapCode}>{row.code}</strong>
+                        <span className={styles.heatmapValue}>{row.valueText}</span>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             </div>

@@ -90,28 +90,28 @@
   },
   "settlement": {
     "stats": [
-      { "id": "totalPending", "labelKey": "hqDashboard.settlement.totalPending", "value": "₩8.42M", "accent": "cyan" },
-      { "id": "completed", "labelKey": "hqDashboard.settlement.completed", "value": "₩31.25M", "accent": "green" },
-      { "id": "onHold", "labelKey": "hqDashboard.settlement.onHold", "value": "₩2.11M", "accent": "orange" },
-      { "id": "memberCollateral", "labelKey": "hqDashboard.settlement.memberCollateral", "value": "₩14.7M", "accent": "purple" }
+      { "id": "totalPending", "labelKey": "hqDashboard.settlement.totalPending", "value": "635.8625 KORI", "accent": "cyan" },
+      { "id": "completed", "labelKey": "hqDashboard.settlement.completed", "value": "180 KORI", "accent": "green" },
+      { "id": "onHold", "labelKey": "hqDashboard.settlement.onHold", "value": "75.9 KORI", "accent": "orange" },
+      { "id": "memberCollateral", "labelKey": "hqDashboard.settlement.memberCollateral", "value": "751.6 KORI", "accent": "purple" }
     ],
     "rows": [
-      { "id": "s1", "type": "Leader", "name": "JOEL", "country": "Nigeria", "requested": "₩1,250,000", "held": "₩0", "payable": "₩1,250,000", "status": "정산대기", "statusAccent": "blue", "action": "승인", "actionAccent": "cyan" },
-      { "id": "s2", "type": "Partner", "name": "Michael", "country": "Ghana", "requested": "₩420,000", "held": "₩80,000", "payable": "₩340,000", "status": "일부보류", "statusAccent": "orange", "action": "상세", "actionAccent": "cyan" },
-      { "id": "s3", "type": "Merchant", "name": "Seoul Cafe", "country": "Korea", "requested": "₩870,000", "held": "₩0", "payable": "₩870,000", "status": "지급가능", "action": "지급", "actionAccent": "green" },
-      { "id": "s4", "type": "Member", "name": "Wallet TQ...Ez1r", "country": "Nigeria", "requested": "₩0", "held": "₩650,000", "payable": "₩0", "status": "리스크보류", "statusAccent": "orange", "action": "검토", "actionAccent": "cyan" }
+      { "id": "s1", "type": "Leader", "name": "KR-LEAD-003", "country": "KR", "requested": "320 KORI", "held": "0 KORI", "payable": "320 KORI", "status": "정산대기", "statusAccent": "blue", "action": "상세", "actionAccent": "cyan" },
+      { "id": "s2", "type": "Partner", "name": "KR-SP-0015", "country": "KR", "requested": "270.6 KORI", "held": "35 KORI", "payable": "235.6 KORI", "status": "일부보류", "statusAccent": "orange", "action": "상세", "actionAccent": "cyan" },
+      { "id": "s3", "type": "Merchant", "name": "KR-MER-0039", "country": "KR", "requested": "4.3625 KORI", "held": "0 KORI", "payable": "4.3625 KORI", "status": "지급가능", "statusAccent": "green", "action": "상세", "actionAccent": "cyan" },
+      { "id": "s4", "type": "Partner", "name": "NG-SP-0008", "country": "NG", "requested": "40.9 KORI", "held": "40.9 KORI", "payable": "0 KORI", "status": "리스크보류", "statusAccent": "red", "action": "검토", "actionAccent": "cyan" }
     ]
   },
   "risk": {
     "stats": [
-      { "id": "abnormalWithdrawal", "labelKey": "hqDashboard.risk.abnormalWithdrawal", "value": "19건", "accent": "red" },
-      { "id": "bugSuspect", "labelKey": "hqDashboard.risk.bugSuspect", "value": "4개", "accent": "orange" },
-      { "id": "duplicateWallet", "labelKey": "hqDashboard.risk.duplicateWallet", "value": "8건", "accent": "purple" },
+      { "id": "abnormalWithdrawal", "labelKey": "hqDashboard.risk.abnormalWithdrawal", "value": "10건", "accent": "red" },
+      { "id": "bugSuspect", "labelKey": "hqDashboard.risk.bugSuspect", "value": "1개", "accent": "orange" },
+      { "id": "duplicateWallet", "labelKey": "hqDashboard.risk.duplicateWallet", "value": "3건", "accent": "purple" },
       { "id": "settlementHoldTarget", "labelKey": "hqDashboard.risk.settlementHoldTarget", "value": "14건", "accent": "cyan" }
     ],
     "rows": [
       { "id": "r1", "type": "서명 불일치", "targetId": "TX-004", "wallet": "TQ9x...Ez1r", "country": "Ghana", "relatedTx": "5", "score": "Critical", "scoreAccent": "red", "held": "₩760,000", "action": "차단", "actionAccent": "red" },
-      { "id": "r2", "type": "중복 지갑", "targetId": "Wallet-88", "wallet": "TA10...77Md", "country": "Nigeria", "relatedTx": "8", "score": "High", "scoreAccent": "orange", "held": "₩420,000", "action": "보류", "actionAccent": "orange" },
+      { "id": "r2", "type": "중복 차감", "targetId": "Wallet-88", "wallet": "TA10...77Md", "country": "Nigeria", "relatedTx": "8", "score": "High", "scoreAccent": "orange", "held": "₩420,000", "action": "보류", "actionAccent": "orange" },
       { "id": "r3", "type": "담보 부족", "targetId": "USR-2043", "wallet": "TV66...12Pg", "country": "Korea", "relatedTx": "11", "score": "Medium", "held": "₩650,000", "action": "검토", "actionAccent": "cyan" },
       { "id": "r4", "type": "허위 가맹점", "targetId": "MER-044", "wallet": "TR55...02Aa", "country": "Vietnam", "relatedTx": "3", "score": "High", "scoreAccent": "orange", "held": "₩280,000", "action": "조사", "actionAccent": "cyan" }
     ]
