@@ -16,13 +16,14 @@ import styles from './RequestsLeader.module.css'
  */
 export default function RequestsLeader() {
   const { t } = useTranslation()
-  const { stats, columns, rows: rawRows, statusMeta, approveLabel, rejectLabel } = useRequestsLeader()
+  const { stats, columns, rows: rawRows, statusMeta, approveLabel, rejectLabel, reload } = useRequestsLeader()
   const { rows } = useHqRequestActionRows({
     rows: rawRows,
     statusMeta,
     approveLabel,
     rejectLabel,
     endpointBase: '/api/hq/requests/leader',
+    onActionComplete: reload,
   })
 
   return (

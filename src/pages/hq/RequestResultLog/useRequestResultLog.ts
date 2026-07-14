@@ -1,9 +1,7 @@
-import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
-import { fetchHqPageData } from '../../../services/korionChongApi'
-import data from './requestResultLogData.json'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 
 interface StatRaw {
   id: string
@@ -32,6 +30,16 @@ export interface RequestResultLogRow {
   adminAction: AdminAction
 }
 
+interface RequestResultLogPageData {
+  stats: StatRaw[]
+  rows: RequestResultLogRow[]
+}
+
+const emptyRequestResultLogData: RequestResultLogPageData = {
+  stats: [],
+  rows: [],
+}
+
 /*
  * useRequestResultLog — 본사어드민 "파트너 요청 관리 - 요청 결과 로그 전체내역" 데이터 훅
  * ------------------------------------------------------------------
@@ -41,21 +49,10 @@ export interface RequestResultLogRow {
  */
 export function useRequestResultLog() {
   const { t } = useTranslation()
-  const [pageData, setPageData] = useState(data)
-
-  useEffect(() => {
-    let cancelled = false
-    fetchHqPageData<typeof data>('/api/hq/requests/result-log')
-      .then((response) => {
-        if (!cancelled) setPageData(response)
-      })
-      .catch(() => {
-        if (!cancelled) setPageData(data)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const { data: pageData, isLoading, error } = useHqPageData<RequestResultLogPageData>(
+    '/api/hq/requests/result-log',
+    emptyRequestResultLogData,
+  )
 
   const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
@@ -96,5 +93,7 @@ export function useRequestResultLog() {
     rows: pageData.rows as RequestResultLogRow[],
     adminActionLabel,
     section: t('hqRequestResultLog.section'),
+    isLoading,
+    error,
   }
 }

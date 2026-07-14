@@ -2,7 +2,6 @@ import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './partnersData.json'
 
 interface StatRaw {
   id: string
@@ -30,6 +29,16 @@ export interface HqPartnerListRow {
   status?: HqPartnerStatus
 }
 
+interface HqPartnerListPageData {
+  stats: StatRaw[]
+  rows: HqPartnerListRow[]
+}
+
+const emptyHqPartnerListData: HqPartnerListPageData = {
+  stats: [],
+  rows: [],
+}
+
 /*
  * usePartners (hq) — 본사어드민 "파트너 전체 목록" 데이터 훅
  * ------------------------------------------------------------------
@@ -38,7 +47,7 @@ export interface HqPartnerListRow {
  */
 export function usePartners() {
   const { t } = useTranslation()
-  const { data: pageData, isLoading, error } = useHqPageData('/api/hq/partners', data)
+  const { data: pageData, isLoading, error, reload } = useHqPageData<HqPartnerListPageData>('/api/hq/partners', emptyHqPartnerListData)
 
   const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
@@ -68,5 +77,5 @@ export function usePartners() {
     suspended: { label: t('hqPartnerList.status.suspended'), accent: 'red', solid: true },
   }
 
-  return { stats, columns, rows: pageData.rows as HqPartnerListRow[], statusMeta, isLoading, error }
+  return { stats, columns, rows: pageData.rows as HqPartnerListRow[], statusMeta, isLoading, error, reload }
 }

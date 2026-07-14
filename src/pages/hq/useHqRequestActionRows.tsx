@@ -30,6 +30,7 @@ interface UseHqRequestActionRowsOptions<TRow extends HqRequestActionRow> {
   approveLabel: string
   rejectLabel: string
   endpointBase: string
+  onActionComplete?: () => void
 }
 
 const ACTION_PATH = {
@@ -46,6 +47,7 @@ export function useHqRequestActionRows<TRow extends HqRequestActionRow>({
   approveLabel,
   rejectLabel,
   endpointBase,
+  onActionComplete,
 }: UseHqRequestActionRowsOptions<TRow>) {
   const { t } = useTranslation()
   const [localRows, setLocalRows] = useState<TRow[]>(rows)
@@ -76,55 +78,62 @@ export function useHqRequestActionRows<TRow extends HqRequestActionRow>({
   }
 
   const runRemoteAction = async (row: TRow, action: keyof typeof ACTION_PATH, reason?: string) => {
-    if (!row.applicationId) return
+    if (!row.applicationId) {
+      window.alert('요청 식별자가 없어 처리할 수 없습니다.')
+      return false
+    }
     setLoadingActionId(row.applicationId)
     try {
       await postHqPageData(`${endpointBase}/${row.applicationId}/${ACTION_PATH[action]}`, {
         reason,
         requestId: `hq-request-${action}-${row.applicationId}-${Date.now()}`,
       })
-    } catch {
-      // Fallback/mock 데이터 화면에서도 액션 클릭 피드백은 유지한다.
+      onActionComplete?.()
+      return true
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '요청 처리에 실패했습니다.'
+      window.alert(message)
+      return false
     } finally {
       setLoadingActionId(null)
     }
   }
 
-  const handleAction = (row: TRow, label: string) => {
+  const handleAction = async (row: TRow, label: string) => {
     if (row.applicationId && loadingActionId === row.applicationId) return
     const rowId = requestRowId(row)
 
     if (label === approveLabel) {
-      setLocalRows((prev) => prev.filter((item) => requestRowId(item) !== rowId))
-      void runRemoteAction(row, 'approve')
+      const ok = await runRemoteAction(row, 'approve')
+      if (ok) setLocalRows((prev) => prev.filter((item) => requestRowId(item) !== rowId))
       return
     }
 
     if (label === rejectLabel) {
       const reason = window.prompt(t('hqRequestLeader.prompt.rejectReason'))
       if (reason === null) return
-      setLocalRows((prev) => prev.filter((item) => requestRowId(item) !== rowId))
-      void runRemoteAction(row, 'reject', reason.trim())
+      const ok = await runRemoteAction(row, 'reject', reason.trim())
+      if (ok) setLocalRows((prev) => prev.filter((item) => requestRowId(item) !== rowId))
       return
     }
 
     if (label === statusMeta.review.label) {
-      setLocalRows((prev) => updateStatus(prev, rowId, 'review'))
-      void runRemoteAction(row, 'review')
+      const ok = await runRemoteAction(row, 'review')
+      if (ok) setLocalRows((prev) => updateStatus(prev, rowId, 'review'))
       return
     }
 
     if (label === statusMeta.waiting.label) {
-      setLocalRows((prev) => updateStatus(prev, rowId, 'waiting'))
-      void runRemoteAction(row, 'waiting')
+      const ok = await runRemoteAction(row, 'waiting')
+      if (ok) setLocalRows((prev) => updateStatus(prev, rowId, 'waiting'))
       return
     }
 
     if (label === statusMeta.infoRequested.label) {
       const reason = window.prompt(t('hqRequestLeader.prompt.infoReason'))
       if (!reason?.trim()) return
-      setLocalRows((prev) => updateStatus(prev, rowId, 'infoRequested'))
-      void runRemoteAction(row, 'requestInfo', reason.trim())
+      const ok = await runRemoteAction(row, 'requestInfo', reason.trim())
+      if (ok) setLocalRows((prev) => updateStatus(prev, rowId, 'infoRequested'))
     }
   }
 

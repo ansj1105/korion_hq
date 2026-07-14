@@ -1,9 +1,7 @@
-import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
-import { fetchHqPageData } from '../../../services/korionChongApi'
-import data from './applicationsData.json'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 
 interface StatRaw {
   id: string
@@ -36,6 +34,16 @@ export interface ApplicationListRow {
   status: ApplicationStatus
 }
 
+interface ApplicationsPageData {
+  stats: StatRaw[]
+  rows: ApplicationListRow[]
+}
+
+const emptyApplicationsData: ApplicationsPageData = {
+  stats: [],
+  rows: [],
+}
+
 /*
  * useApplications — 본사어드민 "신청서 관리 - 제휴 / 투자 신청서" 데이터 훅
  * ------------------------------------------------------------------
@@ -44,23 +52,7 @@ export interface ApplicationListRow {
  */
 export function useApplications() {
   const { t } = useTranslation()
-  const [pageData, setPageData] = useState(data)
-
-  useEffect(() => {
-    let cancelled = false
-
-    fetchHqPageData<typeof data>('/api/hq/applications')
-      .then((response) => {
-        if (!cancelled) setPageData(response)
-      })
-      .catch(() => {
-        if (!cancelled) setPageData(data)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const { data: pageData, isLoading, error, reload } = useHqPageData<ApplicationsPageData>('/api/hq/applications', emptyApplicationsData)
 
   const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
@@ -102,5 +94,8 @@ export function useApplications() {
     rows: pageData.rows as ApplicationListRow[],
     statusMeta,
     deleteLabel: t('hqApplications.action.delete'),
+    isLoading,
+    error,
+    reload,
   }
 }

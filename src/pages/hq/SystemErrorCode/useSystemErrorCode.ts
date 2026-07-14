@@ -29,11 +29,26 @@ export interface ErrorCodeRow {
   actions?: string[]
 }
 
+export interface ErrorCodeOptions {
+  categories: string[]
+  severities: string[]
+  autoActions: string[]
+  statuses: string[]
+}
+
 interface SystemErrorCodePageData {
+  systemStats?: Array<{ id: string; labelKey: string; value: string; delta?: string; deltaBadge?: boolean }>
+  options: ErrorCodeOptions
   rows: ErrorCodeRow[]
 }
 
 const EMPTY_SYSTEM_ERROR_CODE: SystemErrorCodePageData = {
+  options: {
+    categories: [],
+    severities: [],
+    autoActions: [],
+    statuses: [],
+  },
   rows: [],
 }
 
@@ -44,43 +59,45 @@ const EMPTY_SYSTEM_ERROR_CODE: SystemErrorCodePageData = {
  */
 export function useSystemErrorCode() {
   const { t } = useTranslation()
-  const { data, isLoading, error } = useHqPageData<SystemErrorCodePageData>(
+  const { data, setData, isLoading, error } = useHqPageData<SystemErrorCodePageData>(
     '/api/hq/payments/error-codes',
     EMPTY_SYSTEM_ERROR_CODE,
   )
   const rows = data.rows
-
-  const kpis: StatCardData[] = [
+  const apiStats = data.systemStats?.length ? data.systemStats : [
     {
       id: 'total',
-      label: t('hqSystemErrorCode.kpi.total'),
+      labelKey: 'hqSystemErrorCode.kpi.total',
       value: `${rows.length}개`,
       delta: t('hqSystemErrorCode.kpi.totalNote'),
-      deltaPlain: true,
-      dense: true,
     },
     {
       id: 'payment',
-      label: t('hqSystemErrorCode.kpi.payment'),
+      labelKey: 'hqSystemErrorCode.kpi.payment',
       value: `${rows.filter((row) => row.category === 'PAYMENT').length}개`,
-      dense: true,
-      alignTop: true,
     },
     {
       id: 'sync',
-      label: t('hqSystemErrorCode.kpi.sync'),
+      labelKey: 'hqSystemErrorCode.kpi.sync',
       value: `${rows.filter((row) => row.category === 'OFFLINE_SYNC').length}개`,
-      dense: true,
-      alignTop: true,
     },
     {
       id: 'security',
-      label: t('hqSystemErrorCode.kpi.security'),
+      labelKey: 'hqSystemErrorCode.kpi.security',
       value: `${rows.filter((row) => row.category === 'RISK' || row.severity === 'CRITICAL').length}개`,
-      dense: true,
-      alignTop: true,
     },
   ]
+
+  const kpis: StatCardData[] = apiStats.map((stat) => ({
+    id: stat.id,
+    label: t(stat.labelKey),
+    value: stat.value,
+    delta: stat.delta,
+    deltaBadge: stat.deltaBadge,
+    deltaPlain: stat.id === 'total',
+    dense: true,
+    alignTop: stat.id !== 'total',
+  }))
 
   const columns: Column[] = [
     { key: 'no', label: t('hqSystemErrorCode.col.no'), width: '72px', align: 'center' },
@@ -95,5 +112,7 @@ export function useSystemErrorCode() {
     { key: 'action', label: t('hqSystemErrorCode.col.action'), width: '180px' },
   ]
 
-  return { kpis, columns, rows, isLoading, error }
+  return { kpis, columns, rows, options: data.options, setData, isLoading, error }
 }
+
+export type { SystemErrorCodePageData }

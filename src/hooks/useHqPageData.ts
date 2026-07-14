@@ -7,6 +7,7 @@ export function useHqPageData<T>(path: string | null, initialData: T, query?: Qu
   const [data, setData] = useState<T>(initialData)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [reloadToken, setReloadToken] = useState(0)
 
   useEffect(() => {
     if (!path) {
@@ -39,7 +40,7 @@ export function useHqPageData<T>(path: string | null, initialData: T, query?: Qu
     return () => {
       cancelled = true
     }
-  }, [path, JSON.stringify(query)])
+  }, [path, JSON.stringify(query), reloadToken])
 
-  return { data, isLoading, error }
+  return { data, setData, isLoading, error, reload: () => setReloadToken((value) => value + 1) }
 }

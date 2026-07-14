@@ -7,6 +7,7 @@ import StatCard from '../../../components/molecules/StatCard'
 import InfoGrid from '../../../components/molecules/InfoGrid'
 import FilterTabs from '../../../components/molecules/FilterTabs'
 import ActionBadges from '../../../components/molecules/ActionBadges'
+import Badge from '../../../components/atoms/Badge'
 import { useTranslation } from '../../../i18n'
 import { useLeaderSales } from './useLeaderSales'
 import { useLeaderPartners } from './useLeaderPartners'
@@ -65,7 +66,7 @@ function LeaderSalesDetail({ leaderCode }: { leaderCode: string }) {
       net: r.net,
       status: r.status,
       syncStatus: r.syncStatus,
-      action: <ActionBadges labels={r.actions} size="xs" />,
+      action: <ActionBadges labels={r.actions} />,
     },
   }))
 
@@ -82,7 +83,7 @@ function LeaderSalesDetail({ leaderCode }: { leaderCode: string }) {
       monthTxCount: r.monthTxCount,
       unsettledFee: r.unsettledFee,
       lastActive: r.lastActive,
-      action: <ActionBadges labels={[t('common.detail')]} size="xs" />,
+      action: <ActionBadges labels={[t('common.detail')]} />,
     },
   }))
 
@@ -98,7 +99,7 @@ function LeaderSalesDetail({ leaderCode }: { leaderCode: string }) {
       fee: r.fee,
       lastPaidAt: r.lastPaidAt,
       usage: r.usage,
-      action: <ActionBadges labels={[t('common.detail')]} size="xs" />,
+      action: <ActionBadges labels={[t('common.detail')]} />,
     },
   }))
 
@@ -109,9 +110,9 @@ function LeaderSalesDetail({ leaderCode }: { leaderCode: string }) {
       code: r.code,
       amount: r.amount,
       fee: r.fee,
-      status: <span className={styles.statusGood}>{r.status}</span>,
+      status: <Badge accent="green" size="md" shape="rect">{r.status}</Badge>,
       paidDate: r.paidDate,
-      detail: <ActionBadges labels={[t('common.detail')]} size="xs" />,
+      detail: <ActionBadges labels={[t('common.detail')]} />,
     },
   }))
 
@@ -122,8 +123,8 @@ function LeaderSalesDetail({ leaderCode }: { leaderCode: string }) {
       code: r.code,
       amount: r.amount,
       fee: r.fee,
-      status: <span className={styles.statusGood}>{r.status}</span>,
-      detail: <ActionBadges labels={[t('common.detail')]} size="xs" />,
+      status: <Badge accent="green" size="md" shape="rect">{r.status}</Badge>,
+      detail: <ActionBadges labels={[t('common.detail')]} />,
     },
   }))
 
@@ -136,7 +137,7 @@ function LeaderSalesDetail({ leaderCode }: { leaderCode: string }) {
       reason: r.reason,
       amount: r.amount,
       heldFee: r.heldFee,
-      status: <span className={styles.statusHold}>{r.status}</span>,
+      status: <Badge accent="orange" size="md" shape="rect">{r.status}</Badge>,
     },
   }))
 
@@ -149,9 +150,9 @@ function LeaderSalesDetail({ leaderCode }: { leaderCode: string }) {
       totalAmount: r.totalAmount,
       partnerAmount: r.partnerAmount,
       held: r.held,
-      status: r.status === '본사 검토중' ? <span className={styles.statusReview}>{r.status}</span> : r.status,
+      status: r.status === '본사 검토중' ? <Badge accent="purple" size="md" shape="rect">{r.status}</Badge> : r.status,
       paidDate: r.paidDate,
-      action: <ActionBadges labels={[t('common.detail')]} size="xs" />,
+      action: <ActionBadges labels={[t('common.detail')]} />,
     },
   }))
 

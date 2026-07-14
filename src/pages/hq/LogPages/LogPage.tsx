@@ -60,7 +60,7 @@ export default function LogPage({ pageType }: LogPageProps) {
         toolbar={[t('common.search'), t('common.filter'), t('common.excel')]}
         columns={columns}
         rows={tableRows}
-        searchKeys={['no', 'time', 'adminId', 'admin', 'eventType', 'menu', 'action', 'targetId', 'ip', 'result', 'riskLevel']}
+        searchKeys={['no', 'logId', 'time', 'adminId', 'admin', 'eventType', 'menu', 'action', 'targetId', 'ip', 'result', 'riskLevel']}
         filterKeys={['eventType', 'menu', 'action', 'result', 'riskLevel']}
         mutedText
         headerBar

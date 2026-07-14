@@ -65,6 +65,11 @@ interface LoginSecurityFormState {
   status: string
 }
 
+interface TwoFactorFormState {
+  configValue: string
+  status: string
+}
+
 export default function AdminPage({ pageType }: AdminPageProps) {
   const { t } = useTranslation()
   const { title, desc, tableTitle, stats, columns, rows, isLoading, error, reload } = useHqAdminPage(pageType)
@@ -72,10 +77,12 @@ export default function AdminPage({ pageType }: AdminPageProps) {
   const [selectedGroup, setSelectedGroup] = useState<null | HqAdminRowWithGroup>(null)
   const [selectedCountryAccess, setSelectedCountryAccess] = useState<null | HqAdminRowWithCountryAccess>(null)
   const [selectedLoginSecurity, setSelectedLoginSecurity] = useState<null | HqAdminRowWithLoginSecurity>(null)
+  const [selectedTwoFactor, setSelectedTwoFactor] = useState<null | HqAdminRowWithTwoFactor>(null)
   const [form, setForm] = useState<AccountFormState>({ adminRole: 'HQ_STAFF', status: 'ACTIVE', parentAdminId: '', countryScope: 'ALL' })
   const [groupForm, setGroupForm] = useState<GroupFormState>({ scope: '', status: 'ACTIVE', permissions: '' })
   const [countryAccessForm, setCountryAccessForm] = useState<CountryAccessFormState>({ countryCode: 'ALL', status: 'ACTIVE', menuPermissions: '' })
   const [loginSecurityForm, setLoginSecurityForm] = useState<LoginSecurityFormState>({ configValue: '', status: 'ACTIVE' })
+  const [twoFactorForm, setTwoFactorForm] = useState<TwoFactorFormState>({ configValue: '', status: 'ACTIVE' })
   const [saveError, setSaveError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
 
@@ -125,6 +132,18 @@ export default function AdminPage({ pageType }: AdminPageProps) {
     if (!policyKey) return
     setSelectedLoginSecurity({ ...row, policyKey })
     setLoginSecurityForm({
+      configValue: String(row.currentValue ?? ''),
+      status: String(row.status ?? '') === '검토필요' ? 'REVIEW' : 'ACTIVE',
+    })
+    setSaveError(null)
+  }
+
+  const openTwoFactorModal = (row: HqAdminRow) => {
+    if (pageType !== 'two-factor') return
+    const policyKey = String(row.policyKey ?? row.id ?? '')
+    if (!policyKey) return
+    setSelectedTwoFactor({ ...row, policyKey })
+    setTwoFactorForm({
       configValue: String(row.currentValue ?? ''),
       status: String(row.status ?? '') === '검토필요' ? 'REVIEW' : 'ACTIVE',
     })
@@ -191,6 +210,25 @@ export default function AdminPage({ pageType }: AdminPageProps) {
     }
   }
 
+  const saveTwoFactor = async () => {
+    if (!selectedTwoFactor) return
+    setIsSaving(true)
+    setSaveError(null)
+    try {
+      await putHqPageData(`/api/hq/admin/two-factor/${selectedTwoFactor.policyKey}`, {
+        configValue: twoFactorForm.configValue.trim(),
+        status: twoFactorForm.status,
+        requestId: `hq-two-factor-${Date.now()}`,
+      })
+      setSelectedTwoFactor(null)
+      reload()
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : t('hqAdmin.twoFactorModal.saveError'))
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   const saveGroup = async () => {
     if (!selectedGroup) return
     setIsSaving(true)
@@ -240,6 +278,8 @@ export default function AdminPage({ pageType }: AdminPageProps) {
                 openCountryAccessModal(row)
               } else if (pageType === 'login-security') {
                 openLoginSecurityModal(row)
+              } else if (pageType === 'two-factor') {
+                openTwoFactorModal(row)
               }
             }}
           />
@@ -458,6 +498,51 @@ export default function AdminPage({ pageType }: AdminPageProps) {
           </section>
         </div>
       )}
+
+      {selectedTwoFactor && (
+        <div className={styles.overlay} onClick={() => setSelectedTwoFactor(null)}>
+          <section className={styles.modal} role="dialog" aria-modal="true" aria-label={t('hqAdmin.twoFactorModal.title')} onClick={(event) => event.stopPropagation()}>
+            <div className={styles.modalHead}>
+              <div>
+                <h2 className={styles.modalTitle}>{t('hqAdmin.twoFactorModal.title')}</h2>
+                <p className={styles.modalDesc}>{t('hqAdmin.twoFactorModal.desc')}</p>
+              </div>
+              <Badge accent={selectedTwoFactor.status === '적용중' ? 'green' : 'orange'} size="md" shape="rect">{String(selectedTwoFactor.status ?? '-')}</Badge>
+            </div>
+
+            <dl className={styles.detailGrid}>
+              <div><dt>{t('hqAdmin.col.policyName')}</dt><dd>{String(selectedTwoFactor.policyName ?? '-')}</dd></div>
+              <div><dt>{t('hqAdmin.col.category')}</dt><dd>{String(selectedTwoFactor.category ?? '-')}</dd></div>
+              <div><dt>{t('hqAdmin.col.controlRange')}</dt><dd>{String(selectedTwoFactor.controlRange ?? '-')}</dd></div>
+              <div><dt>{t('hqAdmin.col.recommendedValue')}</dt><dd>{String(selectedTwoFactor.recommendedValue ?? '-')}</dd></div>
+              <div><dt>{t('hqAdmin.col.enforcement')}</dt><dd>{String(selectedTwoFactor.enforcement ?? '-')}</dd></div>
+              <div><dt>{t('hqAdmin.col.impact')}</dt><dd>{String(selectedTwoFactor.impact ?? '-')}</dd></div>
+            </dl>
+
+            <div className={styles.formGrid}>
+              <label className={styles.field}>
+                <span>{t('hqAdmin.twoFactorModal.configValue')}</span>
+                <input value={twoFactorForm.configValue} onChange={(event) => setTwoFactorForm((prev) => ({ ...prev, configValue: event.target.value }))} placeholder={t('hqAdmin.twoFactorModal.configValuePlaceholder')} />
+              </label>
+              <label className={styles.field}>
+                <span>{t('hqAdmin.twoFactorModal.status')}</span>
+                <select value={twoFactorForm.status} onChange={(event) => setTwoFactorForm((prev) => ({ ...prev, status: event.target.value }))}>
+                  <option value="ACTIVE">ACTIVE</option>
+                  <option value="REVIEW">REVIEW</option>
+                  <option value="DISABLED">DISABLED</option>
+                </select>
+              </label>
+            </div>
+
+            {saveError && <p className={styles.errorText}>{saveError}</p>}
+
+            <div className={styles.modalActions}>
+              <Button variant="secondary" onClick={() => setSelectedTwoFactor(null)}>{t('hqAdmin.modal.cancel')}</Button>
+              <Button variant="primary" onClick={saveTwoFactor} disabled={isSaving}>{isSaving ? t('common.loading') : t('hqAdmin.modal.save')}</Button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   )
 }
@@ -466,3 +551,4 @@ type HqAdminRowWithAccount = HqAdminRow & { adminId: number }
 type HqAdminRowWithGroup = HqAdminRow & { roleCode: string }
 type HqAdminRowWithCountryAccess = HqAdminRow & { adminId: number }
 type HqAdminRowWithLoginSecurity = HqAdminRow & { policyKey: string }
+type HqAdminRowWithTwoFactor = HqAdminRow & { policyKey: string }

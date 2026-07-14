@@ -4,9 +4,9 @@ import RequestListPage from '../../../components/templates/RequestListPage'
 import ActionBadges from '../../../components/molecules/ActionBadges'
 import Badge from '../../../components/atoms/Badge'
 import type { TableRow } from '../../../components/organisms/DataTable'
-import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { AccentKey } from '../../../types'
 import { useTranslation } from '../../../i18n'
+import { postHqPageData } from '../../../services/korionChongApi'
 import { useMerchants, type HqMerchantStatus } from './useMerchants'
 import styles from '../Partners/Partners.module.css'
 
@@ -18,7 +18,7 @@ import styles from '../Partners/Partners.module.css'
 export default function Merchants() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { stats: apiStats, columns, rows: rawRows, statusMeta } = useMerchants()
+  const { stats, columns, rows: rawRows, statusMeta, reload } = useMerchants()
   const [query, setQuery] = useState('')
   const [countryFilter, setCountryFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState<'all' | HqMerchantStatus>('all')
@@ -40,31 +40,6 @@ export default function Merchants() {
     () => sortedRows.map((row) => ({ ...row, currentStatus: statusOverrides[row.no] ?? row.status ?? 'approved' })),
     [sortedRows, statusOverrides],
   )
-
-  const stats = useMemo<StatCardData[]>(() => {
-    const approvedCount = rowsWithCurrentStatus.filter((row) => row.currentStatus === 'approved').length
-    const suspendedCount = rowsWithCurrentStatus.filter((row) => row.currentStatus === 'suspended').length
-    const activePayingCount = rowsWithCurrentStatus.filter((row) => extractNumber(row.monthTxCount) > 0).length
-    const monthVolume = rowsWithCurrentStatus.reduce((sum, row) => sum + extractAmount(row.monthVolume), 0)
-    const monthTxCount = rowsWithCurrentStatus.reduce((sum, row) => sum + extractNumber(row.monthTxCount), 0)
-    const totalFee = rowsWithCurrentStatus.reduce((sum, row) => sum + extractAmount(row.fee), 0)
-    const valuesById: Record<string, string> = {
-      totalMerchants: String(rawRows.length),
-      activeMerchants: String(approvedCount),
-      approvedMerchants: String(approvedCount),
-      suspendedMerchants: String(suspendedCount),
-      activePayingMerchants: String(activePayingCount),
-      monthVolume: formatNumber(monthVolume),
-      monthTxCount: String(monthTxCount),
-      totalFee: formatNumber(totalFee),
-    }
-
-    return apiStats.map((stat) => ({
-      ...stat,
-      value: valuesById[stat.id] ?? stat.value,
-      deltaBadge: stat.deltaBadge ?? Boolean(stat.delta),
-    }))
-  }, [apiStats, rawRows.length, rowsWithCurrentStatus])
 
   const filteredRows = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -121,7 +96,7 @@ export default function Merchants() {
               solid
               size="md"
               shape="rect"
-              onLabelClick={() => toggleMerchantStatus(r.no, r.currentStatus)}
+              onLabelClick={() => toggleMerchantStatus(r, r.currentStatus)}
             />
           </div>
         ),
@@ -129,11 +104,15 @@ export default function Merchants() {
     }
   })
 
-  const toggleMerchantStatus = (id: string, currentStatus: HqMerchantStatus) => {
+  const toggleMerchantStatus = async (row: { no: string; merchantCode: string }, currentStatus: HqMerchantStatus) => {
+    const nextStatus = currentStatus === 'approved' ? 'suspended' : 'approved'
+    const ok = await updateEntityStatus(`/api/hq/merchants/${encodeURIComponent(row.merchantCode)}/status`, nextStatus)
+    if (!ok) return
     setStatusOverrides((prev) => ({
       ...prev,
-      [id]: currentStatus === 'approved' ? 'suspended' : 'approved',
+      [row.no]: nextStatus,
     }))
+    reload()
   }
 
   const handleRowClick = (id: string) => {
@@ -229,16 +208,19 @@ function extractNumber(value: string) {
   return match ? Number(match.join('')) : 0
 }
 
-function extractAmount(value: string) {
-  const normalized = value.replace(/,/g, '')
-  const match = normalized.match(/-?\d+(?:\.\d+)?/)
-  return match ? Number(match[0]) : 0
-}
-
-function formatNumber(value: number) {
-  return value.toLocaleString(undefined, { maximumFractionDigits: 6 })
-}
-
 function toCsvLine(values: string[]) {
   return values.map((value) => `"${value.replace(/"/g, '""')}"`).join(',')
+}
+
+async function updateEntityStatus(path: string, status: HqMerchantStatus) {
+  try {
+    await postHqPageData(path, {
+      status,
+      requestId: `hq-entity-${status}-${Date.now()}`,
+    })
+    return true
+  } catch (error) {
+    window.alert(error instanceof Error ? error.message : '요청 처리에 실패했습니다.')
+    return false
+  }
 }

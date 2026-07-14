@@ -16,13 +16,14 @@ import styles from './RequestsMerchantDirect.module.css'
  */
 export default function RequestsMerchantDirect() {
   const { t } = useTranslation()
-  const { stats, columns, rows: rawRows, statusMeta, approveLabel, rejectLabel } = useRequestsMerchantDirect()
+  const { stats, columns, rows: rawRows, statusMeta, approveLabel, rejectLabel, reload } = useRequestsMerchantDirect()
   const { rows } = useHqRequestActionRows({
     rows: rawRows,
     statusMeta,
     approveLabel,
     rejectLabel,
     endpointBase: '/api/hq/requests/merchant-direct',
+    onActionComplete: reload,
   })
 
   return (

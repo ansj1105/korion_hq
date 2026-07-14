@@ -7,6 +7,8 @@ import styles from './MaintenanceStartOverlay.module.css'
 interface Props {
   open: boolean
   onClose: () => void
+  onConfirm: (userMessage: string) => void
+  isSaving?: boolean
 }
 
 /*
@@ -17,7 +19,7 @@ interface Props {
  * 배지 선택 상태(기능별 점검/즉시 점검 시작)는 시안 고정값 — 선택/입력/저장 동작은
  * 협의 전이라 UI 상태만 구현(CLAUDE.md 1번).
  */
-export default function MaintenanceStartOverlay({ open, onClose }: Props) {
+export default function MaintenanceStartOverlay({ open, onClose, onConfirm, isSaving }: Props) {
   const { t } = useTranslation()
   const { scopes, features, timing, schedule } = useMaintenanceStart()
   // "점검 시작" 클릭 → 재확인 모달(Figma 81:29835)을 이 폼 위에 겹쳐 띄움
@@ -115,7 +117,12 @@ export default function MaintenanceStartOverlay({ open, onClose }: Props) {
         </div>
 
         {/* 재확인 모달 — 이 폼은 유지된 채 위에 겹침 */}
-        <MaintenanceConfirmOverlay open={confirmOpen} onClose={() => setConfirmOpen(false)} />
+        <MaintenanceConfirmOverlay
+          open={confirmOpen}
+          onClose={() => setConfirmOpen(false)}
+          onConfirm={() => onConfirm(schedule.userMessage)}
+          isSaving={isSaving}
+        />
       </div>
     </div>
   )

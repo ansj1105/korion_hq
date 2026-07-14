@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { AccentKey } from '../../../types'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
-import { fetchHqPageData } from '../../../services/korionChongApi'
-import data from './requestsPartnerByLeaderData.json'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 
 interface StatRaw {
   id: string
@@ -20,6 +18,7 @@ export type PartnerByLeaderRequestStatus = 'review' | 'waiting' | 'infoRequested
 
 /** 파트너 승인 요청(리더요청) 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
 export interface PartnerByLeaderRequestRow {
+  applicationId?: number
   no: string
   appliedAt: string
   /** 요청을 올린 상위 리더 코드. 없으면 "-" */
@@ -33,6 +32,16 @@ export interface PartnerByLeaderRequestRow {
   status: PartnerByLeaderRequestStatus | null
 }
 
+interface PartnerByLeaderRequestPageData {
+  stats: StatRaw[]
+  rows: PartnerByLeaderRequestRow[]
+}
+
+const emptyPartnerByLeaderRequestData: PartnerByLeaderRequestPageData = {
+  stats: [],
+  rows: [],
+}
+
 /*
  * useRequestsPartnerByLeader — 본사어드민 "파트너 요청 관리 - 파트너 승인 요청 (리더요청)" 데이터 훅
  * ------------------------------------------------------------------
@@ -41,21 +50,10 @@ export interface PartnerByLeaderRequestRow {
  */
 export function useRequestsPartnerByLeader() {
   const { t } = useTranslation()
-  const [pageData, setPageData] = useState(data)
-
-  useEffect(() => {
-    let cancelled = false
-    fetchHqPageData<typeof data>('/api/hq/requests/partner-by-leader')
-      .then((response) => {
-        if (!cancelled) setPageData(response)
-      })
-      .catch(() => {
-        if (!cancelled) setPageData(data)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const { data: pageData, isLoading, error, reload } = useHqPageData<PartnerByLeaderRequestPageData>(
+    '/api/hq/requests/partner-by-leader',
+    emptyPartnerByLeaderRequestData,
+  )
 
   const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
@@ -94,5 +92,8 @@ export function useRequestsPartnerByLeader() {
     statusMeta,
     approveLabel: t('hqRequestPartnerByLeader.action.approve'),
     rejectLabel: t('hqRequestPartnerByLeader.action.reject'),
+    isLoading,
+    error,
+    reload,
   }
 }

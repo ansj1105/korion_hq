@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { AccentKey } from '../../../types'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
-import { fetchHqPageData, postHqPageData } from '../../../services/korionChongApi'
-import data from './requestsLeaderData.json'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 
 interface StatRaw {
   id: string
@@ -17,7 +15,6 @@ interface StatRaw {
 
 /** 진행 상태 — 검토중/대기/자료요청 중 하나만 활성(Figma 액션 배지 기준). 신규 접수는 상태 없음(null) */
 export type LeaderRequestStatus = 'review' | 'waiting' | 'infoRequested'
-export type LeaderRequestAction = 'approve' | 'reject' | 'review' | 'waiting' | 'requestInfo'
 
 /** 리더 승인 요청 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
 export interface LeaderRequestRow {
@@ -35,6 +32,16 @@ export interface LeaderRequestRow {
   status: LeaderRequestStatus | null
 }
 
+interface LeaderRequestPageData {
+  stats: StatRaw[]
+  rows: LeaderRequestRow[]
+}
+
+const emptyLeaderRequestData: LeaderRequestPageData = {
+  stats: [],
+  rows: [],
+}
+
 /*
  * useRequestsLeader — 본사어드민 "파트너 요청 관리 - 리더 승인 요청" 데이터 훅
  * ------------------------------------------------------------------
@@ -43,50 +50,10 @@ export interface LeaderRequestRow {
  */
 export function useRequestsLeader() {
   const { t } = useTranslation()
-  const [pageData, setPageData] = useState(data)
-  const [loadingActionId, setLoadingActionId] = useState<number | null>(null)
-
-  const reload = () => {
-    let cancelled = false
-
-    fetchHqPageData<typeof data>('/api/hq/requests/leader')
-      .then((response) => {
-        if (!cancelled) setPageData(response)
-      })
-      .catch(() => {
-        if (!cancelled) setPageData(data)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }
-
-  useEffect(() => {
-    return reload()
-  }, [])
-
-  const runAction = async (row: LeaderRequestRow, action: LeaderRequestAction, reason?: string) => {
-    const applicationId = row.applicationId
-    if (!applicationId) return
-    const actionPath: Record<LeaderRequestAction, string> = {
-      approve: 'approve',
-      reject: 'reject',
-      review: 'review',
-      waiting: 'waiting',
-      requestInfo: 'request-info',
-    }
-    setLoadingActionId(applicationId)
-    try {
-      await postHqPageData(`/api/hq/requests/leader/${applicationId}/${actionPath[action]}`, {
-        reason,
-        requestId: `hq-leader-${action}-${applicationId}-${Date.now()}`,
-      })
-      reload()
-    } finally {
-      setLoadingActionId(null)
-    }
-  }
+  const { data: pageData, isLoading, error, reload } = useHqPageData<LeaderRequestPageData>(
+    '/api/hq/requests/leader',
+    emptyLeaderRequestData,
+  )
 
   const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
@@ -125,7 +92,8 @@ export function useRequestsLeader() {
     statusMeta,
     approveLabel: t('hqRequestLeader.action.approve'),
     rejectLabel: t('hqRequestLeader.action.reject'),
-    runAction,
-    loadingActionId,
+    isLoading,
+    error,
+    reload,
   }
 }

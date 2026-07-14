@@ -16,13 +16,14 @@ import styles from './RequestsPartnerByLeader.module.css'
  */
 export default function RequestsPartnerByLeader() {
   const { t } = useTranslation()
-  const { stats, columns, rows: rawRows, statusMeta, approveLabel, rejectLabel } = useRequestsPartnerByLeader()
+  const { stats, columns, rows: rawRows, statusMeta, approveLabel, rejectLabel, reload } = useRequestsPartnerByLeader()
   const { rows } = useHqRequestActionRows({
     rows: rawRows,
     statusMeta,
     approveLabel,
     rejectLabel,
     endpointBase: '/api/hq/requests/partner-by-leader',
+    onActionComplete: reload,
   })
 
   return (

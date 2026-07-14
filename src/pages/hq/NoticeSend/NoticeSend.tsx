@@ -103,6 +103,7 @@ export default function NoticeSend() {
 
   const getScheduledAt = () => {
     if (method === 'immediate') return null
+    if (!sendDate || !sendTime) return null
     return new Date(`${sendDate.replace(/\./g, '-')}T${sendTime}:00+09:00`).toISOString()
   }
 

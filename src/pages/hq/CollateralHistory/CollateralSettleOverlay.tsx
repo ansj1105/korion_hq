@@ -1,5 +1,5 @@
 import { useTranslation } from '../../../i18n'
-import type { InfoDetailTone } from './useCollateralInfoDetail'
+import Badge from '../../../components/atoms/Badge'
 import { useCollateralSettleDetail } from './useCollateralSettleDetail'
 import type { CollateralSettlementRow } from './useCollateralHistory'
 import styles from './CollateralSettleOverlay.module.css'
@@ -8,13 +8,6 @@ interface Props {
   open: boolean
   onClose: () => void
   row?: CollateralSettlementRow | null
-}
-
-/* 상태 강조색 — Figma 시안의 초록(#34d399)/호박(#fbbf24). 담보금 상세 오버레이와 같은 팔레트 */
-const TONE_COLOR: Record<InfoDetailTone, string> = {
-  cyan: '#22d3ee',
-  green: '#34d399',
-  amber: '#fbbf24',
 }
 
 /*
@@ -92,7 +85,7 @@ export default function CollateralSettleOverlay({ open, onClose, row }: Props) {
               <span>{r.at}</span>
               <span>{r.payAmount}</span>
               <span>{r.receiveAmount}</span>
-              <span style={{ color: TONE_COLOR[r.statusTone] }}>{r.status}</span>
+              <Badge accent={r.statusTone} size="md" shape="rect">{r.status}</Badge>
             </div>
           ))}
         </div>

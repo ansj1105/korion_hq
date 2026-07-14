@@ -16,13 +16,14 @@ import styles from './RequestsPartnerDirect.module.css'
  */
 export default function RequestsPartnerDirect() {
   const { t } = useTranslation()
-  const { stats, columns, rows: rawRows, statusMeta, approveLabel, rejectLabel } = useRequestsPartnerDirect()
+  const { stats, columns, rows: rawRows, statusMeta, approveLabel, rejectLabel, reload } = useRequestsPartnerDirect()
   const { rows } = useHqRequestActionRows({
     rows: rawRows,
     statusMeta,
     approveLabel,
     rejectLabel,
     endpointBase: '/api/hq/requests/partner-direct',
+    onActionComplete: reload,
   })
 
   return (

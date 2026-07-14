@@ -20,7 +20,7 @@ import type { CountryRow } from './useSystemCountry'
  */
 export default function SystemCountry() {
   const { t } = useTranslation()
-  const { kpis, columns, rows: rawRows, isLoading, error } = useSystemCountry()
+  const { kpis, columns, rows: rawRows, formOptions, setData, isLoading, error } = useSystemCountry()
   // "국가 추가" 클릭 → 등록 폼(Figma 81:29739) / 행 클릭 → 국가 상세정보 폼(Figma 81:29865)
   const [addOpen, setAddOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
@@ -85,8 +85,9 @@ export default function SystemCountry() {
         }
         columns={columns}
         rows={rows}
-        searchKeys={['code', 'country', 'regions', 'timezone', 'currency', 'language']}
-        filterKeys={['status', 'payment', 'currency', 'language']}
+        searchKeys={['code', 'country', 'regions', 'timezone', 'currency', 'language', 'leader']}
+        filterKeys={['status', 'payment', 'currency', 'language', 'timezone']}
+        exportUrl="/api/hq/system/country/export"
         mutedText
         headerBar
         wrapCells
@@ -98,12 +99,19 @@ export default function SystemCountry() {
         }}
       />
 
-      <CountryFormOverlay variant="add" open={addOpen} onClose={() => setAddOpen(false)} />
+      <CountryFormOverlay
+        variant="add"
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        formOptions={formOptions}
+        onSaved={setData}
+      />
       <CountryFormOverlay
         variant="detail"
         open={detailOpen}
         onClose={() => setDetailOpen(false)}
         country={selectedCountry}
+        formOptions={formOptions}
       />
     </div>
   )

@@ -28,6 +28,7 @@ export interface MaintenanceRow {
   statusAccent?: string
   admin: string
   source?: string
+  userMessage?: string
   actions?: string[]
 }
 
@@ -37,9 +38,10 @@ interface MaintenanceStatus {
   badge: string
   desc: string
   accent?: string
+  userMessage?: string
 }
 
-interface SystemMaintenancePageData {
+export interface SystemMaintenancePageData {
   status: MaintenanceStatus
   kpis: KpiRaw[]
   rows: MaintenanceRow[]
@@ -63,7 +65,7 @@ const EMPTY_SYSTEM_MAINTENANCE: SystemMaintenancePageData = {
  */
 export function useSystemMaintenance() {
   const { t } = useTranslation()
-  const { data, isLoading, error } = useHqPageData<SystemMaintenancePageData>(
+  const { data, setData, isLoading, error } = useHqPageData<SystemMaintenancePageData>(
     '/api/hq/system/maintenance-mode',
     EMPTY_SYSTEM_MAINTENANCE,
   )
@@ -99,6 +101,7 @@ export function useSystemMaintenance() {
     kpis,
     columns,
     rows: data.rows,
+    setData,
     isLoading,
     error,
   }

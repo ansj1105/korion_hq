@@ -2,7 +2,6 @@ import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './merchantsData.json'
 
 interface StatRaw {
   id: string
@@ -33,6 +32,16 @@ export interface HqMerchantListRow {
   actions?: string[]
 }
 
+interface HqMerchantListPageData {
+  stats: StatRaw[]
+  rows: HqMerchantListRow[]
+}
+
+const emptyHqMerchantListData: HqMerchantListPageData = {
+  stats: [],
+  rows: [],
+}
+
 /*
  * useMerchants (hq) — 본사어드민 "가맹점 전체 목록" 데이터 훅
  * ------------------------------------------------------------------
@@ -41,7 +50,7 @@ export interface HqMerchantListRow {
  */
 export function useMerchants() {
   const { t } = useTranslation()
-  const { data: pageData, isLoading, error } = useHqPageData('/api/hq/merchants', data)
+  const { data: pageData, isLoading, error, reload } = useHqPageData<HqMerchantListPageData>('/api/hq/merchants', emptyHqMerchantListData)
 
   const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
@@ -74,5 +83,5 @@ export function useMerchants() {
     black: { label: t('hqMerchantList.status.black'), accent: 'orange', solid: true },
   }
 
-  return { stats, columns, rows: pageData.rows as HqMerchantListRow[], statusMeta, isLoading, error }
+  return { stats, columns, rows: pageData.rows as HqMerchantListRow[], statusMeta, isLoading, error, reload }
 }

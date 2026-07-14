@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { AccentKey } from '../../../types'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
-import { fetchHqPageData } from '../../../services/korionChongApi'
-import data from './requestsMerchantDirectData.json'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 
 interface StatRaw {
   id: string
@@ -20,6 +18,7 @@ export type MerchantDirectRequestStatus = 'review' | 'waiting' | 'infoRequested'
 
 /** 가맹점 승인 요청(다이렉트) 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
 export interface MerchantDirectRequestRow {
+  applicationId?: number
   no: string
   appliedAt: string
   /** 신청자의 상위(리더/파트너) 코드. 다이렉트 신청이라 없으면 "-" */
@@ -33,6 +32,16 @@ export interface MerchantDirectRequestRow {
   status: MerchantDirectRequestStatus | null
 }
 
+interface MerchantDirectRequestPageData {
+  stats: StatRaw[]
+  rows: MerchantDirectRequestRow[]
+}
+
+const emptyMerchantDirectRequestData: MerchantDirectRequestPageData = {
+  stats: [],
+  rows: [],
+}
+
 /*
  * useRequestsMerchantDirect — 본사어드민 "파트너 요청 관리 - 가맹점 승인 요청 (다이렉트)" 데이터 훅
  * ------------------------------------------------------------------
@@ -42,21 +51,10 @@ export interface MerchantDirectRequestRow {
  */
 export function useRequestsMerchantDirect() {
   const { t } = useTranslation()
-  const [pageData, setPageData] = useState(data)
-
-  useEffect(() => {
-    let cancelled = false
-    fetchHqPageData<typeof data>('/api/hq/requests/merchant-direct')
-      .then((response) => {
-        if (!cancelled) setPageData(response)
-      })
-      .catch(() => {
-        if (!cancelled) setPageData(data)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const { data: pageData, isLoading, error, reload } = useHqPageData<MerchantDirectRequestPageData>(
+    '/api/hq/requests/merchant-direct',
+    emptyMerchantDirectRequestData,
+  )
 
   const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
@@ -95,5 +93,8 @@ export function useRequestsMerchantDirect() {
     statusMeta,
     approveLabel: t('hqRequestMerchantDirect.action.approve'),
     rejectLabel: t('hqRequestMerchantDirect.action.reject'),
+    isLoading,
+    error,
+    reload,
   }
 }

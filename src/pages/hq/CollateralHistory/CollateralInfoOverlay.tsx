@@ -1,4 +1,5 @@
 import { useTranslation } from '../../../i18n'
+import Badge from '../../../components/atoms/Badge'
 import { useCollateralInfoDetail, type InfoDetailTone } from './useCollateralInfoDetail'
 import type { CollateralHistoryRow, CollateralInfoRow } from './useCollateralHistory'
 import styles from './CollateralInfoOverlay.module.css'
@@ -125,7 +126,7 @@ export default function CollateralInfoOverlay({ open, onClose, row }: Props) {
               <span>{a.at}</span>
               <span>{a.type}</span>
               <span>{a.amount}</span>
-              <span style={{ color: TONE_COLOR[a.statusTone] }}>{a.status}</span>
+              <Badge accent={a.statusTone} size="md" shape="rect">{a.status}</Badge>
             </div>
           ))}
         </div>

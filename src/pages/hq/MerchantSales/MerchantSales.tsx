@@ -7,6 +7,7 @@ import StatCard from '../../../components/molecules/StatCard'
 import InfoGrid from '../../../components/molecules/InfoGrid'
 import FilterTabs from '../../../components/molecules/FilterTabs'
 import ActionBadges from '../../../components/molecules/ActionBadges'
+import Badge from '../../../components/atoms/Badge'
 import { useTranslation } from '../../../i18n'
 import { useHqPageData } from '../../../hooks/useHqPageData'
 import Merchants from '../Merchants'
@@ -68,7 +69,7 @@ export default function MerchantSales() {
       net: r.net,
       status: r.status,
       syncStatus: r.syncStatus,
-      action: <ActionBadges labels={r.actions} size="xs" />,
+      action: <ActionBadges labels={r.actions} />,
     },
   }))
 
@@ -81,7 +82,7 @@ export default function MerchantSales() {
       reason: r.reason,
       amount: r.amount,
       heldFee: r.heldFee,
-      status: <span className={styles.statusHold}>{r.status}</span>,
+      status: <Badge accent="orange" size="md" shape="rect">{r.status}</Badge>,
     },
   }))
 
@@ -93,9 +94,9 @@ export default function MerchantSales() {
       period: r.period,
       partnerAmount: r.partnerAmount,
       held: r.held,
-      status: r.status === '본사 검토중' ? <span className={styles.statusReview}>{r.status}</span> : r.status,
+      status: r.status === '본사 검토중' ? <Badge accent="purple" size="md" shape="rect">{r.status}</Badge> : r.status,
       paidDate: r.paidDate,
-      action: <ActionBadges labels={[t('common.detail')]} size="xs" />,
+      action: <ActionBadges labels={[t('common.detail')]} />,
     },
   }))
 

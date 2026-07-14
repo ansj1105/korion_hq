@@ -15,6 +15,7 @@ interface HqLogColumn {
 
 export interface HqLogRow {
   id: string
+  logId?: string
   no: string
   adminId: string
   admin: string

@@ -5,6 +5,8 @@ import styles from './MaintenanceConfirmOverlay.module.css'
 interface Props {
   open: boolean
   onClose: () => void
+  onConfirm: () => void
+  isSaving?: boolean
 }
 
 /*
@@ -15,7 +17,7 @@ interface Props {
  * backdrop 클릭 또는 '취소'로 이 모달만 닫힌다(설정 폼은 유지).
  * 모달의 "점검 시작" 확정 동작은 시안이 없어 UI만 구현(CLAUDE.md 1번).
  */
-export default function MaintenanceConfirmOverlay({ open, onClose }: Props) {
+export default function MaintenanceConfirmOverlay({ open, onClose, onConfirm, isSaving }: Props) {
   const { t } = useTranslation()
   const { fields } = useMaintenanceConfirm()
 
@@ -50,8 +52,8 @@ export default function MaintenanceConfirmOverlay({ open, onClose }: Props) {
           <button type="button" className={styles.cancelButton} onClick={onClose}>
             {t('hqSystemMaintenance.confirm.cancel')}
           </button>
-          <button type="button" className={styles.confirmButton}>
-            {t('hqSystemMaintenance.btn.start')}
+          <button type="button" className={styles.confirmButton} onClick={onConfirm} disabled={isSaving}>
+            {isSaving ? t('common.loading') : t('hqSystemMaintenance.btn.start')}
           </button>
         </div>
       </div>

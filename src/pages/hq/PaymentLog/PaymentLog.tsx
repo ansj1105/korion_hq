@@ -149,9 +149,6 @@ export default function PaymentLog() {
         toolbarInline
         tableMutedText
         onRowClick={(id) => setSelectedId(id)}
-        /* 15컬럼이라 가로폭은 컨테이너에 고정하고, 긴 값은 가로 스크롤 대신 다음 줄로 줄바꿈해 끝까지 보이게 */
-        tableFluid
-        tableWrapCells
       />
 
       <DetailDrawer

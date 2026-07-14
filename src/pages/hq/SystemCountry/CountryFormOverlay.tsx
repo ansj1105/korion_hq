@@ -1,33 +1,80 @@
+import { useEffect, useMemo, useState } from 'react'
+import { postHqPageData } from '../../../services/korionChongApi'
 import { useTranslation } from '../../../i18n'
-import type { CountryRow } from './useSystemCountry'
-import { useCountryForm } from './useCountryForm'
+import type { CountryOption, CountryRow, LeaderOption, SystemCountryFormOptions, SystemCountryPageData } from './useSystemCountry'
 import styles from './CountryFormOverlay.module.css'
 
+type CountryStatus = 'ACTIVE' | 'PREPARING' | 'RESTRICTED'
+
+interface SaveResponse {
+  status: string
+  countryCode: string
+  page: SystemCountryPageData
+}
+
 interface Props {
-  /** add: "국가 추가" 등록 폼(Figma 81:29739) / detail: 행 클릭 "국가 상세정보" 폼(Figma 81:29865) */
   variant: 'add' | 'detail'
   open: boolean
   onClose: () => void
   country?: CountryRow | null
+  formOptions?: SystemCountryFormOptions
+  onSaved?: (page: SystemCountryPageData) => void
 }
 
-/*
- * CountryFormOverlay — 국가 등록/상세 폼 오버레이
- * ------------------------------------------------------------------
- * 두 시안(81:29739 국가 추가 / 81:29865 국가 상세정보)은 제목과 하단 버튼만 다르고
- * 필드 구성이 같아 variant 하나로 처리한다.
- * 별도 라우트 없이 open prop으로만 제어. 사이드바를 제외한 콘텐츠 영역 중앙에 노출
- * (CollateralDetailOverlay와 동일한 backdrop 방식). backdrop 클릭 또는 '취소'로 닫힘.
- * 입력/토글/수정·저장 동작은 협의 전이라 시안의 예시값을 채운 UI 상태만 구현(CLAUDE.md 1번).
- */
-export default function CountryFormOverlay({ variant, open, onClose, country }: Props) {
+function normalizeCountryOptions(options?: CountryOption[]) {
+  return options?.length ? options : [
+    { code: 'KR', name: '대한민국', nameEn: 'Korea', timezone: 'UTC+09', currency: 'KRW', language: 'Korean' },
+    { code: 'NG', name: 'Nigeria', nameEn: 'Nigeria', timezone: 'UTC+01', currency: 'NGN', language: 'English' },
+    { code: 'PH', name: 'Philippines', nameEn: 'Philippines', timezone: 'UTC+08', currency: 'PHP', language: 'English' },
+    { code: 'GH', name: 'Ghana', nameEn: 'Ghana', timezone: 'UTC+00', currency: 'GHS', language: 'English' },
+    { code: 'VN', name: 'Vietnam', nameEn: 'Vietnam', timezone: 'UTC+07', currency: 'VND', language: 'Vietnamese' },
+  ]
+}
+
+function requestId() {
+  return `hq-system-country-${Date.now()}-${Math.random().toString(16).slice(2)}`
+}
+
+export default function CountryFormOverlay({ variant, open, onClose, country, formOptions, onSaved }: Props) {
   const { t } = useTranslation()
-  const { fields, toggles, memo } = useCountryForm()
+  const countryOptions = useMemo(() => normalizeCountryOptions(formOptions?.countryOptions), [formOptions?.countryOptions])
+  const [code, setCode] = useState(countryOptions[0]?.code ?? '')
+  const selectedOption = countryOptions.find((option) => option.code === code) ?? countryOptions[0]
+  const leaders = useMemo<LeaderOption[]>(() => (
+    formOptions?.leaderOptions?.filter((leader) => leader.countryCode === code) ?? []
+  ), [code, formOptions?.leaderOptions])
+
+  const [name, setName] = useState(selectedOption?.name ?? '')
+  const [regions, setRegions] = useState('')
+  const [timezone, setTimezone] = useState(selectedOption?.timezone ?? '')
+  const [currency, setCurrency] = useState(selectedOption?.currency ?? '')
+  const [language, setLanguage] = useState(selectedOption?.language ?? '')
+  const [leaderAccountId, setLeaderAccountId] = useState('')
+  const [status, setStatus] = useState<CountryStatus>('ACTIVE')
+  const [paymentAllowed, setPaymentAllowed] = useState(true)
+  const [offlinePaymentAllowed, setOfflinePaymentAllowed] = useState(true)
+  const [memo, setMemo] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!open || variant !== 'add') return
+    const option = selectedOption
+    setName(option?.name ?? '')
+    setTimezone(option?.timezone ?? '')
+    setCurrency(option?.currency ?? '')
+    setLanguage(option?.language ?? '')
+    setLeaderAccountId('')
+    setError(null)
+  }, [code, open, selectedOption, variant])
 
   if (!open) return null
 
   const title = variant === 'add' ? t('hqSystemCountry.btn.addCountry') : t('hqSystemCountry.detail.title')
-  const displayFields = variant === 'detail' && country ? [
+  const isActive = status === 'ACTIVE'
+  const canSubmit = Boolean(code && name && timezone && currency && language && regions.trim()) && !isSaving
+
+  const detailFields = variant === 'detail' && country ? [
     { label: t('hqSystemCountry.add.field.name'), value: country.country },
     { label: t('hqSystemCountry.add.field.code'), value: country.code },
     { label: t('hqSystemCountry.add.field.regions'), value: country.regions },
@@ -36,18 +83,38 @@ export default function CountryFormOverlay({ variant, open, onClose, country }: 
     { label: t('hqSystemCountry.add.field.language'), value: country.language },
     { label: t('hqSystemCountry.col.leader'), value: country.leader },
     { label: t('hqSystemCountry.col.status'), value: country.status },
-  ] : fields
-  const displayToggles = variant === 'detail' && country ? [
-    { label: t('hqSystemCountry.add.field.paymentAllowed'), on: country.payment === 'ON' },
-    { label: t('hqSystemCountry.add.field.offlinePaymentAllowed'), on: country.payment === 'ON' },
-  ] : toggles
-  const displayMemo = variant === 'detail' && country
-    ? `${country.country} / ${country.code} · ${country.regions}`
-    : memo
+  ] : []
+
+  async function handleSubmit() {
+    if (!canSubmit) return
+    setIsSaving(true)
+    setError(null)
+    try {
+      const response = await postHqPageData<SaveResponse>('/api/hq/system/country', {
+        code,
+        name,
+        regions: regions.trim(),
+        timezone,
+        currency,
+        language,
+        leaderAccountId: leaderAccountId ? Number(leaderAccountId) : null,
+        status,
+        paymentAllowed: isActive && paymentAllowed,
+        offlinePaymentAllowed: isActive && offlinePaymentAllowed,
+        memo: memo.trim(),
+        requestId: requestId(),
+      })
+      onSaved?.(response.page)
+      onClose()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('hqSystemCountry.add.saveError'))
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   return (
     <div className={styles.backdrop} onClick={onClose}>
-      {/* stopPropagation: 패널 안 클릭이 backdrop 클릭으로 버블링되지 않도록 */}
       <div
         className={styles.panel}
         role="dialog"
@@ -60,33 +127,121 @@ export default function CountryFormOverlay({ variant, open, onClose, country }: 
           <p className={styles.subtitle}>{t('hqSystemCountry.add.desc')}</p>
         </div>
 
-        {/* 입력 필드 8개 — 2열 그리드 (시안 예시값 표시) */}
-        <div className={styles.fieldGrid}>
-          {displayFields.map((f) => (
-            <div key={f.label} className={styles.field}>
-              <span className={styles.fieldLabel}>{f.label}</span>
-              <span className={styles.fieldValue}>{f.value}</span>
+        {variant === 'add' ? (
+          <div className={styles.fieldGrid}>
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.code')}</span>
+              <select className={styles.fieldControl} value={code} onChange={(event) => setCode(event.target.value)}>
+                {countryOptions.map((option) => (
+                  <option key={option.code} value={option.code}>{option.code}</option>
+                ))}
+              </select>
+            </label>
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.name')}</span>
+              <input className={styles.fieldControl} value={name} onChange={(event) => setName(event.target.value)} />
+            </label>
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.regions')}</span>
+              <input
+                className={styles.fieldControl}
+                value={regions}
+                placeholder={t('hqSystemCountry.add.placeholder.regions')}
+                onChange={(event) => setRegions(event.target.value)}
+              />
+            </label>
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.timezone')}</span>
+              <input className={styles.fieldControl} value={timezone} onChange={(event) => setTimezone(event.target.value)} />
+            </label>
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.currency')}</span>
+              <input className={styles.fieldControl} value={currency} onChange={(event) => setCurrency(event.target.value)} />
+            </label>
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.language')}</span>
+              <input className={styles.fieldControl} value={language} onChange={(event) => setLanguage(event.target.value)} />
+            </label>
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.leader')}</span>
+              <select className={styles.fieldControl} value={leaderAccountId} onChange={(event) => setLeaderAccountId(event.target.value)}>
+                <option value="">{t('hqSystemCountry.add.option.noLeader')}</option>
+                {leaders.map((leader) => (
+                  <option key={leader.accountId} value={leader.accountId}>{leader.name} / {leader.code}</option>
+                ))}
+              </select>
+            </label>
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.status')}</span>
+              <select className={styles.fieldControl} value={status} onChange={(event) => setStatus(event.target.value as CountryStatus)}>
+                <option value="ACTIVE">{t('hqSystemCountry.add.status.ACTIVE')}</option>
+                <option value="PREPARING">{t('hqSystemCountry.add.status.PREPARING')}</option>
+                <option value="RESTRICTED">{t('hqSystemCountry.add.status.RESTRICTED')}</option>
+              </select>
+            </label>
+            <div className={styles.field}>
+              <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.paymentAllowed')}</span>
+              <button
+                type="button"
+                className={`${styles.toggleButton} ${isActive && paymentAllowed ? styles.toggleButtonOn : styles.toggleButtonOff}`}
+                aria-pressed={isActive && paymentAllowed}
+                disabled={!isActive}
+                onClick={() => setPaymentAllowed((current) => !current)}
+              >
+                {isActive && paymentAllowed ? 'ON' : 'OFF'}
+              </button>
             </div>
-          ))}
-
-          {/* 결제 허용 / 오프라인 결제 허용 토글 — 시안은 둘 다 ON(초록) */}
-          {displayToggles.map((tg) => (
-            <div key={tg.label} className={styles.field}>
-              <span className={styles.fieldLabel}>{tg.label}</span>
-              <span className={tg.on ? styles.toggleOn : styles.toggleOff} aria-hidden>
-                {tg.on ? 'ON' : 'OFF'}
+            <div className={styles.field}>
+              <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.offlinePaymentAllowed')}</span>
+              <button
+                type="button"
+                className={`${styles.toggleButton} ${isActive && offlinePaymentAllowed ? styles.toggleButtonOn : styles.toggleButtonOff}`}
+                aria-pressed={isActive && offlinePaymentAllowed}
+                disabled={!isActive}
+                onClick={() => setOfflinePaymentAllowed((current) => !current)}
+              >
+                {isActive && offlinePaymentAllowed ? 'ON' : 'OFF'}
+              </button>
+            </div>
+            <label className={`${styles.field} ${styles.memoField}`}>
+              <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.memo')}</span>
+              <textarea
+                className={`${styles.fieldControl} ${styles.memoControl}`}
+                value={memo}
+                placeholder={t('hqSystemCountry.add.placeholder.memo')}
+                onChange={(event) => setMemo(event.target.value)}
+              />
+            </label>
+          </div>
+        ) : (
+          <div className={styles.fieldGrid}>
+            {detailFields.map((field) => (
+              <div key={field.label} className={styles.field}>
+                <span className={styles.fieldLabel}>{field.label}</span>
+                <span className={styles.fieldValue}>{field.value}</span>
+              </div>
+            ))}
+            <div className={styles.field}>
+              <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.paymentAllowed')}</span>
+              <span className={country?.payment === 'ON' ? styles.toggleOn : styles.toggleOff} aria-hidden>
+                {country?.payment === 'ON' ? 'ON' : 'OFF'}
               </span>
             </div>
-          ))}
-
-          {/* 관리자 메모 — 첫 번째 열, 다른 인풋보다 높은 박스(Figma 300×90) */}
-          <div className={`${styles.field} ${styles.memoField}`}>
-            <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.memo')}</span>
-            <span className={`${styles.fieldValue} ${styles.memoValue}`}>{displayMemo}</span>
+            <div className={styles.field}>
+              <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.offlinePaymentAllowed')}</span>
+              <span className={country?.payment === 'ON' ? styles.toggleOn : styles.toggleOff} aria-hidden>
+                {country?.payment === 'ON' ? 'ON' : 'OFF'}
+              </span>
+            </div>
+            <div className={`${styles.field} ${styles.memoField}`}>
+              <span className={styles.fieldLabel}>{t('hqSystemCountry.add.field.memo')}</span>
+              <span className={`${styles.fieldValue} ${styles.memoValue}`}>{country ? `${country.country} / ${country.code} · ${country.regions}` : '-'}</span>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* 하단 버튼 — add: 우측 [취소·국가 추가] / detail: 좌측 [수정] + 우측 [취소·저장] (Figma 실측 배치) */}
+        {error && <p className={styles.errorText}>{error}</p>}
+
         <div className={variant === 'detail' ? `${styles.footer} ${styles.footerDetail}` : styles.footer}>
           {variant === 'detail' && (
             <button type="button" className={`${styles.ghostButton} ${styles.editButton}`}>
@@ -96,8 +251,13 @@ export default function CountryFormOverlay({ variant, open, onClose, country }: 
           <button type="button" className={styles.ghostButton} onClick={onClose}>
             {t('hqSystemCountry.add.cancel')}
           </button>
-          <button type="button" className={styles.submitButton}>
-            {variant === 'add' ? t('hqSystemCountry.btn.addCountry') : t('hqSystemCountry.detail.save')}
+          <button
+            type="button"
+            className={styles.submitButton}
+            disabled={variant === 'add' ? !canSubmit : false}
+            onClick={variant === 'add' ? handleSubmit : undefined}
+          >
+            {isSaving ? t('common.loading') : variant === 'add' ? t('hqSystemCountry.btn.addCountry') : t('hqSystemCountry.detail.save')}
           </button>
         </div>
       </div>

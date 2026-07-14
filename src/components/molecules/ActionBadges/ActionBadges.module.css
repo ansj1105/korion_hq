@@ -1,7 +1,7 @@
 /* ActionBadges — 테이블 액션 컬럼의 작은 배지 묶음 */
 .actions {
   display: flex;
-  gap: 3px;            /* 한 줄에 여러 배지가 들어가도록 간격을 좁게 */
+  gap: var(--space-2);
   flex-wrap: nowrap;   /* 항상 한 줄 유지 */
   min-width: 0;
 }
@@ -12,6 +12,6 @@
  * "한 자리의 상태 토글"처럼 보이게 하는 화면용.
  */
 .equalWidth > * {
-  width: 37px;
+  min-width: 52px;
   justify-content: center;
 }

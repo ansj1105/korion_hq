@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import Badge from '../../../components/atoms/Badge'
 import { useTranslation } from '../../../i18n'
 import { fetchHqPageData } from '../../../services/korionChongApi'
 import styles from './SettlementDetailModal.module.css'
@@ -82,7 +83,7 @@ export default function SettlementDetailModal({ settlementRequestId, onClose }: 
         {/* 헤더: 제목 좌측 + 정산 상태 배지(연녹색, 데이터 값) 우측 */}
         <div className={styles.header}>
           <h2 className={styles.title}>{t('hqSettle.histModal.title')}</h2>
-          <span className={styles.statusBadge}>{detail?.header?.statusOk ?? '-'}</span>
+          <Badge accent="green" size="md" shape="rect">{detail?.header?.statusOk ?? '-'}</Badge>
         </div>
         <div className={styles.divider} />
 

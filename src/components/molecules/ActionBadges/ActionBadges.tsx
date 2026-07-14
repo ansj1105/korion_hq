@@ -1,6 +1,7 @@
 import type { MouseEvent } from 'react'
 import Badge from '../../atoms/Badge'
 import type { AccentKey } from '../../../types'
+import { actionBadgeAccent } from '../../../utils/badgeAccents'
 import styles from './ActionBadges.module.css'
 
 interface ActionBadgesProps {
@@ -40,9 +41,9 @@ interface ActionBadgesProps {
 /*
  * ActionBadges (molecule)
  * ------------------------------------------------------------------
- * 테이블 액션 컬럼에 들어가는 작은 배지 묶음. 동작 없는 UI(표시 전용).
+ * 테이블 액션 컬럼에 들어가는 배지 묶음. onLabelClick이 있으면 버튼, 없으면 표시 전용이다.
  */
-export default function ActionBadges({ labels, accentByLabel, size = 'sm', shape = 'pill', solid, solidByLabel, equalWidth, onLabelClick }: ActionBadgesProps) {
+export default function ActionBadges({ labels, accentByLabel, size = 'md', shape = 'rect', solid, solidByLabel, equalWidth, onLabelClick }: ActionBadgesProps) {
   const className = equalWidth ? `${styles.actions} ${styles.equalWidth}` : styles.actions
   const stopActionPropagation = (event: MouseEvent<HTMLDivElement>) => {
     if (onLabelClick) {
@@ -55,7 +56,7 @@ export default function ActionBadges({ labels, accentByLabel, size = 'sm', shape
       {labels.map((label) => (
         <Badge
           key={label}
-          accent={accentByLabel ? accentByLabel[label] : 'cyan'}
+          accent={accentByLabel ? accentByLabel[label] : actionBadgeAccent(label)}
           size={size}
           shape={shape}
           solid={solidByLabel ? solidByLabel[label] : solid}

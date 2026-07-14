@@ -5,6 +5,7 @@ import Badge from '../../../components/atoms/Badge'
 import type { TableRow } from '../../../components/organisms/DataTable'
 import type { AccentKey } from '../../../types'
 import { useTranslation } from '../../../i18n'
+import { postHqPageData } from '../../../services/korionChongApi'
 import { useApplications } from './useApplications'
 import type { ApplicationListRow, ApplicationStatus } from './useApplications'
 import ApplicationDetailOverlay from './ApplicationDetailOverlay'
@@ -23,7 +24,7 @@ export default function Applications() {
   const [searchText, setSearchText] = useState('')
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus | 'all'>('all')
   const [page, setPage] = useState(1)
-  const { stats, columns, rows: rawRows, statusMeta, deleteLabel } = useApplications()
+  const { stats, columns, rows: rawRows, statusMeta, deleteLabel, reload } = useApplications()
   const [applicationRows, setApplicationRows] = useState<ApplicationListRow[]>(rawRows)
   const pageSize = 10
   const actionLabelByStatus: Record<ApplicationStatus, string> = {
@@ -90,16 +91,28 @@ export default function Applications() {
     URL.revokeObjectURL(url)
   }
 
-  const handleAction = (rowId: string, label: string) => {
+  const handleAction = async (row: ApplicationListRow, label: string) => {
+    const rowId = applicationRowId(row)
+    const applicationId = applicationIdFromNo(row.no)
+    if (!applicationId) {
+      window.alert('신청서 식별자가 없어 처리할 수 없습니다.')
+      return
+    }
     if (label === deleteLabel) {
-      setApplicationRows((prev) => prev.filter((row) => applicationRowId(row) !== rowId))
+      const ok = await updateApplicationStatus(applicationId, 'deleted')
+      if (!ok) return
+      setApplicationRows((prev) => prev.filter((item) => applicationRowId(item) !== rowId))
       setSelectedApplication((prev) => (prev && applicationRowId(prev) === rowId ? null : prev))
+      reload()
       return
     }
 
     const nextStatus = actionStatusByLabel[label]
     if (!nextStatus) return
-    setApplicationRows((prev) => prev.map((row) => (applicationRowId(row) === rowId ? { ...row, status: nextStatus } : row)))
+    const ok = await updateApplicationStatus(applicationId, nextStatus)
+    if (!ok) return
+    setApplicationRows((prev) => prev.map((item) => (applicationRowId(item) === rowId ? { ...item, status: nextStatus } : item)))
+    reload()
   }
 
   const rows: TableRow[] = pagedRows.map((r, index) => {
@@ -133,7 +146,7 @@ export default function Applications() {
               solidByLabel={solidByLabel}
               size="md"
               shape="rect"
-              onLabelClick={(label) => handleAction(rowId, label)}
+              onLabelClick={(label) => handleAction(r, label)}
             />
           </span>
         ),
@@ -224,4 +237,22 @@ export default function Applications() {
 
 function applicationRowId(row: ApplicationListRow) {
   return [row.no, row.appliedAt, row.type, row.country, row.contact, row.company, row.email].join('|')
+}
+
+function applicationIdFromNo(no: string) {
+  const parsed = Number(String(no).replace(/\D/g, ''))
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null
+}
+
+async function updateApplicationStatus(applicationId: number, status: ApplicationStatus | 'deleted') {
+  try {
+    await postHqPageData(`/api/hq/applications/${applicationId}/status`, {
+      status,
+      requestId: `hq-application-${status}-${applicationId}-${Date.now()}`,
+    })
+    return true
+  } catch (error) {
+    window.alert(error instanceof Error ? error.message : '요청 처리에 실패했습니다.')
+    return false
+  }
 }

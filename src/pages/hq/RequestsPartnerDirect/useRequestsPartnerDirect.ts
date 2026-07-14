@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { AccentKey } from '../../../types'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
-import { fetchHqPageData } from '../../../services/korionChongApi'
-import data from './requestsPartnerDirectData.json'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 
 interface StatRaw {
   id: string
@@ -20,6 +18,7 @@ export type PartnerDirectRequestStatus = 'review' | 'waiting' | 'infoRequested'
 
 /** 파트너 승인 요청(다이렉트) 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
 export interface PartnerDirectRequestRow {
+  applicationId?: number
   no: string
   appliedAt: string
   /** 신청자의 상위 리더 코드. 다이렉트 신청이라 없으면 "-" */
@@ -33,6 +32,16 @@ export interface PartnerDirectRequestRow {
   status: PartnerDirectRequestStatus | null
 }
 
+interface PartnerDirectRequestPageData {
+  stats: StatRaw[]
+  rows: PartnerDirectRequestRow[]
+}
+
+const emptyPartnerDirectRequestData: PartnerDirectRequestPageData = {
+  stats: [],
+  rows: [],
+}
+
 /*
  * useRequestsPartnerDirect — 본사어드민 "파트너 요청 관리 - 파트너 승인 요청 (다이렉트)" 데이터 훅
  * ------------------------------------------------------------------
@@ -41,21 +50,10 @@ export interface PartnerDirectRequestRow {
  */
 export function useRequestsPartnerDirect() {
   const { t } = useTranslation()
-  const [pageData, setPageData] = useState(data)
-
-  useEffect(() => {
-    let cancelled = false
-    fetchHqPageData<typeof data>('/api/hq/requests/partner-direct')
-      .then((response) => {
-        if (!cancelled) setPageData(response)
-      })
-      .catch(() => {
-        if (!cancelled) setPageData(data)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const { data: pageData, isLoading, error, reload } = useHqPageData<PartnerDirectRequestPageData>(
+    '/api/hq/requests/partner-direct',
+    emptyPartnerDirectRequestData,
+  )
 
   const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
@@ -94,5 +92,8 @@ export function useRequestsPartnerDirect() {
     statusMeta,
     approveLabel: t('hqRequestPartnerDirect.action.approve'),
     rejectLabel: t('hqRequestPartnerDirect.action.reject'),
+    isLoading,
+    error,
+    reload,
   }
 }

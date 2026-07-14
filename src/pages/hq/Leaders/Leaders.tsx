@@ -4,9 +4,9 @@ import RequestListPage from '../../../components/templates/RequestListPage'
 import ActionBadges from '../../../components/molecules/ActionBadges'
 import Badge from '../../../components/atoms/Badge'
 import type { TableRow } from '../../../components/organisms/DataTable'
-import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { AccentKey } from '../../../types'
 import { useTranslation } from '../../../i18n'
+import { postHqPageData } from '../../../services/korionChongApi'
 import { useLeaders, type LeaderStatus } from './useLeaders'
 import styles from './Leaders.module.css'
 
@@ -19,7 +19,7 @@ import styles from './Leaders.module.css'
 export default function Leaders() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { columns, rows: rawRows, statusMeta } = useLeaders()
+  const { stats, columns, rows: rawRows, statusMeta, reload } = useLeaders()
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | LeaderStatus>('all')
   const [countryFilter, setCountryFilter] = useState('all')
@@ -36,44 +36,6 @@ export default function Leaders() {
   )
 
   const countryOptions = useMemo(() => Array.from(new Set(sortedRows.map((row) => row.country))), [sortedRows])
-
-  const stats = useMemo<StatCardData[]>(() => {
-    const rowsWithStatus = rawRows.map((row) => statusOverrides[row.no] ?? row.status)
-    const approvedCount = rowsWithStatus.filter((status) => status === 'approved').length
-    const suspendedCount = rowsWithStatus.filter((status) => status === 'suspended').length
-    const uniqueCountryCount = new Set(rawRows.map((row) => row.country)).size
-
-    return [
-      {
-        id: 'countries',
-        label: t('hqLeaderList.kpi.countries'),
-        value: String(uniqueCountryCount),
-        delta: t('hqLeaderList.kpi.delta5'),
-        deltaBadge: true,
-      },
-      {
-        id: 'totalLeaders',
-        label: t('hqLeaderList.kpi.totalLeaders'),
-        value: String(rawRows.length),
-        delta: t('hqLeaderList.kpi.delta5'),
-        deltaBadge: true,
-      },
-      {
-        id: 'approvedLeaders',
-        label: t('hqLeaderList.kpi.approvedLeaders'),
-        value: String(approvedCount),
-        delta: t('hqLeaderList.kpi.delta5'),
-        deltaBadge: true,
-      },
-      {
-        id: 'suspendedLeaders',
-        label: t('hqLeaderList.kpi.suspendedLeaders'),
-        value: String(suspendedCount),
-        delta: t('hqLeaderList.kpi.delta5'),
-        deltaBadge: true,
-      },
-    ]
-  }, [rawRows, statusOverrides, t])
 
   const filteredRows = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -122,7 +84,7 @@ export default function Leaders() {
               solid
               size="md"
               shape="rect"
-              onLabelClick={() => toggleLeaderStatus(r.no, status)}
+              onLabelClick={() => toggleLeaderStatus(r, status)}
             />
           </div>
         ),
@@ -158,11 +120,15 @@ export default function Leaders() {
     URL.revokeObjectURL(url)
   }
 
-  const toggleLeaderStatus = (id: string, currentStatus: LeaderStatus) => {
+  const toggleLeaderStatus = async (row: { no: string; leaderCode: string }, currentStatus: LeaderStatus) => {
+    const nextStatus = currentStatus === 'approved' ? 'suspended' : 'approved'
+    const ok = await updateEntityStatus(`/api/hq/leaders/${encodeURIComponent(row.leaderCode)}/status`, nextStatus)
+    if (!ok) return
     setStatusOverrides((prev) => ({
       ...prev,
-      [id]: currentStatus === 'approved' ? 'suspended' : 'approved',
+      [row.no]: nextStatus,
     }))
+    reload()
   }
 
   const handleRowClick = (id: string) => {
@@ -226,4 +192,17 @@ function extractNumber(value: string) {
 
 function toCsvLine(values: string[]) {
   return values.map((value) => `"${value.replace(/"/g, '""')}"`).join(',')
+}
+
+async function updateEntityStatus(path: string, status: LeaderStatus) {
+  try {
+    await postHqPageData(path, {
+      status,
+      requestId: `hq-entity-${status}-${Date.now()}`,
+    })
+    return true
+  } catch (error) {
+    window.alert(error instanceof Error ? error.message : '요청 처리에 실패했습니다.')
+    return false
+  }
 }

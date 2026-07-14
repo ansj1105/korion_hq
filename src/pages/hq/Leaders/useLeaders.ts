@@ -2,7 +2,6 @@ import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
 import { useHqPageData } from '../../../hooks/useHqPageData'
-import data from './leadersData.json'
 
 interface StatRaw {
   id: string
@@ -29,6 +28,16 @@ export interface LeaderListRow {
   status: LeaderStatus
 }
 
+interface LeaderListPageData {
+  stats: StatRaw[]
+  rows: LeaderListRow[]
+}
+
+const emptyLeaderListData: LeaderListPageData = {
+  stats: [],
+  rows: [],
+}
+
 /*
  * useLeaders — 본사어드민 "국가 리더 전체 목록" 데이터 훅
  * ------------------------------------------------------------------
@@ -38,7 +47,7 @@ export interface LeaderListRow {
  */
 export function useLeaders() {
   const { t } = useTranslation()
-  const { data: pageData, isLoading, error } = useHqPageData('/api/hq/leaders', data)
+  const { data: pageData, isLoading, error, reload } = useHqPageData<LeaderListPageData>('/api/hq/leaders', emptyLeaderListData)
 
   const stats: StatCardData[] = (pageData.stats as StatRaw[]).map((s) => ({
     id: s.id,
@@ -72,5 +81,5 @@ export function useLeaders() {
     suspended: { label: t('hqLeaderList.status.suspended'), accent: 'red', solid: true },
   }
 
-  return { stats, columns, rows: pageData.rows as LeaderListRow[], statusMeta, detailLabel: '상세', isLoading, error }
+  return { stats, columns, rows: pageData.rows as LeaderListRow[], statusMeta, detailLabel: '상세', isLoading, error, reload }
 }

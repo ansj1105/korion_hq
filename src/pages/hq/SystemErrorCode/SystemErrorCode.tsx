@@ -5,9 +5,10 @@ import ActionBadges from '../../../components/molecules/ActionBadges'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
 import Badge from '../../../components/atoms/Badge'
 import { useTranslation } from '../../../i18n'
+import { fetchHqPageData, postHqPageData } from '../../../services/korionChongApi'
 import type { AccentKey } from '../../../types'
-import { useSystemErrorCode } from './useSystemErrorCode'
-import ErrorCodeFormOverlay from './ErrorCodeFormOverlay'
+import { useSystemErrorCode, type SystemErrorCodePageData } from './useSystemErrorCode'
+import ErrorCodeFormOverlay, { type ErrorCodeCreatePayload } from './ErrorCodeFormOverlay'
 import styles from './SystemErrorCode.module.css'
 
 /*
@@ -20,9 +21,11 @@ import styles from './SystemErrorCode.module.css'
  */
 export default function SystemErrorCode() {
   const { t } = useTranslation()
-  const { kpis, columns, rows: rawRows, isLoading, error } = useSystemErrorCode()
+  const { kpis, columns, rows: rawRows, options, setData, isLoading, error } = useSystemErrorCode()
   // "오류코드 추가" 클릭 → 등록 폼 오버레이(Figma 81:29775)
   const [addOpen, setAddOpen] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   const severityAccent: Record<string, AccentKey> = {
     INFO: 'blue',
@@ -81,6 +84,21 @@ export default function SystemErrorCode() {
     },
   }))
 
+  async function submitErrorCode(payload: ErrorCodeCreatePayload) {
+    setIsSaving(true)
+    setSaveError(null)
+    try {
+      await postHqPageData('/api/hq/payments/error-codes', payload)
+      const nextPage = await fetchHqPageData<SystemErrorCodePageData>('/api/hq/payments/error-codes')
+      setData(nextPage)
+      setAddOpen(false)
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : t('hqSystemErrorCode.add.saveError'))
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   return (
     <div className={styles.page}>
       <PageHeader title={t('hqSystemErrorCode.title')}>
@@ -114,6 +132,7 @@ export default function SystemErrorCode() {
         rows={rows}
         searchKeys={['code', 'name', 'category', 'severity', 'autoAction', 'status', 'userMessage']}
         filterKeys={['category', 'severity', 'autoAction', 'status']}
+        exportUrl="/api/hq/payments/error-codes/export"
         mutedText
         headerBar
         wrapCells
@@ -121,7 +140,14 @@ export default function SystemErrorCode() {
         pageSize={10}
       />
 
-      <ErrorCodeFormOverlay open={addOpen} onClose={() => setAddOpen(false)} />
+      <ErrorCodeFormOverlay
+        open={addOpen}
+        options={options}
+        isSaving={isSaving}
+        error={saveError}
+        onClose={() => setAddOpen(false)}
+        onSubmit={submitErrorCode}
+      />
     </div>
   )
 }

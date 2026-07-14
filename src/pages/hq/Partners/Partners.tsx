@@ -4,9 +4,9 @@ import RequestListPage from '../../../components/templates/RequestListPage'
 import ActionBadges from '../../../components/molecules/ActionBadges'
 import Badge from '../../../components/atoms/Badge'
 import type { TableRow } from '../../../components/organisms/DataTable'
-import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { AccentKey } from '../../../types'
 import { useTranslation } from '../../../i18n'
+import { postHqPageData } from '../../../services/korionChongApi'
 import { usePartners, type HqPartnerStatus } from './usePartners'
 import styles from './Partners.module.css'
 
@@ -22,7 +22,7 @@ interface PartnersProps {
 export default function Partners({ detailTab }: PartnersProps = {}) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { stats: apiStats, columns, rows: rawRows, statusMeta } = usePartners()
+  const { stats, columns, rows: rawRows, statusMeta, reload } = usePartners()
   const [query, setQuery] = useState('')
   const [countryFilter, setCountryFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState<'all' | HqPartnerStatus>('all')
@@ -44,31 +44,6 @@ export default function Partners({ detailTab }: PartnersProps = {}) {
     () => sortedRows.map((row) => ({ ...row, currentStatus: statusOverrides[row.no] ?? row.status ?? 'approved' })),
     [sortedRows, statusOverrides],
   )
-
-  const stats = useMemo<StatCardData[]>(() => {
-    const approvedCount = rowsWithCurrentStatus.filter((row) => row.currentStatus === 'approved').length
-    const suspendedCount = rowsWithCurrentStatus.filter((row) => row.currentStatus === 'suspended').length
-    const directCount = rawRows.filter((row) => !row.leaderCode || row.leaderCode === '-' || row.leaderCode.includes('HQ')).length
-    const leaderAffiliatedCount = rawRows.length - directCount
-    const subMerchantCount = rawRows.reduce((sum, row) => sum + extractNumber(row.subMerchantCount), 0)
-    const unsettledFee = rowsWithCurrentStatus.reduce((sum, row) => sum + extractAmount(row.unsettledFee), 0)
-    const valuesById: Record<string, string> = {
-      totalPartners: String(rawRows.length),
-      activePartners: String(approvedCount),
-      approvedPartners: String(approvedCount),
-      suspendedPartners: String(suspendedCount),
-      directPartners: String(directCount),
-      leaderPartners: String(leaderAffiliatedCount),
-      subMerchants: String(subMerchantCount),
-      unsettledFee: `${formatNumber(unsettledFee)} KORI`,
-    }
-
-    return apiStats.map((stat) => ({
-      ...stat,
-      value: valuesById[stat.id] ?? stat.value,
-      deltaBadge: stat.deltaBadge ?? Boolean(stat.delta),
-    }))
-  }, [apiStats, rawRows, rowsWithCurrentStatus])
 
   const filteredRows = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -115,7 +90,7 @@ export default function Partners({ detailTab }: PartnersProps = {}) {
               solid
               size="md"
               shape="rect"
-              onLabelClick={() => togglePartnerStatus(r.no, r.currentStatus)}
+              onLabelClick={() => togglePartnerStatus(r, r.currentStatus)}
             />
           </div>
         ),
@@ -123,11 +98,15 @@ export default function Partners({ detailTab }: PartnersProps = {}) {
     }
   })
 
-  const togglePartnerStatus = (id: string, currentStatus: HqPartnerStatus) => {
+  const togglePartnerStatus = async (row: { no: string; partnerCode: string }, currentStatus: HqPartnerStatus) => {
+    const nextStatus = currentStatus === 'approved' ? 'suspended' : 'approved'
+    const ok = await updateEntityStatus(`/api/hq/partners/${encodeURIComponent(row.partnerCode)}/status`, nextStatus)
+    if (!ok) return
     setStatusOverrides((prev) => ({
       ...prev,
-      [id]: currentStatus === 'approved' ? 'suspended' : 'approved',
+      [row.no]: nextStatus,
     }))
+    reload()
   }
 
   const handleRowClick = (id: string) => {
@@ -223,16 +202,19 @@ function extractNumber(value: string) {
   return match ? Number(match.join('')) : 0
 }
 
-function extractAmount(value: string) {
-  const normalized = value.replace(/KORI/gi, '').replace(/,/g, '').trim()
-  const amount = Number(normalized)
-  return Number.isFinite(amount) ? amount : 0
-}
-
-function formatNumber(value: number) {
-  return value.toLocaleString(undefined, { maximumFractionDigits: 6 })
-}
-
 function toCsvLine(values: string[]) {
   return values.map((value) => `"${value.replace(/"/g, '""')}"`).join(',')
+}
+
+async function updateEntityStatus(path: string, status: HqPartnerStatus) {
+  try {
+    await postHqPageData(path, {
+      status,
+      requestId: `hq-entity-${status}-${Date.now()}`,
+    })
+    return true
+  } catch (error) {
+    window.alert(error instanceof Error ? error.message : '요청 처리에 실패했습니다.')
+    return false
+  }
 }

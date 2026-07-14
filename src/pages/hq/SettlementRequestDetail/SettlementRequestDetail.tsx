@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import PageHeader from '../../../components/organisms/PageHeader'
 import InfoGrid from '../../../components/molecules/InfoGrid'
 import ActionBadges from '../../../components/molecules/ActionBadges'
+import Badge from '../../../components/atoms/Badge'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
 import { useTranslation } from '../../../i18n'
 import { postHqPageData } from '../../../services/korionChongApi'
@@ -85,16 +86,16 @@ export default function HqSettlementRequestDetail() {
     ? [targetName, targetType, targetCountry, targetStatus].filter((value): value is string => Boolean(value))
     : header.contextBadges
 
-  const detailCell = <ActionBadges labels={[t('hqSettle.reqDetail.view')]} accentByLabel={{}} size="xs" solid />
+  const detailCell = <ActionBadges labels={[t('hqSettle.reqDetail.view')]} solid />
   const ptRows: TableRow[] = partnerTable.rows.map((r) => ({
     id: r.code,
     // '자동 예정' 값은 청록으로 강조 — 데이터는 그대로 두고 화면에서만 색 입힘
-    cells: { ...r, auto: <span className={styles.autoTag}>{r.auto}</span>, detail: detailCell },
+    cells: { ...r, auto: <Badge accent="green" size="md" shape="rect">{r.auto}</Badge>, detail: detailCell },
   }))
   const htRows: TableRow[] = heldTable.rows.map((r) => ({
     id: r.txNo,
     // '정산 보류' 값은 주황으로 강조
-    cells: { ...r, status: <span className={styles.heldTag}>{r.status}</span>, detail: detailCell },
+    cells: { ...r, status: <Badge accent="orange" size="md" shape="rect">{r.status}</Badge>, detail: detailCell },
   }))
   const allChecked = checks.length > 0 && checks.every((_, index) => checkedItems[index])
 
@@ -133,7 +134,7 @@ export default function HqSettlementRequestDetail() {
             ))}
           </div>
         </div>
-        <span className={styles.statusBadge}>{header.statusOk}</span>
+        <Badge accent="green" size="md" shape="rect">{header.statusOk}</Badge>
       </div>
 
       {/* 정산 기간 배너 */}

@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
-import { fetchHqPageData } from '../../../services/korionChongApi'
-import data from './noticeSendData.json'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 
 interface KpiRaw {
   id: string
@@ -41,6 +39,23 @@ interface NoticeSendPageData {
   form: NoticeSendForm
 }
 
+const emptyNoticeSendData: NoticeSendPageData = {
+  kpis: [],
+  filters: {
+    countryOptions: [{ value: 'all', label: 'all' }],
+    rangeOptions: ['ALL', 'TODAY', '7D', '30D', '90D'],
+  },
+  form: {
+    sender: '',
+    sendDate: '',
+    sendTime: '',
+    timezone: 'KST',
+    recipients: '0명',
+    noticeTitle: '',
+    noticeBody: '',
+  },
+}
+
 interface UseNoticeSendFilters {
   countryScope: string
   range: HqNoticeSendRange
@@ -49,25 +64,15 @@ interface UseNoticeSendFilters {
 /*
  * useNoticeSend — 본사어드민 "알림 / 공지 - 공지 보내기" 데이터 훅
  * ------------------------------------------------------------------
- * API에서 KPI/필터 옵션을 가져오고, 실패 시 기존 JSON을 fallback으로 사용한다.
+ * API에서 KPI/필터 옵션을 가져온다. API 실패 시 샘플 JSON을 섞지 않고 빈 상태와 오류를 유지한다.
  */
 export function useNoticeSend({ countryScope, range }: UseNoticeSendFilters) {
   const { t } = useTranslation()
-  const [pageData, setPageData] = useState<NoticeSendPageData>(data as NoticeSendPageData)
-
-  useEffect(() => {
-    let cancelled = false
-    fetchHqPageData<NoticeSendPageData>('/api/hq/announcements/send-summary', { countryScope, range })
-      .then((response) => {
-        if (!cancelled) setPageData(response)
-      })
-      .catch(() => {
-        if (!cancelled) setPageData(data as NoticeSendPageData)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [countryScope, range])
+  const { data: pageData, isLoading, error } = useHqPageData<NoticeSendPageData>(
+    '/api/hq/announcements/send-summary',
+    emptyNoticeSendData,
+    { countryScope, range },
+  )
 
   const kpis: StatCardData[] = pageData.kpis.map((k) => ({
     id: k.id,
@@ -82,5 +87,5 @@ export function useNoticeSend({ countryScope, range }: UseNoticeSendFilters) {
   }))
   const rangeOptions = pageData.filters?.rangeOptions ?? ['ALL', 'TODAY', '7D', '30D', '90D']
 
-  return { kpis, filters: { countryOptions, rangeOptions }, form: pageData.form }
+  return { kpis, filters: { countryOptions, rangeOptions }, form: pageData.form, isLoading, error }
 }

@@ -24,6 +24,8 @@ export interface CountryRow {
   currency: string
   language: string
   leader: string
+  leaderCount?: string
+  leaderNames?: string
   partners: string
   merchants: string
   status: string
@@ -33,14 +35,40 @@ export interface CountryRow {
   actions?: string[]
 }
 
+export interface CountryOption {
+  code: string
+  name: string
+  nameEn?: string
+  timezone: string
+  currency: string
+  language: string
+}
+
+export interface LeaderOption {
+  accountId: number
+  name: string
+  code: string
+  countryCode: string
+}
+
+export interface SystemCountryFormOptions {
+  countryOptions: CountryOption[]
+  leaderOptions: LeaderOption[]
+}
+
 interface SystemCountryPageData {
   kpis: KpiRaw[]
   rows: CountryRow[]
+  formOptions: SystemCountryFormOptions
 }
 
 const EMPTY_SYSTEM_COUNTRY: SystemCountryPageData = {
   kpis: [],
   rows: [],
+  formOptions: {
+    countryOptions: [],
+    leaderOptions: [],
+  },
 }
 
 /*
@@ -50,7 +78,7 @@ const EMPTY_SYSTEM_COUNTRY: SystemCountryPageData = {
  */
 export function useSystemCountry() {
   const { t } = useTranslation()
-  const { data, isLoading, error } = useHqPageData<SystemCountryPageData>(
+  const { data, setData, isLoading, error } = useHqPageData<SystemCountryPageData>(
     '/api/hq/system/country',
     EMPTY_SYSTEM_COUNTRY,
   )
@@ -83,5 +111,7 @@ export function useSystemCountry() {
     { key: 'action', label: t('hqSystemCountry.col.action'), width: '220px' },
   ]
 
-  return { kpis, columns, rows: data.rows, isLoading, error }
+  return { kpis, columns, rows: data.rows, formOptions: data.formOptions, setData, isLoading, error }
 }
+
+export type { SystemCountryPageData }

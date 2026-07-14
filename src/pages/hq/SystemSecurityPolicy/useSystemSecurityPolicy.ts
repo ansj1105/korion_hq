@@ -21,7 +21,7 @@ export interface SecurityPolicyRow {
   actions?: string[]
 }
 
-interface SecurityPolicyPageData {
+export interface SecurityPolicyPageData {
   kpis: Array<{ id: string; labelKey: string; value: string; delta?: string; deltaBadge?: boolean }>
   rows: SecurityPolicyRow[]
 }
@@ -33,7 +33,7 @@ const EMPTY_SECURITY_POLICY: SecurityPolicyPageData = {
 
 export function useSystemSecurityPolicy() {
   const { t } = useTranslation()
-  const { data, isLoading, error } = useHqPageData<SecurityPolicyPageData>(
+  const { data, setData, isLoading, error } = useHqPageData<SecurityPolicyPageData>(
     '/api/hq/system/security-policy',
     EMPTY_SECURITY_POLICY,
   )
@@ -62,5 +62,5 @@ export function useSystemSecurityPolicy() {
     { key: 'action', label: t('hqSystemSecurityPolicy.col.action'), width: '180px' },
   ]
 
-  return { kpis, columns, rows: data.rows, isLoading, error }
+  return { kpis, columns, rows: data.rows, setData, isLoading, error }
 }

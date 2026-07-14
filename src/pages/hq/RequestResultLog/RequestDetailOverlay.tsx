@@ -54,7 +54,7 @@ export default function RequestDetailOverlay({ open, onClose }: Props) {
       fee: r.fee,
       lastPaidAt: r.lastPaidAt,
       usage: r.usage,
-      action: <ActionBadges labels={[t('hqRequestResultLog.detail.col.detailBadge')]} size="xs" />,
+      action: <ActionBadges labels={[t('hqRequestResultLog.detail.col.detailBadge')]} />,
     },
   }))
 
