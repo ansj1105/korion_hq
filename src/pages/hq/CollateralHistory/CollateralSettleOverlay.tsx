@@ -1,11 +1,13 @@
 import { useTranslation } from '../../../i18n'
 import type { InfoDetailTone } from './useCollateralInfoDetail'
 import { useCollateralSettleDetail } from './useCollateralSettleDetail'
+import type { CollateralSettlementRow } from './useCollateralHistory'
 import styles from './CollateralSettleOverlay.module.css'
 
 interface Props {
   open: boolean
   onClose: () => void
+  row?: CollateralSettlementRow | null
 }
 
 /* 상태 강조색 — Figma 시안의 초록(#34d399)/호박(#fbbf24). 담보금 상세 오버레이와 같은 팔레트 */
@@ -23,9 +25,24 @@ const TONE_COLOR: Record<InfoDetailTone, string> = {
  * 읽기 전용 필드 → 관련 거래 요약(미니 표) → 하단 버튼 구성.
  * '트랜잭션 복사' 버튼은 동작 협의 전이라 UI만(1번 규칙).
  */
-export default function CollateralSettleOverlay({ open, onClose }: Props) {
+export default function CollateralSettleOverlay({ open, onClose, row }: Props) {
   const { t } = useTranslation()
   const { fields, txRows } = useCollateralSettleDetail()
+  const detailFields = row
+    ? [
+        { label: t('hqCollateral.settle.col.no'), value: row.no },
+        { label: t('hqCollateral.settle.col.settledAt'), value: row.settledAt },
+        { label: t('hqCollateral.settle.col.parentPartner'), value: row.parentPartner },
+        { label: t('hqCollateral.settle.col.ownCode'), value: row.ownCode },
+        { label: t('hqCollateral.col.country'), value: row.country },
+        { label: t('hqCollateral.col.memberId'), value: row.memberId },
+        { label: t('hqCollateral.col.memberName'), value: row.memberName },
+        { label: t('hqCollateral.settle.col.target'), value: row.target },
+        { label: t('hqCollateral.settle.col.amount'), value: row.amount },
+        { label: t('hqCollateral.settle.col.beforeAfter'), value: row.beforeAfter },
+        { label: t('hqCollateral.col.status'), value: row.status },
+      ]
+    : fields
 
   if (!open) return null
 
@@ -51,8 +68,8 @@ export default function CollateralSettleOverlay({ open, onClose }: Props) {
 
         {/* 읽기 전용 필드 2열 — "전송 대상"이 시안상 두 번 나와 key는 인덱스 사용. newRow는 빈 칸 배치 재현 */}
         <div className={styles.fieldGrid}>
-          {fields.map((f, i) => (
-            <div key={`${f.label}-${i}`} className={f.newRow ? `${styles.field} ${styles.fieldNewRow}` : styles.field}>
+          {detailFields.map((f, i) => (
+            <div key={`${f.label}-${i}`} className={'newRow' in f && f.newRow ? `${styles.field} ${styles.fieldNewRow}` : styles.field}>
               <span className={styles.fieldLabel}>{f.label}</span>
               <span className={styles.fieldValue}>{f.value}</span>
             </div>

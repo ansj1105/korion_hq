@@ -1,5 +1,7 @@
 import { useTranslation } from '../../../i18n'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 import type { Column } from '../../../components/organisms/DataTable'
+import type { AccentKey } from '../../../types'
 import data from './settlementHistoryData.json'
 
 interface KpiRaw {
@@ -10,10 +12,12 @@ interface KpiRaw {
 }
 
 /** 정산 상태 enum — 검토/완료/보류. 표시 라벨은 데이터 값(번역 대상 아님) */
-export type HistoryStatus = 'review' | 'done' | 'hold'
+export type HistoryStatus = 'review' | 'done' | 'hold' | 'infoRequested' | 'rejected'
 
 /** 정산 내역 행 (Figma 샘플값 하드코딩) */
 export interface HistoryRow {
+  settlementRequestId?: number
+  no?: string
   id: string
   date: string
   processedAt: string
@@ -28,6 +32,8 @@ export interface HistoryRow {
   held: string
   finalAmount: string
   status: HistoryStatus
+  statusAccent?: AccentKey
+  sourceStatus?: string
 }
 
 /** KPI 카드 (라벨/설명만 번역, highlight면 시안 강조 테두리) */
@@ -48,8 +54,12 @@ export interface KpiItem {
  */
 export function useSettlementHistory() {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useHqPageData<{ kpis: KpiRaw[]; rows: HistoryRow[] }>(
+    '/api/hq/settlement-history',
+    data as { kpis: KpiRaw[]; rows: HistoryRow[] },
+  )
 
-  const kpis: KpiItem[] = (data.kpis as KpiRaw[]).map((k) => ({
+  const kpis: KpiItem[] = pageData.kpis.map((k) => ({
     id: k.labelKey,
     label: t(k.labelKey),
     value: k.value,
@@ -58,6 +68,7 @@ export function useSettlementHistory() {
   }))
 
   const columns: Column[] = [
+    { key: 'no', label: t('hqSettle.hist.col.no'), width: '0.5fr', align: 'center' },
     { key: 'id', label: t('hqSettle.hist.col.id'), width: '1.5fr' },
     { key: 'date', label: t('hqSettle.hist.col.date'), width: '0.9fr' },
     { key: 'processedAt', label: t('hqSettle.hist.col.processedAt'), width: '0.9fr' },
@@ -72,28 +83,24 @@ export function useSettlementHistory() {
     { key: 'held', label: t('hqSettle.hist.col.held'), width: '0.6fr', align: 'right' },
     { key: 'finalAmount', label: t('hqSettle.hist.col.finalAmount'), width: '0.9fr', align: 'right' },
     { key: 'status', label: t('hqSettle.hist.col.status'), width: '0.9fr' },
-    { key: 'action', label: t('hqSettle.hist.col.action'), width: '1.2fr' },
   ]
 
   /** 상태 enum → 표시 라벨(데이터 값) + 행 액션 2번째 버튼 라벨(번역, 신청 화면 키 재사용) */
   const statusLabel: Record<HistoryStatus, string> = {
-    review: '정산검토',
-    done: '정산완료',
-    hold: '정산보류',
-  }
-  const statusAction: Record<HistoryStatus, string> = {
-    review: t('hqSettle.req.action.review'),
-    done: t('hqSettle.req.action.review'),
-    hold: t('hqSettle.req.action.hold'),
+    review: t('hqSettle.req.status.review'),
+    done: t('hqSettle.req.status.done'),
+    hold: t('hqSettle.req.status.hold'),
+    infoRequested: t('hqSettle.req.status.infoRequested'),
+    rejected: t('hqSettle.req.status.rejected'),
   }
 
   return {
     kpis,
     columns,
-    rows: data.rows as HistoryRow[],
+    rows: pageData.rows,
     statusLabel,
-    statusAction,
-    detailLabel: t('hqSettle.req.action.detail'),
     section: t('hqSettle.hist.section'),
+    isLoading,
+    error,
   }
 }

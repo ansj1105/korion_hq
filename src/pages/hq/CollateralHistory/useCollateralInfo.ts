@@ -33,7 +33,7 @@ export function useCollateralInfo() {
     { key: 'memberId', label: t('hqCollateral.col.memberId'), width: '1.05fr' },
     { key: 'memberName', label: t('hqCollateral.col.memberName'), width: '1.05fr' },
     { key: 'totalWallet', label: t('hqCollateral.col.totalWallet'), width: '1.2fr' },
-    { key: 'availableWallet', label: t('hqCollateral.col.availableWallet'), width: '1.45fr' },
+    { key: 'availableWallet', label: t('hqCollateral.col.availableWallet'), width: '1.9fr' },
     { key: 'collateralBalance', label: t('hqCollateral.col.collateralBalance'), width: '1.3fr' },
     { key: 'lastTopup', label: t('hqCollateral.col.lastTopup'), width: '0.95fr' },
     { key: 'lastPayment', label: t('hqCollateral.col.lastPayment'), width: '1.3fr' },

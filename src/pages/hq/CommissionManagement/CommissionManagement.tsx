@@ -2,16 +2,11 @@ import { useState } from 'react'
 import PageHeader from '../../../components/organisms/PageHeader'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
 import ActionBadges from '../../../components/molecules/ActionBadges'
+import Badge from '../../../components/atoms/Badge'
 import { useTranslation } from '../../../i18n'
-import { useCommission, type FeeStatus } from './useCommission'
+import { useCommission, type FeeRow } from './useCommission'
 import CommissionFeeModal from './CommissionFeeModal'
 import styles from './CommissionManagement.module.css'
-
-/** 상태 enum → 표시 색 클래스 (활성=초록 / 대기=호박) */
-const STATUS_CLASS: Record<FeeStatus, string> = {
-  active: styles.stActive,
-  pending: styles.stPending,
-}
 
 /*
  * HqCommissionManagement (page) — 본사어드민 · 수수료/정산 · 수수료 관리
@@ -23,16 +18,23 @@ const STATUS_CLASS: Record<FeeStatus, string> = {
  */
 export default function HqCommissionManagement() {
   const { t } = useTranslation()
-  const { kpis, columns, rows: rawRows, statusLabel, globalFee, modalData, detailLabel } = useCommission()
-  // 모달 모드 — null: 닫힘 / add: 국가 수수료 추가 / edit: 행 상세(수정)
+  const { kpis, columns, rows: rawRows, countries, statusLabel, globalFee, makeModalData, editLabel, deleteLabel, saveFee, deleteFee } = useCommission()
   const [modalMode, setModalMode] = useState<'add' | 'edit' | null>(null)
+  const [selectedCode, setSelectedCode] = useState<string | null>(null)
 
   // Figma에서 굵게 표시되는 셀(국가코드~적용 코인수)만 감싸는 헬퍼
   const strong = (value: string) => <span className={styles.cellStrong}>{value}</span>
+  const selectedRow = rawRows.find((row) => (row.countryCode ?? row.code) === selectedCode)
+
+  const openEdit = (row: FeeRow) => {
+    setSelectedCode(row.countryCode ?? row.code)
+    setModalMode('edit')
+  }
 
   const rows: TableRow[] = rawRows.map((r) => ({
-    id: r.code,
+    id: r.countryCode ?? r.code,
     cells: {
+      no: r.no,
       country: r.country,
       code: strong(r.code),
       baseFee: strong(r.baseFee),
@@ -41,8 +43,24 @@ export default function HqCommissionManagement() {
       event: strong(r.event),
       actualFee: strong(r.actualFee),
       coinCount: strong(r.coinCount),
-      status: <span className={STATUS_CLASS[r.status]}>{statusLabel[r.status]}</span>,
-      action: <ActionBadges labels={[detailLabel]} accentByLabel={{}} size="xs" solid equalWidth />,
+      status: <Badge accent={r.statusAccent ?? 'green'} size="md" shape="rect">{statusLabel[r.status]}</Badge>,
+      action: (
+        <div onClick={(event) => event.stopPropagation()}>
+          <ActionBadges
+            labels={[editLabel, deleteLabel]}
+            accentByLabel={{ [editLabel]: 'cyan', [deleteLabel]: 'red' }}
+            size="xs"
+            shape="rect"
+            onLabelClick={(label) => {
+              if (label === editLabel) {
+                openEdit(r)
+                return
+              }
+              void deleteFee(r.countryCode ?? r.code)
+            }}
+          />
+        </div>
+      ),
     },
   }))
 
@@ -100,8 +118,18 @@ export default function HqCommissionManagement() {
         columns={columns}
         rows={rows}
         toolbar={[t('common.search'), t('common.filter'), t('common.excel')]}
+        searchKeys={['country', 'code', 'status']}
+        filterKeys={['country', 'status']}
+        exportUrl="/api/hq/commission-fees/export"
         toolbarExtra={
-          <button type="button" className={styles.addButton} onClick={() => setModalMode('add')}>
+          <button
+            type="button"
+            className={styles.addButton}
+            onClick={() => {
+              setSelectedCode(null)
+              setModalMode('add')
+            }}
+          >
             {t('hqCommission.btn.addCountryFee')}
           </button>
         }
@@ -109,11 +137,24 @@ export default function HqCommissionManagement() {
         mutedText
         headerBar
         tallToolbar
-        onRowClick={() => setModalMode('edit')}
+        paginated
+        pageSize={10}
+        onRowClick={(id) => {
+          const row = rawRows.find((item) => (item.countryCode ?? item.code) === id)
+          if (row) openEdit(row)
+        }}
       />
 
       {/* 국가 수수료 추가/수정 모달 — 사이드바 제외 콘텐츠 영역 중앙 */}
-      {modalMode && <CommissionFeeModal variant={modalMode} data={modalData} onClose={() => setModalMode(null)} />}
+      {modalMode && (
+        <CommissionFeeModal
+          variant={modalMode}
+          data={makeModalData(modalMode === 'edit' ? selectedRow : undefined)}
+          countries={countries}
+          onClose={() => setModalMode(null)}
+          onSubmit={(payload) => saveFee(modalMode, payload)}
+        />
+      )}
     </div>
   )
 }

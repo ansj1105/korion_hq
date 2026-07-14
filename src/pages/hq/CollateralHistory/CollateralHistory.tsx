@@ -3,9 +3,10 @@ import PageHeader from '../../../components/organisms/PageHeader'
 import StatCard from '../../../components/molecules/StatCard'
 import FilterTabs from '../../../components/molecules/FilterTabs'
 import ActionBadges from '../../../components/molecules/ActionBadges'
+import Badge from '../../../components/atoms/Badge'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
 import { useTranslation } from '../../../i18n'
-import { useCollateralHistory } from './useCollateralHistory'
+import { useCollateralHistory, type CollateralHistoryRow, type CollateralInfoRow, type CollateralSettlementRow } from './useCollateralHistory'
 import { useCollateralInfo } from './useCollateralInfo'
 import { useCollateralSettlement } from './useCollateralSettlement'
 import CollateralDetailOverlay from './CollateralDetailOverlay'
@@ -30,35 +31,19 @@ const SETTLEMENT_TAB_INDEX = 2
  */
 export default function CollateralHistory() {
   const { t } = useTranslation()
-  const { kpis, columns, rows: rawRows } = useCollateralHistory()
+  const [tab, setTab] = useState(HISTORY_TAB_INDEX)
+  const [countryFilter, setCountryFilter] = useState('all')
+  const [dateFilter, setDateFilter] = useState('today')
+  const { kpis, columns, rows: rawRows, infoRows: rawInfoRows, settlementRows: rawSettleRows, countryOptions, dateOptions } = useCollateralHistory(countryFilter, dateFilter)
   const info = useCollateralInfo()
   const settle = useCollateralSettlement()
-  const [tab, setTab] = useState(HISTORY_TAB_INDEX)
   // 행 클릭 → 상세 폼 오버레이(내역 탭 81:29506 / 정보 탭 81:29553 / 정산 탭 81:29616). 시안이 단일 샘플이라 어떤 행이든 같은 내용
   const [detailOpen, setDetailOpen] = useState(false)
   const [infoDetailOpen, setInfoDetailOpen] = useState(false)
   const [settleDetailOpen, setSettleDetailOpen] = useState(false)
-
-  /*
-   * 상태 강조색 — 완료/성공=초록 65% 틴트, 실패=경고 빨강(Figma 실측 #ff4e4e, 토큰 red와 다른 색조).
-   * 상태 문자열은 데이터(enum)라 번역하지 않고, 색만 표시 계층에서 입힌다.
-   */
-  const STATUS_COLOR: Record<string, string> = {
-    완료: 'color-mix(in srgb, var(--color-accent-green) 65%, transparent)',
-    성공: 'color-mix(in srgb, var(--color-accent-green) 65%, transparent)',
-    실패: '#ff4e4e',
-  }
-
-  // 액션 배지(상세/회원정보)는 전부 중립 회색 솔리드 — accentByLabel을 빈 매핑으로 줘 중립색으로 통일
-  const actionBadges = (
-    <ActionBadges
-      labels={[t('common.detail'), t('hqCollateral.action.memberInfo')]}
-      accentByLabel={{}}
-      solid
-      equalWidth
-      size="xs"
-    />
-  )
+  const [selectedHistoryRow, setSelectedHistoryRow] = useState<CollateralHistoryRow | null>(null)
+  const [selectedInfoRow, setSelectedInfoRow] = useState<CollateralInfoRow | CollateralHistoryRow | null>(null)
+  const [selectedSettlementRow, setSelectedSettlementRow] = useState<CollateralSettlementRow | null>(null)
 
   // Figma 시안은 번호가 전부 "0001"이라 리스트 key는 인덱스로 보강
   const rows: TableRow[] = rawRows.map((r, i) => ({
@@ -73,13 +58,33 @@ export default function CollateralHistory() {
       type: r.type,
       amount: r.amount,
       beforeAfter: r.beforeAfter,
-      status: <span style={{ color: STATUS_COLOR[r.status] }}>{r.status}</span>,
-      action: actionBadges,
+      status: <StatusBadge status={r.status} />,
+      action: (
+        <div onClick={(event) => event.stopPropagation()}>
+          <ActionBadges
+            labels={[t('common.detail'), t('hqCollateral.action.memberInfo')]}
+            accentByLabel={{ [t('common.detail')]: 'cyan', [t('hqCollateral.action.memberInfo')]: 'purple' }}
+            solid
+            equalWidth
+            size="xs"
+            shape="rect"
+            onLabelClick={(label) => {
+              if (label === t('hqCollateral.action.memberInfo')) {
+                setSelectedInfoRow(r)
+                setInfoDetailOpen(true)
+                return
+              }
+              setSelectedHistoryRow(r)
+              setDetailOpen(true)
+            }}
+          />
+        </div>
+      ),
     },
   }))
 
   // "회원 정산 내역" 탭(Figma 81:21528) — 회원 수취금 정산 표. 구조는 내역 표와 동일
-  const settleRows: TableRow[] = settle.rows.map((r, i) => ({
+  const settleRows: TableRow[] = rawSettleRows.map((r, i) => ({
     id: `${r.ownCode}-${i}`,
     cells: {
       no: r.no,
@@ -92,13 +97,28 @@ export default function CollateralHistory() {
       target: r.target,
       amount: r.amount,
       beforeAfter: r.beforeAfter,
-      status: <span style={{ color: STATUS_COLOR[r.status] }}>{r.status}</span>,
-      action: actionBadges,
+      status: <StatusBadge status={r.status} />,
+      action: (
+        <div onClick={(event) => event.stopPropagation()}>
+          <ActionBadges
+            labels={[t('common.detail')]}
+            accentByLabel={{ [t('common.detail')]: 'cyan' }}
+            solid
+            equalWidth
+            size="xs"
+            shape="rect"
+            onLabelClick={() => {
+              setSelectedSettlementRow(r)
+              setSettleDetailOpen(true)
+            }}
+          />
+        </div>
+      ),
     },
   }))
 
   // "회원 담보금 정보" 탭(Figma 81:22038) — 회원별 지갑/담보금 잔액 표. 구조는 내역 표와 동일
-  const infoRows: TableRow[] = info.rows.map((r, i) => ({
+  const infoRows: TableRow[] = rawInfoRows.map((r, i) => ({
     id: `${r.memberId}-${i}`,
     cells: {
       no: r.no,
@@ -111,18 +131,74 @@ export default function CollateralHistory() {
       collateralBalance: r.collateralBalance,
       lastTopup: r.lastTopup,
       lastPayment: r.lastPayment,
-      action: actionBadges,
+      action: (
+        <div onClick={(event) => event.stopPropagation()}>
+          <ActionBadges
+            labels={[t('common.detail'), t('hqCollateral.action.memberInfo')]}
+            accentByLabel={{ [t('common.detail')]: 'cyan', [t('hqCollateral.action.memberInfo')]: 'purple' }}
+            solid
+            equalWidth
+            size="xs"
+            shape="rect"
+            onLabelClick={() => {
+              setSelectedInfoRow(r)
+              setInfoDetailOpen(true)
+            }}
+          />
+        </div>
+      ),
     },
   }))
+
+  const openHistoryDetail = (id: string) => {
+    const rowIndex = rows.findIndex((row) => row.id === id)
+    const row = rowIndex >= 0 ? rawRows[rowIndex] : null
+    setSelectedHistoryRow(row)
+    setDetailOpen(Boolean(row))
+  }
+
+  const openInfoDetail = (id: string) => {
+    const rowIndex = infoRows.findIndex((row) => row.id === id)
+    const row = rowIndex >= 0 ? rawInfoRows[rowIndex] : null
+    setSelectedInfoRow(row)
+    setInfoDetailOpen(Boolean(row))
+  }
+
+  const openSettlementDetail = (id: string) => {
+    const rowIndex = settleRows.findIndex((row) => row.id === id)
+    const row = rowIndex >= 0 ? rawSettleRows[rowIndex] : null
+    setSelectedSettlementRow(row)
+    setSettleDetailOpen(Boolean(row))
+  }
 
   return (
     <div className={styles.page}>
       <PageHeader title={t('hqCollateral.title')}>
         <p className={styles.pageDesc}>{t('hqCollateral.desc')}</p>
-        {/* Figma의 국가/날짜 필터칩 — 동작 없는 UI 표시만 (CLAUDE.md 1번 규칙: 인터랙션은 협의 전까지 보류) */}
         <div className={styles.filterChips}>
-          <span className={styles.chip}>{t('hqDashboard.filter.allCountries')}</span>
-          <span className={styles.chip}>{t('hqDashboard.filter.today')}</span>
+          <label className={styles.filterLabel}>
+            <span className={styles.filterLabelText}>{t('hqCollateral.filter.country')}</span>
+            <select className={styles.filterSelect} value={countryFilter} onChange={(event) => setCountryFilter(event.target.value)}>
+              <option value="all">{t('hqDashboard.filter.allCountries')}</option>
+              {countryOptions.map((country) => (
+                <option key={country.value} value={country.value}>
+                  {country.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={styles.filterLabel}>
+            <span className={styles.filterLabelText}>{t('hqCollateral.filter.date')}</span>
+            <select className={styles.filterSelect} value={dateFilter} onChange={(event) => setDateFilter(event.target.value)}>
+              <option value="all">{t('hqCollateral.filter.allDates')}</option>
+              <option value="today">{t('hqDashboard.filter.today')}</option>
+              {dateOptions.map((date) => (
+                <option key={date} value={date}>
+                  {date}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </PageHeader>
 
@@ -187,7 +263,11 @@ export default function CollateralHistory() {
           mutedText
           headerBar
           wrapCells
-          onRowClick={() => setDetailOpen(true)}
+          paginated
+          pageSize={5}
+          searchKeys={['processedAt', 'code', 'country', 'memberId', 'memberName', 'type', 'amount', 'status']}
+          filterKeys={['country', 'type', 'status']}
+          onRowClick={openHistoryDetail}
         />
       ) : tab === INFO_TAB_INDEX ? (
         <DataTable
@@ -198,7 +278,11 @@ export default function CollateralHistory() {
           mutedText
           headerBar
           wrapCells
-          onRowClick={() => setInfoDetailOpen(true)}
+          paginated
+          pageSize={5}
+          searchKeys={['adminCode', 'country', 'memberId', 'memberName', 'totalWallet', 'availableWallet', 'collateralBalance']}
+          filterKeys={['country']}
+          onRowClick={openInfoDetail}
         />
       ) : (
         <DataTable
@@ -209,13 +293,27 @@ export default function CollateralHistory() {
           mutedText
           headerBar
           wrapCells
-          onRowClick={() => setSettleDetailOpen(true)}
+          paginated
+          pageSize={5}
+          searchKeys={['settledAt', 'parentPartner', 'ownCode', 'country', 'memberId', 'memberName', 'target', 'status']}
+          filterKeys={['country', 'target', 'status']}
+          onRowClick={openSettlementDetail}
         />
       )}
 
-      <CollateralDetailOverlay open={detailOpen} onClose={() => setDetailOpen(false)} />
-      <CollateralInfoOverlay open={infoDetailOpen} onClose={() => setInfoDetailOpen(false)} />
-      <CollateralSettleOverlay open={settleDetailOpen} onClose={() => setSettleDetailOpen(false)} />
+      <CollateralDetailOverlay open={detailOpen} row={selectedHistoryRow} onClose={() => setDetailOpen(false)} />
+      <CollateralInfoOverlay open={infoDetailOpen} row={selectedInfoRow} onClose={() => setInfoDetailOpen(false)} />
+      <CollateralSettleOverlay open={settleDetailOpen} row={selectedSettlementRow} onClose={() => setSettleDetailOpen(false)} />
     </div>
+  )
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const normalized = status.trim()
+  const accent = normalized === '실패' ? 'red' : normalized === '보류' || normalized === '대기' ? 'orange' : 'green'
+  return (
+    <Badge accent={accent} size="md" shape="rect">
+      {status}
+    </Badge>
   )
 }

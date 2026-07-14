@@ -1,10 +1,12 @@
 import { useTranslation } from '../../../i18n'
 import { useCollateralInfoDetail, type InfoDetailTone } from './useCollateralInfoDetail'
+import type { CollateralHistoryRow, CollateralInfoRow } from './useCollateralHistory'
 import styles from './CollateralInfoOverlay.module.css'
 
 interface Props {
   open: boolean
   onClose: () => void
+  row?: CollateralInfoRow | CollateralHistoryRow | null
 }
 
 /* 상태 강조색 — Figma 시안의 초록(#34d399)/호박(#fbbf24). 페이지 안내 카드와 같은 팔레트라 토큰과 별개 실측값 */
@@ -29,9 +31,39 @@ const METRIC_TONE_CLASS: Record<InfoDetailTone, string> = {
  * A.기본 정보(읽기 전용 필드) → B.담보금 요약(메트릭 3장) → C.최근 활동(미니 표) → 하단 버튼.
  * '관련 회원 정산 내역 보기' 버튼은 동작 협의 전이라 UI만(1번 규칙).
  */
-export default function CollateralInfoOverlay({ open, onClose }: Props) {
+export default function CollateralInfoOverlay({ open, onClose, row }: Props) {
   const { t } = useTranslation()
   const { fields, metrics, activities } = useCollateralInfoDetail()
+  const detailMetrics = row && isInfoRow(row)
+    ? [
+        { label: t('hqCollateral.infoDetail.metric.balance'), value: row.collateralBalance, tone: 'cyan' as InfoDetailTone },
+        { label: t('hqCollateral.col.availableWallet'), value: row.availableWallet, tone: 'green' as InfoDetailTone },
+        { label: t('hqCollateral.col.totalWallet'), value: row.totalWallet, tone: 'amber' as InfoDetailTone },
+      ]
+    : metrics
+  const detailFields = row
+    ? [
+        { label: t('hqCollateral.col.country'), value: row.country },
+        { label: t('hqCollateral.col.memberId'), value: row.memberId },
+        { label: t('hqCollateral.col.memberName'), value: row.memberName },
+        ...(isInfoRow(row)
+          ? [
+              { label: t('hqCollateral.detail.field.adminCode'), value: row.adminCode },
+              { label: t('hqCollateral.col.totalWallet'), value: row.totalWallet },
+              { label: t('hqCollateral.col.availableWallet'), value: row.availableWallet },
+              { label: t('hqCollateral.col.collateralBalance'), value: row.collateralBalance },
+              { label: t('hqCollateral.col.lastTopup'), value: row.lastTopup },
+              { label: t('hqCollateral.col.lastPayment'), value: row.lastPayment },
+            ]
+          : [
+              { label: t('hqCollateral.col.processedAt'), value: row.processedAt },
+              { label: t('hqCollateral.col.type'), value: row.type },
+              { label: t('hqCollateral.col.amount'), value: row.amount },
+              { label: t('hqCollateral.col.beforeAfter'), value: row.beforeAfter },
+              { label: t('hqCollateral.col.status'), value: row.status },
+            ]),
+      ]
+    : fields
 
   if (!open) return null
 
@@ -58,8 +90,8 @@ export default function CollateralInfoOverlay({ open, onClose }: Props) {
         {/* A. 회원 기본 정보 — 읽기 전용 필드 2열. newRow는 Figma의 빈 칸(한 줄에 필드 1개) 배치 재현 */}
         <h3 className={styles.sectionTitle}>{t('hqCollateral.infoDetail.secBasic')}</h3>
         <div className={styles.fieldGrid}>
-          {fields.map((f) => (
-            <div key={f.label} className={f.newRow ? `${styles.field} ${styles.fieldNewRow}` : styles.field}>
+          {detailFields.map((f) => (
+            <div key={f.label} className={'newRow' in f && f.newRow ? `${styles.field} ${styles.fieldNewRow}` : styles.field}>
               <span className={styles.fieldLabel}>{f.label}</span>
               <span className={styles.fieldValue}>{f.value}</span>
             </div>
@@ -69,7 +101,7 @@ export default function CollateralInfoOverlay({ open, onClose }: Props) {
         {/* B. 담보금 요약 — 색조가 다른 메트릭 카드 3장 */}
         <h3 className={styles.sectionTitle}>{t('hqCollateral.infoDetail.secSummary')}</h3>
         <div className={styles.metricRow}>
-          {metrics.map((m) => (
+          {detailMetrics.map((m) => (
             <div key={m.label} className={`${styles.metricCard} ${METRIC_TONE_CLASS[m.tone]}`}>
               <span className={styles.metricLabel}>{m.label}</span>
               <span className={styles.metricValue} style={{ color: TONE_COLOR[m.tone] }}>
@@ -106,4 +138,8 @@ export default function CollateralInfoOverlay({ open, onClose }: Props) {
       </div>
     </div>
   )
+}
+
+function isInfoRow(row: CollateralInfoRow | CollateralHistoryRow): row is CollateralInfoRow {
+  return 'collateralBalance' in row
 }

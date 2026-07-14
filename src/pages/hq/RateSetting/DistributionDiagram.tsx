@@ -13,6 +13,12 @@ export interface DiagramCell {
 
 /** 배분 행 — 경로 라벨(파트너 경유/직계약) + 좌→우 배분 셀들 */
 export interface DiagramRow {
+  routeKey?: string
+  routeType?: string
+  hqRate?: string
+  leaderRate?: string
+  partnerRate?: string
+  merchantRate?: string
   route: 'via' | 'direct'
   cells: DiagramCell[]
 }
@@ -23,6 +29,8 @@ interface DistributionDiagramProps {
   titleSlot?: ReactNode
   /** 헤더 행 맨 뒤(우측 끝)에 놓일 액션(페이지의 "저장" 버튼 등) */
   action?: ReactNode
+  editable?: boolean
+  onRowsChange?: (rows: DiagramRow[]) => void
 }
 
 /*
@@ -33,7 +41,7 @@ interface DistributionDiagramProps {
  * 공유해 역할 배지와 값 배지의 열이 항상 맞는다. 값은 데이터(번역 안 함),
  * 경로/역할 라벨은 UI 텍스트(번역). 입력 동작은 없음(표시 전용, Figma 시안 값).
  */
-export default function DistributionDiagram({ rows, titleSlot, action }: DistributionDiagramProps) {
+export default function DistributionDiagram({ rows, titleSlot, action, editable, onRowsChange }: DistributionDiagramProps) {
   const { t } = useTranslation()
 
   const colorClass: Record<DiagramCellColor, string> = {
@@ -77,7 +85,29 @@ export default function DistributionDiagram({ rows, titleSlot, action }: Distrib
                 {cell && (
                   <>
                     <span className={`${styles.badge} ${colorClass[cell.color]}`}>
-                      {cell.value ?? t('hqRate.diagram.merchant')}
+                      {editable && cell.value !== undefined ? (
+                        <input
+                          className={styles.rateInput}
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="1"
+                          value={cell.value}
+                          aria-label={`${row.routeKey ?? rowIndex}-${cell.color}`}
+                          onChange={(event) => {
+                            const nextRows = rows.map((targetRow, targetRowIndex) => {
+                              if (targetRowIndex !== rowIndex) return targetRow
+                              const nextCells = targetRow.cells.map((targetCell, targetCellIndex) =>
+                                targetCellIndex === i ? { ...targetCell, value: event.target.value } : targetCell
+                              )
+                              return syncRouteRates({ ...targetRow, cells: nextCells })
+                            })
+                            onRowsChange?.(nextRows)
+                          }}
+                        />
+                      ) : (
+                        cell.value ?? t('hqRate.diagram.merchant')
+                      )}
                     </span>
                     <span className={styles.pct}>%</span>
                     {row.cells[i + 1] && <span className={styles.arrow}>→</span>}
@@ -90,4 +120,22 @@ export default function DistributionDiagram({ rows, titleSlot, action }: Distrib
       ))}
     </div>
   )
+}
+
+function syncRouteRates(row: DiagramRow): DiagramRow {
+  const next: DiagramRow = {
+    ...row,
+    hqRate: '0',
+    leaderRate: '0',
+    partnerRate: '0',
+    merchantRate: row.merchantRate ?? '0',
+  }
+  row.cells.forEach((cell) => {
+    if (cell.value === undefined) return
+    if (cell.color === 'hq') next.hqRate = cell.value
+    if (cell.color === 'leader') next.leaderRate = cell.value
+    if (cell.color === 'partner') next.partnerRate = cell.value
+    if (cell.color === 'merchant') next.merchantRate = cell.value
+  })
+  return next
 }

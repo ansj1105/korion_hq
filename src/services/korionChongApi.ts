@@ -116,8 +116,62 @@ async function postJson<T>(path: string, body: unknown, headers?: Headers) {
   return response.json() as Promise<T>
 }
 
+async function putJson<T>(path: string, body: unknown, headers?: Headers) {
+  const response = await fetch(buildUrl(path), {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(headers ?? {}),
+    },
+    body: JSON.stringify(body),
+  })
+  if (!response.ok) {
+    let code = ''
+    let detail = ''
+    try {
+      const payload = (await response.json()) as { code?: string; message?: string }
+      code = payload.code ?? ''
+      detail = payload.message ?? payload.code ?? ''
+    } catch {
+      detail = ''
+    }
+    throw new KorionChongApiError(code || `HTTP_${response.status}`, detail || `KORION Chong API ${response.status}`)
+  }
+  return response.json() as Promise<T>
+}
+
+async function deleteJson<T>(path: string, headers?: Headers) {
+  const response = await fetch(buildUrl(path), {
+    method: 'DELETE',
+    headers: {
+      ...(headers ?? {}),
+    },
+  })
+  if (!response.ok) {
+    let code = ''
+    let detail = ''
+    try {
+      const payload = (await response.json()) as { code?: string; message?: string }
+      code = payload.code ?? ''
+      detail = payload.message ?? payload.code ?? ''
+    } catch {
+      detail = ''
+    }
+    throw new KorionChongApiError(code || `HTTP_${response.status}`, detail || `KORION Chong API ${response.status}`)
+  }
+  return response.json() as Promise<T>
+}
+
 export function postHqPageData<T>(path: string, body: unknown) {
   return postJson<T>(path, body, hqHeaders())
+}
+
+export function putHqPageData<T>(path: string, body: unknown) {
+  return putJson<T>(path, body, hqHeaders())
+}
+
+export function deleteHqPageData<T>(path: string) {
+  return deleteJson<T>(path, hqHeaders())
 }
 
 function requestId(prefix: string) {

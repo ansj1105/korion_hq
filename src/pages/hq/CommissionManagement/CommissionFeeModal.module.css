@@ -130,6 +130,8 @@
   font-size: var(--font-size-14);
   font-weight: var(--font-weight-semibold);
   color: #f7f3ff;
+  outline: none;
+  appearance: none;
 }
 /* ▼ 화살표 — Figma는 폴리곤 이미지라 CSS 삼각형으로 재현 */
 .selectArrow {
@@ -168,6 +170,10 @@
   font-size: var(--font-size-14);
   font-weight: var(--font-weight-semibold);
   color: #f7f3ff;
+  outline: none;
+}
+.feeInput[type='number'] {
+  padding: 0 10px;
 }
 .feeUnit {
   font-size: var(--font-size-14);
@@ -194,6 +200,7 @@
   background: rgba(52, 211, 153, 0.16);
   border: 1px solid rgba(52, 211, 153, 0.75);
   white-space: nowrap;
+  cursor: pointer;
 }
 .scopePillDim {
   color: rgba(52, 211, 153, 0.33);
@@ -253,6 +260,12 @@
   justify-content: space-between;
   gap: var(--space-3);
 }
+.coinRowEditable {
+  display: grid;
+  grid-template-columns: 0.8fr 0.9fr 0.9fr 0.75fr auto;
+  align-items: center;
+  gap: 8px;
+}
 .coinName,
 .coinFee {
   font-size: var(--font-size-14);
@@ -260,6 +273,41 @@
   color: #f7f3ff;
   /* 코인명 사이 이중 공백(Figma 표기)을 그대로 살린다 */
   white-space: pre-wrap;
+}
+.coinInput,
+.coinFeeInput {
+  min-width: 0;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 8px;
+  background: rgba(8, 7, 20, 0.9);
+  border: 1px solid rgba(45, 36, 80, 0.95);
+  color: #f7f3ff;
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-semibold);
+  outline: none;
+}
+.coinFeeEdit {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #f7f3ff;
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-semibold);
+}
+.coinFeeInput {
+  width: 52px;
+}
+.coinRemoveButton {
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: rgba(255, 77, 112, 0.14);
+  border: 1px solid rgba(255, 77, 112, 0.7);
+  color: #ff8aa0;
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
 }
 
 /* 하단 버튼 — 우측 정렬 (Figma: 취소 100×42 시안 고스트 / 추가·수정 130×42 보라) */
@@ -292,6 +340,10 @@
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
 }
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 /*
  * ON 토글 — Figma는 49×23 비트맵(초록 ON 스위치)이라 CSS로 재현(국가/지역 설정과 동일).
@@ -310,12 +362,40 @@
   color: #ffffff;
   font-size: 8px;
   font-weight: var(--font-weight-bold);
+  border: 0;
+  cursor: pointer;
 }
 .toggleOn::after {
   content: '';
   position: absolute;
   top: 2px;
   right: 2px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+.toggleOff {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 49px;
+  height: 23px;
+  padding-left: 20px;
+  border-radius: var(--radius-pill);
+  background: rgba(175, 167, 200, 0.22);
+  border: 0;
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+.toggleOff::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
   width: 19px;
   height: 19px;
   border-radius: 50%;

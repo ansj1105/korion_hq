@@ -1,18 +1,22 @@
+import { useState } from 'react'
 import PageHeader from '../../../components/organisms/PageHeader'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
-import ActionBadges from '../../../components/molecules/ActionBadges'
+import Badge from '../../../components/atoms/Badge'
 import { useTranslation } from '../../../i18n'
 import { useSettlementHistory, type HistoryStatus } from './useSettlementHistory'
+import SettlementDetailModal from './SettlementDetailModal'
 import styles from './SettlementHistory.module.css'
 
 /** 기간 필터 — Figma상 활성값 하나만 노출(데이터 토큰이라 번역 안 함) */
 const PERIOD_FILTER = '30 D'
 
-/** 상태 enum → 표시 색 클래스 (검토=주황 / 완료=초록 / 보류=호박) */
-const STATUS_CLASS: Record<HistoryStatus, string> = {
-  review: styles.stReview,
-  done: styles.stDone,
-  hold: styles.stHold,
+/** 상태 enum → 공통 뱃지 색 */
+const STATUS_ACCENT: Record<HistoryStatus, 'cyan' | 'green' | 'orange' | 'purple' | 'red'> = {
+  review: 'cyan',
+  done: 'green',
+  hold: 'orange',
+  infoRequested: 'purple',
+  rejected: 'red',
 }
 
 /*
@@ -24,12 +28,14 @@ const STATUS_CLASS: Record<HistoryStatus, string> = {
  */
 export default function HqSettlementHistory() {
   const { t } = useTranslation()
-  const { kpis, columns, rows: rawRows, statusLabel, statusAction, detailLabel, section } = useSettlementHistory()
+  const { kpis, columns, rows: rawRows, statusLabel, section } = useSettlementHistory()
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null)
 
   const rows: TableRow[] = rawRows.map((r, index) => ({
     // 신청 ID가 샘플상 중복돼 있어 index로 key를 구분
     id: `${r.id}-${index}`,
     cells: {
+      no: r.no ?? String(rawRows.length - index),
       id: r.id,
       date: r.date,
       processedAt: r.processedAt,
@@ -43,8 +49,7 @@ export default function HqSettlementHistory() {
       partnerSettle: r.partnerSettle,
       held: r.held,
       finalAmount: r.finalAmount,
-      status: <span className={STATUS_CLASS[r.status]}>{statusLabel[r.status]}</span>,
-      action: <ActionBadges labels={[detailLabel, statusAction[r.status]]} accentByLabel={{}} size="xs" solid />,
+      status: <Badge accent={r.statusAccent ?? STATUS_ACCENT[r.status]} size="md" shape="rect">{statusLabel[r.status]}</Badge>,
     },
   }))
 
@@ -74,10 +79,17 @@ export default function HqSettlementHistory() {
         columns={columns}
         rows={rows}
         toolbar={[t('common.search'), t('common.filter'), t('hqSettle.req.toolbar.excel')]}
+        searchKeys={['id', 'code', 'partnerName', 'country', 'period', 'status']}
+        filterKeys={['country', 'status']}
+        onRowClick={setSelectedRowId}
         fill
         inlineToolbar
         mutedText
+        paginated
+        pageSize={10}
       />
+
+      {selectedRowId && <SettlementDetailModal onClose={() => setSelectedRowId(null)} />}
     </div>
   )
 }

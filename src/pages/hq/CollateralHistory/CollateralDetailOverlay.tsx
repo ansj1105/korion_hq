@@ -1,10 +1,12 @@
 import { useTranslation } from '../../../i18n'
 import { useCollateralDetail } from './useCollateralDetail'
+import type { CollateralHistoryRow } from './useCollateralHistory'
 import styles from './CollateralDetailOverlay.module.css'
 
 interface Props {
   open: boolean
   onClose: () => void
+  row?: CollateralHistoryRow | null
 }
 
 /*
@@ -14,9 +16,24 @@ interface Props {
  * (RequestDetailOverlay와 동일한 backdrop 방식). backdrop 클릭 또는 '닫기' 버튼으로 닫힘.
  * 필드는 전부 읽기 전용 표시이고, '메모 수정' 버튼은 동작 협의 전이라 UI만(1번 규칙).
  */
-export default function CollateralDetailOverlay({ open, onClose }: Props) {
+export default function CollateralDetailOverlay({ open, onClose, row }: Props) {
   const { t } = useTranslation()
   const { fields, memo } = useCollateralDetail()
+  const detailFields = row
+    ? [
+        { label: t('hqCollateral.detail.field.txNo'), value: row.no },
+        { label: t('hqCollateral.col.processedAt'), value: row.processedAt },
+        { label: t('hqCollateral.detail.field.adminCode'), value: row.code },
+        { label: t('hqCollateral.col.country'), value: row.country },
+        { label: t('hqCollateral.col.memberId'), value: row.memberId },
+        { label: t('hqCollateral.col.memberName'), value: row.memberName },
+        { label: t('hqCollateral.col.type'), value: row.type },
+        { label: t('hqCollateral.col.amount'), value: row.amount },
+        { label: t('hqCollateral.col.beforeAfter'), value: row.beforeAfter },
+        { label: t('hqCollateral.detail.field.status'), value: row.status },
+      ]
+    : fields
+  const detailMemo = row ? `${row.type} 처리 후 담보금 변경: ${row.beforeAfter}` : memo
 
   if (!open) return null
 
@@ -42,7 +59,7 @@ export default function CollateralDetailOverlay({ open, onClose }: Props) {
 
         {/* 읽기 전용 필드 12개 — 2열 그리드 */}
         <div className={styles.fieldGrid}>
-          {fields.map((f) => (
+          {detailFields.map((f) => (
             <div key={f.label} className={styles.field}>
               <span className={styles.fieldLabel}>{f.label}</span>
               <span className={styles.fieldValue}>{f.value}</span>
@@ -53,7 +70,7 @@ export default function CollateralDetailOverlay({ open, onClose }: Props) {
         {/* 처리 사유 / 관리자 메모 박스 */}
         <div className={styles.memoBox}>
           <h3 className={styles.memoTitle}>{t('hqCollateral.detail.memo.title')}</h3>
-          <p className={styles.memoBody}>{memo}</p>
+          <p className={styles.memoBody}>{detailMemo}</p>
         </div>
 
         <div className={styles.footer}>

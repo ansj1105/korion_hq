@@ -12,20 +12,45 @@
   color: var(--color-text-muted);
 }
 
-/* 헤더 아래 "전체 국가 / 오늘" 필터칩 — 동작 없는 표시용 (국가별 대시보드와 동일 시안) */
 .filterChips {
   display: flex;
+  flex-wrap: wrap;
   gap: 15px; /* Figma 실측 칩 간격 15 */
 }
 
-.chip {
-  padding: var(--space-1) var(--space-3);
+.filterLabel {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filterLabelText {
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.filterSelect {
+  min-width: 132px;
+  height: 32px;
+  padding: 0 32px 0 12px;
   border-radius: var(--radius-pill);
   border: 1px solid color-mix(in srgb, var(--color-accent-cyan) 45%, transparent);
   background: color-mix(in srgb, var(--color-accent-cyan) 12%, transparent);
   color: var(--color-text);
-  font-size: var(--font-size-10);
+  font-size: var(--font-size-12);
   font-weight: var(--font-weight-bold);
+  appearance: none;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--color-text) 50%), linear-gradient(135deg, var(--color-text) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 12px, calc(100% - 11px) 12px;
+  background-size: 7px 7px, 7px 7px;
+  background-repeat: no-repeat;
+}
+
+.filterSelect option {
+  background: #120d22;
+  color: var(--color-text);
 }
 
 /*

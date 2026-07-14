@@ -1,18 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import PageHeader from '../../../components/organisms/PageHeader'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
-import ActionBadges from '../../../components/molecules/ActionBadges'
+import Badge from '../../../components/atoms/Badge'
 import { useTranslation } from '../../../i18n'
-import { useRateSetting, type RateStatus, type EventStatus } from './useRateSetting'
-import DistributionDiagram from './DistributionDiagram'
+import { useRateSetting, type EventStatus, type RateRow } from './useRateSetting'
+import DistributionDiagram, { type DiagramRow } from './DistributionDiagram'
 import RateFormModal from './RateFormModal'
 import styles from './RateSetting.module.css'
-
-/** 상태 enum → 표시 색 클래스 (활성=초록 / 대기=호박) */
-const STATUS_CLASS: Record<RateStatus, string> = {
-  active: styles.stActive,
-  pending: styles.stPending,
-}
 
 /*
  * HqRateSetting (page) — 본사어드민 · 수수료/정산 · 배분율 설정
@@ -24,9 +18,27 @@ const STATUS_CLASS: Record<RateStatus, string> = {
  */
 export default function HqRateSetting() {
   const { t } = useTranslation()
-  const { kpis, columns, rows: rawRows, diagramRows, statusLabel, eventLabel, modalData, detailLabel } = useRateSetting()
+  const {
+    kpis,
+    columns,
+    rows: rawRows,
+    diagramRows,
+    countries,
+    statusLabel,
+    eventLabel,
+    makeModalData,
+    saveDiagramRows,
+    saveCountryRate,
+    deleteCountryRate,
+  } = useRateSetting()
   // 모달 모드 — null: 닫힘 / add: 국가별 배분율 추가 / edit: 행 상세(수정)
   const [modalMode, setModalMode] = useState<'add' | 'edit' | null>(null)
+  const [selectedRow, setSelectedRow] = useState<RateRow | undefined>()
+  const [draftDiagramRows, setDraftDiagramRows] = useState<DiagramRow[]>(diagramRows)
+
+  useEffect(() => {
+    setDraftDiagramRows(diagramRows)
+  }, [diagramRows])
 
   // Figma에서 굵게 표시되는 셀(국가코드~적용 코인수)만 감싸는 헬퍼
   const strong = (value: string) => <span className={styles.cellStrong}>{value}</span>
@@ -34,16 +46,16 @@ export default function HqRateSetting() {
   const rows: TableRow[] = rawRows.map((r) => ({
     id: r.code,
     cells: {
+      no: r.no,
       country: r.country,
       code: strong(r.code),
       hqFee: strong(r.hqFee),
       leaderFee: strong(r.leaderFee),
       partnerFee: strong(r.partnerFee),
       merchantSettle: strong(r.merchantSettle),
-      event: <span className={EVENT_CLASS[r.event] ? styles.evApplied : styles.cellStrong}>{eventLabel[r.event]}</span>,
+      event: <Badge accent={EVENT_CLASS[r.event] ? 'green' : 'amber'} size="md" shape="rect">{eventLabel[r.event]}</Badge>,
       coinCount: strong(r.coinCount),
-      status: <span className={STATUS_CLASS[r.status]}>{statusLabel[r.status]}</span>,
-      action: <ActionBadges labels={[detailLabel]} accentByLabel={{}} size="xs" solid equalWidth />,
+      status: <Badge accent={r.statusAccent ?? 'green'} size="md" shape="rect">{statusLabel[r.status]}</Badge>,
     },
   }))
 
@@ -68,10 +80,12 @@ export default function HqRateSetting() {
       {/* 기본 배분 구조 다이어그램 카드 — Figma상 제목·역할 배지·저장 버튼이 한 줄 */}
       <div className={styles.diagramCard}>
         <DistributionDiagram
-          rows={diagramRows}
+          rows={draftDiagramRows}
           titleSlot={<h3 className={styles.diagramTitle}>{t('hqRate.diagram.title')}</h3>}
+          editable
+          onRowsChange={setDraftDiagramRows}
           action={
-            <button type="button" className={styles.saveButton}>
+            <button type="button" className={styles.saveButton} onClick={() => void saveDiagramRows(draftDiagramRows)}>
               {t('hqRate.diagram.save')}
             </button>
           }
@@ -90,8 +104,18 @@ export default function HqRateSetting() {
         columns={columns}
         rows={rows}
         toolbar={[t('common.search'), t('common.filter'), t('common.excel')]}
+        searchKeys={['country', 'code', 'status', 'event']}
+        filterKeys={['country', 'event', 'status']}
+        exportUrl="/api/hq/distribution-rates/export"
         toolbarExtra={
-          <button type="button" className={styles.addButton} onClick={() => setModalMode('add')}>
+          <button
+            type="button"
+            className={styles.addButton}
+            onClick={() => {
+              setSelectedRow(undefined)
+              setModalMode('add')
+            }}
+          >
             {t('hqRate.btn.add')}
           </button>
         }
@@ -99,12 +123,26 @@ export default function HqRateSetting() {
         mutedText
         headerBar
         tallToolbar
-        onRowClick={() => setModalMode('edit')}
+        paginated
+        pageSize={10}
+        onRowClick={(id) => {
+          const sourceRow = rawRows.find((item) => (item.countryCode ?? item.code) === id)
+          setSelectedRow(sourceRow)
+          setModalMode('edit')
+        }}
       />
 
       {/* 국가별 배분율 추가/수정 모달 — 사이드바 제외 콘텐츠 영역 중앙 */}
       {modalMode && (
-        <RateFormModal variant={modalMode} data={modalData} diagramRows={diagramRows} onClose={() => setModalMode(null)} />
+        <RateFormModal
+          variant={modalMode}
+          data={makeModalData(selectedRow)}
+          countries={countries}
+          diagramRows={diagramRows}
+          onClose={() => setModalMode(null)}
+          onSubmit={(payload) => saveCountryRate(modalMode, payload)}
+          onDelete={(countryCode) => deleteCountryRate(countryCode)}
+        />
       )}
     </div>
   )

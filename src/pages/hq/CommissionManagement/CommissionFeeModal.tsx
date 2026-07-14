@@ -1,29 +1,75 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from '../../../i18n'
-import type { FeeModalData } from './useCommission'
+import type { FeeCountryOption, FeeModalData } from './useCommission'
 import styles from './CommissionFeeModal.module.css'
 
 interface CommissionFeeModalProps {
-  /** add: "국가 수수료 추가" CTA(하단 추가하기) / edit: 행(상세) 클릭(하단 수정하기) */
   variant: 'add' | 'edit'
   data: FeeModalData
-  /** 닫기(취소/배경 클릭) — 추가/수정 동작은 협의 전이라 UI만 */
+  countries: FeeCountryOption[]
   onClose: () => void
+  onSubmit: (payload: FeeModalData) => Promise<void>
 }
 
-/*
- * CommissionFeeModal — "수수료 설정/추가" 모달 (Figma 81:22758 내 Modal Card, 780×552)
- * ------------------------------------------------------------------
- * 특정 국가에만 별도 수수료를 적용하는 폼. 좌측 네브바를 제외한 콘텐츠 영역 기준
- * 가운데 정렬(CountryFormOverlay와 동일 backdrop 방식). Figma에 추가하기/수정하기
- * 버튼이 함께 있어 CTA 진입(add)/행 진입(edit) 두 모드로 나눠 하단 버튼만 바꾼다.
- * 입력/토글/선택 동작은 협의 전이라 시안 예시값을 채운 UI 상태만 구현.
- */
-export default function CommissionFeeModal({ variant, data, onClose }: CommissionFeeModalProps) {
+export default function CommissionFeeModal({ variant, data, countries, onClose, onSubmit }: CommissionFeeModalProps) {
   const { t } = useTranslation()
+  const [form, setForm] = useState<FeeModalData>(data)
+  const [isSaving, setIsSaving] = useState(false)
+
+  useEffect(() => {
+    setForm(data)
+  }, [data])
+
+  const update = <K extends keyof FeeModalData>(key: K, value: FeeModalData[K]) => {
+    setForm((current) => ({ ...current, [key]: value }))
+  }
+
+  const updateCountry = (countryCode: string) => {
+    const country = countries.find((item) => item.code === countryCode)
+    setForm((current) => ({
+      ...current,
+      countryCode,
+      country: country?.name ?? current.country,
+    }))
+  }
+
+  const updateCoin = (index: number, key: 'assetCode' | 'network' | 'tokenStandard' | 'fee', value: string) => {
+    setForm((current) => ({
+      ...current,
+      coins: current.coins.map((coin, coinIndex) =>
+        coinIndex === index ? { ...coin, [key]: value, name: `${key === 'assetCode' ? value : coin.assetCode}  ${key === 'network' ? value : coin.network}  ${key === 'tokenStandard' ? value : coin.tokenStandard}` } : coin
+      ),
+    }))
+  }
+
+  const addCoin = () => {
+    setForm((current) => ({
+      ...current,
+      coins: [...current.coins, { assetCode: 'KORI', network: 'TRON', tokenStandard: 'TRC-20', fee: '0.1', name: 'KORI  TRON  TRC-20' }],
+    }))
+  }
+
+  const removeCoin = (index: number) => {
+    setForm((current) => ({
+      ...current,
+      coins: current.coins.filter((_, coinIndex) => coinIndex !== index),
+    }))
+  }
+
+  const submit = async () => {
+    setIsSaving(true)
+    try {
+      await onSubmit(form)
+      onClose()
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : '저장에 실패했습니다.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   return (
     <div className={styles.backdrop} onClick={onClose}>
-      {/* stopPropagation: 패널 안 클릭이 backdrop 클릭으로 버블링되지 않도록 */}
       <div
         className={styles.panel}
         role="dialog"
@@ -31,93 +77,155 @@ export default function CommissionFeeModal({ variant, data, onClose }: Commissio
         aria-label={t('hqCommission.modal.title')}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 헤더: 제목/설명(좌) + 이벤트 적용중 배지 · ON 토글(우) */}
         <div className={styles.header}>
           <div>
             <h2 className={styles.title}>{t('hqCommission.modal.title')}</h2>
             <p className={styles.desc}>{t('hqCommission.modal.desc')}</p>
           </div>
           <div className={styles.headerRight}>
-            <span className={styles.eventBadge}>{t('hqCommission.modal.eventActive')}</span>
-            <span className={styles.toggleOn} aria-hidden>
-              ON
-            </span>
+            <span className={styles.eventBadge}>{form.eventEnabled ? t('hqCommission.modal.eventActive') : t('hqCommission.modal.eventInactive')}</span>
+            <button
+              type="button"
+              className={form.eventEnabled ? styles.toggleOn : styles.toggleOff}
+              onClick={() => update('eventEnabled', !form.eventEnabled)}
+            >
+              {form.eventEnabled ? 'ON' : 'OFF'}
+            </button>
           </div>
         </div>
 
         <div className={styles.body}>
-          {/* 좌측: 국가 선택 + 이벤트/적용 범위 + 수수료 입력 3개 */}
           <div className={styles.formCol}>
-            <div className={styles.field}>
+            <label className={styles.field}>
               <span className={styles.fieldLabel}>{t('hqCommission.modal.countrySelect')}</span>
-              {/* 셀렉트 모양(표시 전용) — Figma 334×46 + 우측 ▼ */}
-              <span className={styles.selectBox}>
-                {data.country}
-                <span className={styles.selectArrow} aria-hidden />
-              </span>
-            </div>
+              <select className={styles.selectBox} value={form.countryCode} onChange={(event) => updateCountry(event.target.value)}>
+                {countries.map((country) => (
+                  <option key={country.code} value={country.code}>
+                    {country.name}
+                  </option>
+                ))}
+              </select>
+            </label>
 
             <div className={styles.field}>
               <div className={styles.eventRow}>
                 <span className={styles.fieldLabel}>{t('hqCommission.modal.eventPromo')}</span>
-                <span className={styles.toggleOn} aria-hidden>
-                  ON
-                </span>
+                <button
+                  type="button"
+                  className={form.eventEnabled ? styles.toggleOn : styles.toggleOff}
+                  onClick={() => update('eventEnabled', !form.eventEnabled)}
+                >
+                  {form.eventEnabled ? 'ON' : 'OFF'}
+                </button>
               </div>
               <div className={styles.feeInputRow}>
-                <span className={styles.feeInput}>{data.eventFee}</span>
+                <input
+                  className={styles.feeInput}
+                  type="number"
+                  min="0"
+                  step="0.0001"
+                  value={form.eventFee}
+                  onChange={(event) => update('eventFee', event.target.value)}
+                />
                 <span className={styles.feeUnit}>%</span>
               </div>
             </div>
 
-            {/* 적용 범위 알약 — Figma상 우측(리더 소속만)만 활성 톤. 표시 전용 */}
             <div className={styles.scopeRow}>
-              <span className={`${styles.scopePill} ${styles.scopePillDim}`}>{t('hqCommission.modal.scopeCountryAll')}</span>
-              <span className={styles.scopePill}>{t('hqCommission.modal.scopeLeaderOnly')}</span>
+              <button
+                type="button"
+                className={form.scope === 'COUNTRY_ALL' ? styles.scopePill : `${styles.scopePill} ${styles.scopePillDim}`}
+                onClick={() => update('scope', 'COUNTRY_ALL')}
+              >
+                {t('hqCommission.modal.scopeCountryAll')}
+              </button>
+              <button
+                type="button"
+                className={form.scope === 'LEADER_ONLY' ? styles.scopePill : `${styles.scopePill} ${styles.scopePillDim}`}
+                onClick={() => update('scope', 'LEADER_ONLY')}
+              >
+                {t('hqCommission.modal.scopeLeaderOnly')}
+              </button>
             </div>
 
             <div className={styles.feeTriple}>
               {[
-                { label: t('hqCommission.modal.baseFee'), value: data.baseFee },
-                { label: t('hqCommission.modal.online'), value: data.onlineFee },
-                { label: t('hqCommission.modal.offline'), value: data.offlineFee },
-              ].map((f) => (
-                <div key={f.label} className={styles.field}>
-                  <span className={styles.fieldLabel}>{f.label}</span>
+                { label: t('hqCommission.modal.baseFee'), key: 'baseFee' as const },
+                { label: t('hqCommission.modal.online'), key: 'onlineFee' as const },
+                { label: t('hqCommission.modal.offline'), key: 'offlineFee' as const },
+              ].map((field) => (
+                <label key={field.key} className={styles.field}>
+                  <span className={styles.fieldLabel}>{field.label}</span>
                   <div className={styles.feeInputRow}>
-                    <span className={styles.feeInput}>{f.value}</span>
+                    <input
+                      className={styles.feeInput}
+                      type="number"
+                      min="0"
+                      step="0.0001"
+                      value={form[field.key]}
+                      onChange={(event) => update(field.key, event.target.value)}
+                    />
                     <span className={styles.feeUnit}>%</span>
                   </div>
-                </div>
+                </label>
               ))}
             </div>
           </div>
 
-          {/* 우측: 코인별 수수료 목록 */}
           <div className={styles.coinCol}>
             <div className={styles.coinHead}>
               <span className={styles.fieldLabel}>{t('hqCommission.modal.coinFee')}</span>
-              <button type="button" className={styles.coinAddButton}>
+              <button type="button" className={styles.coinAddButton} onClick={addCoin}>
                 {t('hqCommission.modal.coinAdd')}
               </button>
             </div>
             <div className={styles.coinBox}>
-              {data.coins.map((c) => (
-                <div key={c.name} className={styles.coinRow}>
-                  <span className={styles.coinName}>{c.name}</span>
-                  <span className={styles.coinFee}>{c.fee}</span>
+              {form.coins.map((coin, index) => (
+                <div key={`${coin.assetCode}-${coin.network}-${coin.tokenStandard}-${index}`} className={styles.coinRowEditable}>
+                  <input
+                    className={styles.coinInput}
+                    aria-label={t('hqCommission.modal.coinAsset')}
+                    value={coin.assetCode}
+                    onChange={(event) => updateCoin(index, 'assetCode', event.target.value)}
+                  />
+                  <input
+                    className={styles.coinInput}
+                    aria-label={t('hqCommission.modal.coinNetwork')}
+                    value={coin.network}
+                    onChange={(event) => updateCoin(index, 'network', event.target.value)}
+                  />
+                  <input
+                    className={styles.coinInput}
+                    aria-label={t('hqCommission.modal.coinStandard')}
+                    value={coin.tokenStandard}
+                    onChange={(event) => updateCoin(index, 'tokenStandard', event.target.value)}
+                  />
+                  <div className={styles.coinFeeEdit}>
+                    <input
+                      className={styles.coinFeeInput}
+                      aria-label={t('hqCommission.modal.coinFeeValue')}
+                      type="number"
+                      min="0"
+                      step="0.0001"
+                      value={coin.fee}
+                      onChange={(event) => updateCoin(index, 'fee', event.target.value)}
+                    />
+                    <span>%</span>
+                  </div>
+                  <button type="button" className={styles.coinRemoveButton} onClick={() => removeCoin(index)}>
+                    {t('hqCommission.modal.coinRemove')}
+                  </button>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* 하단 버튼 — add: [취소·추가하기] / edit: [취소·수정하기] */}
         <div className={styles.footer}>
           <button type="button" className={styles.ghostButton} onClick={onClose}>
             {t('hqCommission.modal.cancel')}
           </button>
-          <button type="button" className={styles.submitButton}>
+          <button type="button" className={styles.submitButton} disabled={isSaving} onClick={submit}>
             {variant === 'add' ? t('hqCommission.modal.add') : t('hqCommission.modal.edit')}
           </button>
         </div>

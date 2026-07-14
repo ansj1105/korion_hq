@@ -1,15 +1,18 @@
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import DistributionDiagram, { type DiagramRow } from './DistributionDiagram'
-import type { RateModalData } from './useRateSetting'
+import type { RateCountryOption, RateModalData } from './useRateSetting'
 import styles from './RateFormModal.module.css'
 
 interface RateFormModalProps {
   /** add: "국가별 배분율 추가" CTA(하단 추가하기) / edit: 행(상세) 클릭(하단 수정하기) */
   variant: 'add' | 'edit'
   data: RateModalData
+  countries: RateCountryOption[]
   diagramRows: DiagramRow[]
-  /** 닫기(취소/배경 클릭) — 추가/수정 동작은 협의 전이라 UI만 */
   onClose: () => void
+  onSubmit: (payload: RateModalData) => Promise<void>
+  onDelete: (countryCode: string) => Promise<void>
 }
 
 /*
@@ -20,8 +23,64 @@ interface RateFormModalProps {
  * 함께 있어 CTA 진입(add)/행 진입(edit) 두 모드로 나눠 하단 버튼만 바꾼다.
  * 배분 다이어그램은 페이지와 동일한 DistributionDiagram을 재사용(표시 전용).
  */
-export default function RateFormModal({ variant, data, diagramRows, onClose }: RateFormModalProps) {
+export default function RateFormModal({ variant, data, countries, diagramRows, onClose, onSubmit, onDelete }: RateFormModalProps) {
   const { t } = useTranslation()
+  const [form, setForm] = useState<RateModalData>(data)
+  const [draftRows, setDraftRows] = useState<DiagramRow[]>(() => modalRowsFromData(diagramRows, data))
+  const [isSaving, setIsSaving] = useState(false)
+
+  useEffect(() => {
+    setForm(data)
+    setDraftRows(modalRowsFromData(diagramRows, data))
+  }, [data, diagramRows])
+
+  const eventLabel = form.eventEnabled ? t('hqRate.modal.eventActive') : t('hqRate.modal.eventInactive')
+
+  const countryOptions = useMemo(() => countries.length ? countries : [{ code: form.countryCode, name: form.country }], [countries, form.country, form.countryCode])
+
+  const update = <K extends keyof RateModalData>(key: K, value: RateModalData[K]) => {
+    setForm((current) => ({ ...current, [key]: value }))
+  }
+
+  const updateCountry = (countryCode: string) => {
+    const country = countryOptions.find((item) => item.code === countryCode)
+    setForm((current) => ({
+      ...current,
+      countryCode,
+      country: country?.name ?? current.country,
+    }))
+  }
+
+  const submit = async () => {
+    const routedRow = draftRows[0]
+    setIsSaving(true)
+    try {
+      await onSubmit({
+        ...form,
+        hqRate: routedRow?.hqRate ?? form.hqRate,
+        leaderRate: routedRow?.leaderRate ?? form.leaderRate,
+        partnerRate: routedRow?.partnerRate ?? form.partnerRate,
+      })
+      onClose()
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : '저장에 실패했습니다.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const remove = async () => {
+    if (!window.confirm(t('hqRate.modal.deleteConfirm'))) return
+    setIsSaving(true)
+    try {
+      await onDelete(form.countryCode)
+      onClose()
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : '삭제에 실패했습니다.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   return (
     <div className={styles.backdrop} onClick={onClose}>
@@ -40,46 +99,82 @@ export default function RateFormModal({ variant, data, diagramRows, onClose }: R
             <p className={styles.desc}>{t('hqRate.modal.desc')}</p>
           </div>
           <div className={styles.headerRight}>
-            <span className={styles.eventBadge}>{t('hqRate.modal.eventActive')}</span>
-            <span className={styles.toggleOn} aria-hidden>
-              ON
-            </span>
+            <span className={styles.eventBadge}>{eventLabel}</span>
+            <button
+              type="button"
+              className={form.eventEnabled ? styles.toggleOn : styles.toggleOff}
+              onClick={() => update('eventEnabled', !form.eventEnabled)}
+            >
+              {form.eventEnabled ? 'ON' : 'OFF'}
+            </button>
           </div>
         </div>
 
-        {/* 국가 선택 — 셀렉트 모양(표시 전용, Figma 334×46 + 우측 ▼) */}
-        <div className={styles.field}>
+        <label className={styles.field}>
           <span className={styles.fieldLabel}>{t('hqRate.modal.countrySelect')}</span>
-          <span className={styles.selectBox}>
-            {data.country}
-            <span className={styles.selectArrow} aria-hidden />
-          </span>
-        </div>
+          <select className={styles.selectBox} value={form.countryCode} onChange={(event) => updateCountry(event.target.value)}>
+            {countryOptions.map((country) => (
+              <option key={country.code} value={country.code}>
+                {country.name}
+              </option>
+            ))}
+          </select>
+        </label>
 
         {/* 기본 배분 구조 설정 — 페이지 다이어그램 재사용 (제목이 역할 배지와 한 줄) */}
         <div className={styles.diagramSection}>
           <DistributionDiagram
-            rows={diagramRows}
+            rows={draftRows}
             titleSlot={<h3 className={styles.diagramTitle}>{t('hqRate.diagram.title')}</h3>}
+            editable
+            onRowsChange={setDraftRows}
           />
         </div>
 
-        {/* 관리자 메모 (표시 전용, Figma 330×46) */}
-        <div className={`${styles.field} ${styles.memoField}`}>
+        <label className={`${styles.field} ${styles.memoField}`}>
           <span className={styles.fieldLabel}>{t('hqRate.modal.adminMemo')}</span>
-          <span className={styles.memoBox}>{data.memo}</span>
-        </div>
+          <textarea
+            className={styles.memoBox}
+            value={form.adminMemo}
+            placeholder={t('hqRate.modal.memoPlaceholder')}
+            maxLength={200}
+            onChange={(event) => update('adminMemo', event.target.value)}
+          />
+        </label>
 
-        {/* 하단 버튼 — add: [취소·추가하기] / edit: [취소·수정하기] */}
         <div className={styles.footer}>
+          {variant === 'edit' && (
+            <button type="button" className={styles.deleteButton} disabled={isSaving} onClick={remove}>
+              {t('hqRate.modal.delete')}
+            </button>
+          )}
           <button type="button" className={styles.ghostButton} onClick={onClose}>
             {t('hqRate.modal.cancel')}
           </button>
-          <button type="button" className={styles.submitButton}>
+          <button type="button" className={styles.submitButton} disabled={isSaving} onClick={submit}>
             {variant === 'add' ? t('hqRate.modal.add') : t('hqRate.modal.edit')}
           </button>
         </div>
       </div>
     </div>
   )
+}
+
+function modalRowsFromData(rows: DiagramRow[], data: RateModalData): DiagramRow[] {
+  return rows.map((row, index) => {
+    if (index !== 0) return row
+    return {
+      ...row,
+      hqRate: data.hqRate,
+      leaderRate: data.leaderRate,
+      partnerRate: data.partnerRate,
+      merchantRate: '0',
+      cells: row.cells.map((cell) => {
+        if (cell.color === 'hq') return { ...cell, value: data.hqRate }
+        if (cell.color === 'leader') return { ...cell, value: data.leaderRate }
+        if (cell.color === 'partner') return { ...cell, value: data.partnerRate }
+        return cell
+      }),
+    }
+  })
 }

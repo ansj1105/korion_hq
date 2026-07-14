@@ -5,11 +5,11 @@
     { "id": "rejected", "labelKey": "hqRequestResultLog.kpi.rejected", "value": "50", "deltaKey": "hqRequestResultLog.kpi.delta5" }
   ],
   "rows": [
-    { "no": "APP-2401", "appliedAt": "2026.06.13", "paidAt": "2026.06.15", "requestType": "리더 승인", "parentCode": "NG-LEAD-0001", "applicantCode": "NG-MER-0001", "country": "나이지리아", "partnerName": "Nova", "adminAction": "approveCancelled" },
-    { "no": "APP-2399", "appliedAt": "2026.06.13", "paidAt": "2026.06.15", "requestType": "리더 승인", "parentCode": "NG-LEAD-0001", "applicantCode": "NG-MER-0001", "country": "나이지리아", "partnerName": "Nova", "adminAction": "approved" },
-    { "no": "APP-2398", "appliedAt": "2026.06.13", "paidAt": "2026.06.15", "requestType": "파트너 (리더요청)", "parentCode": "-", "applicantCode": "NG-MER-0001", "country": "대한민국", "partnerName": "Nova", "adminAction": "approved" },
-    { "no": "APP-2397", "appliedAt": "2026.06.12", "paidAt": "2026.06.15", "requestType": "파트너 (다이렉트)", "parentCode": "-", "applicantCode": "NG-MER-0001", "country": "이탈리아", "partnerName": "Nova", "adminAction": "rejectCancelled" },
-    { "no": "APP-2401", "appliedAt": "2026.06.13", "paidAt": "2026.06.15", "requestType": "가맹점 (다이렉트)", "parentCode": "NG-SP-0001", "applicantCode": "NG-MER-0001", "country": "나이지리아", "partnerName": "Nova", "adminAction": "rejected" },
-    { "no": "APP-2397", "appliedAt": "2026.06.12", "paidAt": "2026.06.15", "requestType": "가맹점 (다이렉트)", "parentCode": "NG-LEAD-0001", "applicantCode": "NG-MER-0001", "country": "덴마크", "partnerName": "Nova", "adminAction": "rejected" }
+    { "no": "6", "applicationNo": "APP-2401", "appliedAt": "2026.06.13", "paidAt": "2026.06.15", "requestType": "파트너 (리더 승인)", "parentCode": "NG-LEAD-0001", "applicantCode": "NG-SP-0001", "country": "나이지리아", "partnerName": "Nova", "adminAction": "approveCancelled" },
+    { "no": "5", "applicationNo": "APP-2399", "appliedAt": "2026.06.13", "paidAt": "2026.06.15", "requestType": "파트너 (리더 승인)", "parentCode": "NG-LEAD-0001", "applicantCode": "NG-SP-0002", "country": "나이지리아", "partnerName": "Nova", "adminAction": "approved" },
+    { "no": "4", "applicationNo": "APP-2398", "appliedAt": "2026.06.13", "paidAt": "2026.06.15", "requestType": "리더 승격 요청", "parentCode": "HQ_DIRECT", "applicantCode": "KR-LEAD-0003", "country": "대한민국", "partnerName": "Nova", "adminAction": "review" },
+    { "no": "3", "applicationNo": "APP-2397", "appliedAt": "2026.06.12", "paidAt": "2026.06.15", "requestType": "파트너 (다이렉트)", "parentCode": "HQ_DIRECT", "applicantCode": "NG-SP-0004", "country": "이탈리아", "partnerName": "Nova", "adminAction": "infoRequested" },
+    { "no": "2", "applicationNo": "APP-2396", "appliedAt": "2026.06.13", "paidAt": "2026.06.15", "requestType": "가맹점 (다이렉트)", "parentCode": "HQ_DIRECT", "applicantCode": "NG-MER-0005", "country": "나이지리아", "partnerName": "Nova", "adminAction": "held" },
+    { "no": "1", "applicationNo": "APP-2395", "appliedAt": "2026.06.12", "paidAt": "2026.06.15", "requestType": "가맹점 (다이렉트)", "parentCode": "HQ_DIRECT", "applicantCode": "NG-MER-0006", "country": "덴마크", "partnerName": "Nova", "adminAction": "rejected" }
   ]
 }

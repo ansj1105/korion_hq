@@ -185,16 +185,6 @@
   background: #ffffff;
 }
 
-/* ===== 상태 컬럼 표시 색 (데이터 값이라 글자색만 입힘, Figma 틴트 실측) ===== */
-.stActive {
-  color: color-mix(in srgb, var(--color-accent-green) 65%, transparent);
-  font-weight: var(--font-weight-bold);
-}
-.stPending {
-  color: color-mix(in srgb, var(--color-accent-amber) 75%, transparent);
-  font-weight: var(--font-weight-bold);
-}
-
 /* 국가코드~적용 코인수 등 Figma에서 굵게 표시되는 셀 */
 .cellStrong {
   font-weight: var(--font-weight-bold);

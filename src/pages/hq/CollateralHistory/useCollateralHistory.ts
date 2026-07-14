@@ -1,21 +1,28 @@
 import { useTranslation } from '../../../i18n'
 import type { StatCardData } from '../../../components/molecules/StatCard'
 import type { Column } from '../../../components/organisms/DataTable'
+import { useHqPageData } from '../../../hooks/useHqPageData'
 import data from './collateralHistoryData.json'
+import infoData from './collateralInfoData.json'
+import settlementData from './collateralSettlementData.json'
 
 interface KpiRaw {
   id: string
   labelKey: string
   value: string
   noteKey?: string
+  note?: string
+  labelTone?: 'default' | 'amber' | 'green'
   deltaTone?: 'cyan' | 'red'
+  delta?: string
+  deltaBadge?: boolean
   deltaPlain?: boolean
   dense?: boolean
   alignTop?: boolean
 }
 
 /** 행 데이터(회원명/코드/금액/유형·상태 enum 등)는 CLAUDE.md 11번 규칙상 번역하지 않고 그대로 통과한다. */
-interface HistoryRow {
+export interface CollateralHistoryRow {
   no: string
   processedAt: string
   code: string
@@ -28,6 +35,62 @@ interface HistoryRow {
   status: string
 }
 
+export interface CollateralInfoRow {
+  no: string
+  adminCode: string
+  country: string
+  memberId: string
+  memberName: string
+  totalWallet: string
+  availableWallet: string
+  collateralBalance: string
+  lastTopup: string
+  lastPayment: string
+}
+
+export interface CollateralSettlementRow {
+  no: string
+  settledAt: string
+  parentPartner: string
+  ownCode: string
+  country: string
+  memberId: string
+  memberName: string
+  target: string
+  amount: string
+  beforeAfter: string
+  status: string
+}
+
+interface FilterOption {
+  value: string
+  label: string
+}
+
+interface CollateralHistoryPageData {
+  kpis: KpiRaw[]
+  filters?: {
+    countries?: FilterOption[]
+    dates?: string[]
+  }
+  history: {
+    rows: CollateralHistoryRow[]
+  }
+  info?: {
+    rows: CollateralInfoRow[]
+  }
+  settlement?: {
+    rows: CollateralSettlementRow[]
+  }
+}
+
+const fallbackData: CollateralHistoryPageData = {
+  kpis: data.kpis as KpiRaw[],
+  history: { rows: data.history.rows as CollateralHistoryRow[] },
+  info: { rows: infoData.rows as CollateralInfoRow[] },
+  settlement: { rows: settlementData.rows as CollateralSettlementRow[] },
+}
+
 /*
  * useCollateralHistory — 본사어드민 "회원 담보금 충전 / 해제 내역" 데이터 훅
  * ------------------------------------------------------------------
@@ -36,14 +99,21 @@ interface HistoryRow {
  * 기존 hqDashboard.kpi.* 키를 재사용한다. 추후 실 연동 시 이 훅 내부만
  * API 호출로 교체하면 CollateralHistory.tsx는 그대로 동작한다.
  */
-export function useCollateralHistory() {
+export function useCollateralHistory(countryScope: string, date: string) {
   const { t } = useTranslation()
+  const { data: pageData, isLoading, error } = useHqPageData<CollateralHistoryPageData>(
+    '/api/hq/collateral-history',
+    fallbackData,
+    { countryScope, date }
+  )
 
-  const kpis: StatCardData[] = (data.kpis as KpiRaw[]).map((k) => ({
+  const kpis: StatCardData[] = (pageData.kpis as KpiRaw[]).map((k) => ({
     id: k.id,
     label: t(k.labelKey),
     value: k.value,
-    delta: k.noteKey ? t(k.noteKey) : undefined,
+    delta: collateralDeltaText(k.delta ?? k.note ?? (k.noteKey ? t(k.noteKey) : undefined)),
+    deltaBadge: k.deltaBadge ?? Boolean(k.delta),
+    labelTone: k.labelTone,
     deltaTone: k.deltaTone,
     deltaPlain: k.deltaPlain,
     dense: k.dense,
@@ -65,5 +135,47 @@ export function useCollateralHistory() {
     { key: 'action', label: t('hqCollateral.col.action'), width: '1.95fr' },
   ]
 
-  return { kpis, columns, rows: data.history.rows as HistoryRow[] }
+  return {
+    kpis,
+    columns,
+    rows: pageData.history.rows as CollateralHistoryRow[],
+    infoRows: (pageData.info?.rows ?? []) as CollateralInfoRow[],
+    settlementRows: (pageData.settlement?.rows ?? []) as CollateralSettlementRow[],
+    countryOptions: pageData.filters?.countries ?? fallbackCountryOptions(pageData),
+    dateOptions: pageData.filters?.dates ?? fallbackDateOptions(pageData),
+    isLoading,
+    error,
+  }
+}
+
+function fallbackCountryOptions(pageData: CollateralHistoryPageData) {
+  return Array.from(
+    new Set([
+      ...(pageData.history.rows ?? []).map((row) => row.country),
+      ...(pageData.info?.rows ?? []).map((row) => row.country),
+      ...(pageData.settlement?.rows ?? []).map((row) => row.country),
+    ].filter((value) => value && value !== '-'))
+  )
+    .sort()
+    .map((value) => ({ value, label: value }))
+}
+
+function fallbackDateOptions(pageData: CollateralHistoryPageData) {
+  return Array.from(
+    new Set([
+      ...(pageData.history.rows ?? []).map((row) => dateKey(row.processedAt)),
+      ...(pageData.info?.rows ?? []).map((row) => dateKey(row.lastTopup)),
+      ...(pageData.info?.rows ?? []).map((row) => dateKey(row.lastPayment)),
+      ...(pageData.settlement?.rows ?? []).map((row) => dateKey(row.settledAt)),
+    ].filter(Boolean))
+  ).sort((a, b) => b.localeCompare(a))
+}
+
+function dateKey(value: string) {
+  const match = value.match(/\d{4}[.-]\d{2}[.-]\d{2}/)
+  return match ? match[0].replace(/\./g, '-') : ''
+}
+
+function collateralDeltaText(value?: string) {
+  return value?.replace('전일 대비', '기간 대비')
 }

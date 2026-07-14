@@ -14,12 +14,13 @@ interface StatRaw {
   deltaBadge?: boolean
 }
 
-/** 관리자 행동 enum — 승인/거절과 각각의 취소. 취소된 건은 되돌리기 배지가 없다(상세정보만) */
-export type AdminAction = 'approved' | 'approveCancelled' | 'rejected' | 'rejectCancelled'
+/** 관리자 행동 enum — 신청 처리 화면에서 누른 승인/거절/검토/대기/자료요청/보류 액션 이력 */
+export type AdminAction = 'approved' | 'approveCancelled' | 'rejected' | 'rejectCancelled' | 'review' | 'waiting' | 'infoRequested' | 'held'
 
 /** 요청 결과 로그 행 원본 데이터 형태 (Figma 샘플값 하드코딩) */
 export interface RequestResultLogRow {
   no: string
+  applicationNo: string
   appliedAt: string
   paidAt: string
   /** 요청 유형(리더 승인/파트너 (리더요청)/파트너 (다이렉트)/가맹점 (다이렉트)) — 데이터 enum이라 번역 안 함 */
@@ -29,7 +30,6 @@ export interface RequestResultLogRow {
   country: string
   partnerName: string
   adminAction: AdminAction
-  status?: AdminAction
 }
 
 /*
@@ -66,7 +66,8 @@ export function useRequestResultLog() {
   }))
 
   const columns: Column[] = [
-    { key: 'no', label: t('hqRequestResultLog.col.no'), width: '0.8fr' },
+    { key: 'no', label: t('hqRequestResultLog.col.no'), width: '0.5fr' },
+    { key: 'applicationNo', label: t('hqRequestResultLog.col.applicationNo'), width: '0.8fr' },
     { key: 'appliedAt', label: t('hqRequestResultLog.col.appliedAt'), width: '0.7fr' },
     { key: 'paidAt', label: t('hqRequestResultLog.col.paidAt'), width: '0.7fr' },
     { key: 'requestType', label: t('hqRequestResultLog.col.requestType'), width: '1.1fr' },
@@ -75,9 +76,6 @@ export function useRequestResultLog() {
     { key: 'country', label: t('hqRequestResultLog.col.country'), width: '0.9fr' },
     { key: 'partnerName', label: t('hqRequestResultLog.col.partnerName'), width: '1fr' },
     { key: 'adminAction', label: t('hqRequestResultLog.col.adminAction'), width: '0.9fr' },
-    { key: 'status', label: t('hqRequestResultLog.col.status'), width: '0.8fr' },
-    // 배지 2개(취소 + 상세정보) 영문 라벨까지 들어가도록 넉넉히
-    { key: 'action', label: t('hqRequestResultLog.col.action'), width: '1.4fr' },
   ]
 
   /** 관리자 행동 enum → 표시 라벨(데이터 값이라 번역 안 함, Figma 텍스트 그대로) */
@@ -86,14 +84,10 @@ export function useRequestResultLog() {
     approveCancelled: t('hqRequestResultLog.status.approveCancelled'),
     rejected: t('hqRequestResultLog.status.rejected'),
     rejectCancelled: t('hqRequestResultLog.status.rejectCancelled'),
-  }
-
-  /** 관리자 행동 enum → 행 액션 배지 라벨(번역 UI). 취소된 건은 상세정보만 남는다 */
-  const actionBadges: Record<AdminAction, string[]> = {
-    approved: [t('hqRequestResultLog.action.cancelApprove'), t('hqRequestResultLog.action.detail')],
-    approveCancelled: [t('hqRequestResultLog.action.detail')],
-    rejected: [t('hqRequestResultLog.action.cancelReject'), t('hqRequestResultLog.action.detail')],
-    rejectCancelled: [t('hqRequestResultLog.action.detail')],
+    review: t('hqRequestResultLog.status.review'),
+    waiting: t('hqRequestResultLog.status.waiting'),
+    infoRequested: t('hqRequestResultLog.status.infoRequested'),
+    held: t('hqRequestResultLog.status.held'),
   }
 
   return {
@@ -101,7 +95,6 @@ export function useRequestResultLog() {
     columns,
     rows: pageData.rows as RequestResultLogRow[],
     adminActionLabel,
-    actionBadges,
     section: t('hqRequestResultLog.section'),
   }
 }

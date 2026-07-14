@@ -1,39 +1,60 @@
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../../../i18n'
 import type { Column } from '../../../components/organisms/DataTable'
+import { deleteHqPageData, fetchHqPageData, postHqPageData, putHqPageData } from '../../../services/korionChongApi'
 import type { DiagramRow } from './DistributionDiagram'
 import data from './rateSettingData.json'
 
 interface KpiRaw {
+  id?: string
   labelKey: string
   value: string
   noteKey: string
 }
 
-/** 국가별 배분율 상태 enum — 활성/대기. 표시 라벨은 데이터 값(번역 대상 아님) */
-export type RateStatus = 'active' | 'pending'
-/** 이벤트 컬럼 enum — 적용중(초록 강조)/미적용 */
+export type RateStatus = 'active' | 'pending' | 'inactive'
 export type EventStatus = 'applied' | 'none'
 
-/** 국가별 배분율 행 (Figma 샘플값 하드코딩) */
 export interface RateRow {
+  no?: string
   country: string
   code: string
+  countryCode?: string
   hqFee: string
+  hqRate?: string
   leaderFee: string
+  leaderRate?: string
   partnerFee: string
+  partnerRate?: string
   merchantSettle: string
+  merchantSettlementEnabled?: boolean
   event: EventStatus
+  eventEnabled?: boolean
   coinCount: string
   status: RateStatus
+  statusAccent?: 'green' | 'amber' | 'red'
+  memo?: string
+  adminMemo?: string
 }
 
-/** 배분율 모달 표시용 샘플값 */
 export interface RateModalData {
+  countryCode: string
   country: string
-  memo: string
+  eventEnabled: boolean
+  hqRate: string
+  leaderRate: string
+  partnerRate: string
+  merchantSettlementEnabled: boolean
+  coinCount: string
+  status: RateStatus
+  adminMemo: string
 }
 
-/** KPI 카드 (라벨/설명만 번역) */
+export interface RateCountryOption {
+  code: string
+  name: string
+}
+
 export interface KpiItem {
   id: string
   label: string
@@ -41,25 +62,47 @@ export interface KpiItem {
   note: string
 }
 
-/*
- * useRateSetting — 본사어드민 · 수수료/정산 · 배분율 설정 데이터 훅
- * ------------------------------------------------------------------
- * rateSettingData.json(더미)을 읽어 UI 라벨(KPI/컬럼명)은 번역해 반환한다.
- * 상태/국가명/배분율 수치 등 데이터 값은 번역하지 않는다(CLAUDE.md 11번).
- * 추후 실 연동 시 이 훅 내부만 API 호출로 교체.
- */
+interface RateSettingApiData {
+  kpis: KpiRaw[]
+  diagram: DiagramRow[]
+  rows: RateRow[]
+  countries?: RateCountryOption[]
+  modal?: Partial<RateModalData>
+}
+
+const fallbackData = data as RateSettingApiData
+
 export function useRateSetting() {
   const { t } = useTranslation()
+  const [pageData, setPageData] = useState<RateSettingApiData>(fallbackData)
 
-  const kpis: KpiItem[] = (data.kpis as KpiRaw[]).map((k) => ({
-    id: k.labelKey,
-    label: t(k.labelKey),
-    value: k.value,
-    note: t(k.noteKey),
-  }))
+  useEffect(() => {
+    let cancelled = false
+    fetchHqPageData<RateSettingApiData>('/api/hq/distribution-rates')
+      .then((response) => {
+        if (!cancelled) setPageData(normalizeRateSetting(response))
+      })
+      .catch(() => {
+        if (!cancelled) setPageData(normalizeRateSetting(fallbackData))
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
-  /* 컬럼 폭 = Figma 고정폭(px)을 fr 비율로 환산(98/58/63/68/69/93/75/78/78/128 ÷ 65) */
+  const kpis: KpiItem[] = useMemo(
+    () =>
+      pageData.kpis.map((k) => ({
+        id: k.id ?? k.labelKey,
+        label: t(k.labelKey),
+        value: k.value,
+        note: t(k.noteKey),
+      })),
+    [pageData.kpis, t]
+  )
+
   const columns: Column[] = [
+    { key: 'no', label: t('hqRate.col.no'), width: '0.55fr', align: 'center' },
     { key: 'country', label: t('hqRate.col.country'), width: '1.5fr' },
     { key: 'code', label: t('hqRate.col.code'), width: '0.89fr' },
     { key: 'hqFee', label: t('hqRate.col.hqFee'), width: '0.97fr' },
@@ -69,27 +112,137 @@ export function useRateSetting() {
     { key: 'event', label: t('hqRate.col.event'), width: '1.15fr' },
     { key: 'coinCount', label: t('hqRate.col.coinCount'), width: '1.2fr' },
     { key: 'status', label: t('hqRate.col.status'), width: '1.2fr' },
-    { key: 'action', label: t('hqRate.col.action'), width: '1.97fr' },
   ]
 
-  /** 상태/이벤트 enum → 표시 라벨(데이터 값) */
   const statusLabel: Record<RateStatus, string> = {
-    active: '활성',
-    pending: '대기',
+    active: t('hqRate.status.active'),
+    pending: t('hqRate.status.pending'),
+    inactive: t('hqRate.status.inactive'),
   }
   const eventLabel: Record<EventStatus, string> = {
-    applied: '적용중',
-    none: '미적용',
+    applied: t('hqRate.event.applied'),
+    none: t('hqRate.event.none'),
+  }
+
+  const saveDiagramRows = async (rows: DiagramRow[]) => {
+    const response = await postHqPageData<RateSettingApiData>('/api/hq/distribution-rates', {
+      routes: rows.map((row) => ({
+        routeKey: row.routeKey,
+        routeType: row.routeType,
+        hqRate: row.hqRate ?? '0',
+        leaderRate: row.leaderRate ?? '0',
+        partnerRate: row.partnerRate ?? '0',
+        merchantRate: row.merchantRate ?? '0',
+      })),
+    })
+    setPageData(normalizeRateSetting(response))
+  }
+
+  const makeModalData = (row?: RateRow): RateModalData => ({
+    countryCode: row?.countryCode ?? row?.code ?? pageData.modal?.countryCode ?? 'NG',
+    country: row?.country ?? pageData.modal?.country ?? 'Nigeria',
+    eventEnabled: row?.eventEnabled ?? pageData.modal?.eventEnabled ?? false,
+    hqRate: row?.hqRate ?? stripPercent(row?.hqFee) ?? pageData.modal?.hqRate ?? '50',
+    leaderRate: row?.leaderRate ?? stripPercent(row?.leaderFee) ?? pageData.modal?.leaderRate ?? '25',
+    partnerRate: row?.partnerRate ?? stripPercent(row?.partnerFee) ?? pageData.modal?.partnerRate ?? '25',
+    merchantSettlementEnabled: row?.merchantSettlementEnabled ?? pageData.modal?.merchantSettlementEnabled ?? true,
+    coinCount: row?.coinCount ?? pageData.modal?.coinCount ?? '0',
+    status: row?.status ?? pageData.modal?.status ?? 'active',
+    adminMemo: row?.adminMemo ?? row?.memo ?? pageData.modal?.adminMemo ?? '',
+  })
+
+  const saveCountryRate = async (mode: 'add' | 'edit', payload: RateModalData) => {
+    if (mode === 'add' && pageData.rows.some((row) => (row.countryCode ?? row.code) === payload.countryCode)) {
+      throw new Error(t('hqRate.modal.duplicateCountry'))
+    }
+    const request = {
+      countryCode: payload.countryCode,
+      country: payload.country,
+      hqRate: numberText(payload.hqRate),
+      leaderRate: numberText(payload.leaderRate),
+      partnerRate: numberText(payload.partnerRate),
+      merchantSettlementEnabled: payload.merchantSettlementEnabled,
+      eventEnabled: payload.eventEnabled,
+      coinCount: Number(numberText(payload.coinCount)),
+      status: payload.status.toUpperCase(),
+      adminMemo: payload.adminMemo,
+    }
+    const response = mode === 'add'
+      ? await postHqPageData<RateSettingApiData>('/api/hq/distribution-rates/countries', request)
+      : await putHqPageData<RateSettingApiData>(`/api/hq/distribution-rates/countries/${encodeURIComponent(payload.countryCode)}`, request)
+    setPageData(normalizeRateSetting(response))
+  }
+
+  const deleteCountryRate = async (countryCode: string) => {
+    const response = await deleteHqPageData<RateSettingApiData>(`/api/hq/distribution-rates/countries/${encodeURIComponent(countryCode)}`)
+    setPageData(normalizeRateSetting(response))
   }
 
   return {
     kpis,
     columns,
-    rows: data.rows as RateRow[],
-    diagramRows: data.diagram as DiagramRow[],
+    rows: pageData.rows,
+    diagramRows: pageData.diagram,
+    countries: pageData.countries ?? fallbackCountries(pageData.rows),
     statusLabel,
     eventLabel,
-    modalData: data.modal as RateModalData,
-    detailLabel: t('hqRate.action.detail'),
+    makeModalData,
+    saveDiagramRows,
+    saveCountryRate,
+    deleteCountryRate,
   }
+}
+
+function normalizeRateSetting(response: RateSettingApiData): RateSettingApiData {
+  return {
+    ...response,
+    diagram: response.diagram.map((row, index) => enrichDiagramRow(row, index)),
+    rows: response.rows.map((row, index, rows) => ({
+      ...row,
+      no: row.no ?? String(rows.length - index),
+      countryCode: row.countryCode ?? row.code,
+      hqRate: row.hqRate ?? stripPercent(row.hqFee),
+      leaderRate: row.leaderRate ?? stripPercent(row.leaderFee),
+      partnerRate: row.partnerRate ?? stripPercent(row.partnerFee),
+      eventEnabled: row.eventEnabled ?? row.event === 'applied',
+      status: row.status ?? 'active',
+      statusAccent: row.statusAccent ?? 'green',
+    })),
+  }
+}
+
+function stripPercent(value?: string) {
+  if (!value || value === '-') return undefined
+  return value.replace('%', '').trim()
+}
+
+function numberText(value: string) {
+  const normalized = value.replace('%', '').trim()
+  return normalized || '0'
+}
+
+function fallbackCountries(rows: RateRow[]): RateCountryOption[] {
+  return rows.map((row) => ({ code: row.countryCode ?? row.code, name: row.country }))
+}
+
+function enrichDiagramRow(row: DiagramRow, index: number): DiagramRow {
+  const routeKeys = ['PARTNER_ROUTED', 'LEADER_DIRECT_MERCHANT', 'HQ_DIRECT_PARTNER', 'HQ_DIRECT_MERCHANT']
+  const routeTypes = ['PARTNER_ROUTED', 'LEADER_DIRECT', 'HQ_DIRECT_PARTNER', 'HQ_DIRECT_MERCHANT']
+  const enriched: DiagramRow = {
+    ...row,
+    routeKey: row.routeKey ?? routeKeys[index],
+    routeType: row.routeType ?? routeTypes[index],
+    hqRate: row.hqRate ?? '0',
+    leaderRate: row.leaderRate ?? '0',
+    partnerRate: row.partnerRate ?? '0',
+    merchantRate: row.merchantRate ?? '0',
+  }
+  row.cells.forEach((cell) => {
+    if (cell.value === undefined) return
+    if (cell.color === 'hq') enriched.hqRate = cell.value
+    if (cell.color === 'leader') enriched.leaderRate = cell.value
+    if (cell.color === 'partner') enriched.partnerRate = cell.value
+    if (cell.color === 'merchant') enriched.merchantRate = cell.value
+  })
+  return enriched
 }

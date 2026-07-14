@@ -116,6 +116,18 @@
   font-size: var(--font-size-14);
   font-weight: var(--font-weight-semibold);
   color: #f7f3ff;
+  appearance: none;
+  cursor: pointer;
+}
+select.selectBox {
+  background-image: linear-gradient(45deg, transparent 50%, #f7f3ff 50%), linear-gradient(135deg, #f7f3ff 50%, transparent 50%);
+  background-position: calc(100% - 20px) 18px, calc(100% - 12px) 18px;
+  background-size: 8px 8px, 8px 8px;
+  background-repeat: no-repeat;
+}
+select.selectBox option {
+  background: #120d22;
+  color: #f7f3ff;
 }
 /* ▼ 화살표 — Figma는 폴리곤 이미지라 CSS 삼각형으로 재현 */
 .selectArrow {
@@ -144,11 +156,9 @@
   margin-top: 33px;
 }
 .memoBox {
-  display: flex;
-  align-items: center;
   max-width: 330px;
-  height: 46px;
-  padding: 0 14px;
+  min-height: 74px;
+  padding: 12px 14px;
   border-radius: var(--radius-md);
   background: rgba(8, 7, 20, 0.84);
   border: 1px solid rgba(45, 36, 80, 0.82);
@@ -156,9 +166,11 @@
   font-size: var(--font-size-14);
   font-weight: var(--font-weight-semibold);
   color: #f7f3ff;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  resize: none;
+  outline: none;
+}
+.memoBox::placeholder {
+  color: rgba(175, 167, 200, 0.72);
 }
 
 /* 하단 버튼 — 우측 정렬 (Figma: 취소 100×42 시안 고스트 / 추가·수정 130×42 보라).
@@ -167,7 +179,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 22px;
-  margin-top: -46px; /* Figma: 버튼 줄이 관리자 메모 입력과 같은 높이 */
+  margin-top: 22px;
 }
 /* 반응형: 좁은 화면에선 메모와 버튼이 겹치지 않게 버튼 줄을 아래로 내린다 */
 @media (max-width: 720px) {
@@ -198,6 +210,26 @@
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
 }
+.deleteButton {
+  width: 100px;
+  height: 42px;
+  margin-right: auto;
+  border-radius: var(--radius-md);
+  background: rgba(255, 77, 112, 0.14);
+  border: 1px solid rgba(255, 77, 112, 0.85);
+  color: #ff8aa1;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+.submitButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+.deleteButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
 
 /*
  * ON 토글 — Figma는 49×23 비트맵(초록 ON 스위치)이라 CSS로 재현(국가/지역 설정과 동일).
@@ -226,4 +258,35 @@
   height: 19px;
   border-radius: 50%;
   background: #ffffff;
+}
+.toggleOff {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  width: 49px;
+  height: 23px;
+  padding-right: 6px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: rgba(80, 72, 112, 0.9);
+  color: #d8d1f4;
+  font-size: 8px;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+.toggleOff::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+.toggleOn {
+  border: 0;
+  cursor: pointer;
 }
