@@ -1,0 +1,9 @@
+{
+  "rows": [
+    { "no": "0001", "settledAt": "2026.06.14 06:59", "parentPartner": "-", "ownCode": "-", "country": "나이지리아", "memberId": "Richard j", "memberName": "Richard jang", "target": "KORION WALLET", "amount": "1,420 KORI", "beforeAfter": "1,420 → 220", "status": "성공" },
+    { "no": "0001", "settledAt": "2026.06.14 06:59", "parentPartner": "-", "ownCode": "NG-READ-0001", "country": "나이지리아", "memberId": "Richard j", "memberName": "Richard jang", "target": "KORION WALLET", "amount": "860 KORI", "beforeAfter": "860 → 0", "status": "성공" },
+    { "no": "0001", "settledAt": "2026.06.14 06:59", "parentPartner": "NG-READ-0001", "ownCode": "NG-SP-0001", "country": "나이지리아", "memberId": "Richard j", "memberName": "Richard jang", "target": "KORION WALLET", "amount": "420 KORI", "beforeAfter": "420 → 120", "status": "성공" },
+    { "no": "0001", "settledAt": "2026.06.14 06:59", "parentPartner": "NG-SP-0001", "ownCode": "NG-MER-0001", "country": "나이지리아", "memberId": "Richard j", "memberName": "Richard jang", "target": "KORION WALLET", "amount": "910 KORI", "beforeAfter": "910 → 910", "status": "실패" },
+    { "no": "0001", "settledAt": "2026.06.14 06:59", "parentPartner": "-", "ownCode": "-", "country": "나이지리아", "memberId": "Richard j", "memberName": "Richard jang", "target": "KORION WALLET", "amount": "670 KORI", "beforeAfter": "670 → 170", "status": "성공" }
+  ]
+}

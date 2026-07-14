@@ -1,0 +1,78 @@
+/* SystemCountry(본사어드민 · 시스템 설정 · 국가/지역 설정) 페이지 레이아웃 — HQ 대시보드류와 동일 컨벤션 */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* Figma 콘텐츠 세로 간격 18 */
+}
+
+/* 제목 아래 화면 설명 — Figma 13px #afa7c8(토큰 스케일에 없어 직접 지정) */
+.pageDesc {
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  color: #afa7c8;
+}
+
+/* 전체 운영 KPI 그리드 — Figma 실측 4열 고정(gap 14×12) */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px 12px;
+}
+
+/*
+ * 운영 영향 안내 카드 — Figma: 따뜻한 어두운 배경(rgba(26,18,8,.86)) + 호박색 테두리 + radius 18.
+ * 테두리/그림자/제목 색(#fbbf24)은 Figma 실측값으로 토큰 accent와 다른 색조라 직접 지정.
+ */
+.noticeCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 17px 26px 21px;
+  background: rgba(26, 18, 8, 0.86);
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  border-radius: 18px;
+  box-shadow: 0 14px 24px -8px rgba(251, 191, 36, 0.11);
+}
+
+.noticeTitle {
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-bold);
+  color: #fbbf24;
+}
+
+.noticeDesc {
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  color: #afa7c8;
+  line-height: 1.5;
+}
+
+/*
+ * "국가 추가" CTA — Figma 실측 92×33, radius 12, 보라 솔리드(#8b5cf6 계열).
+ * 공지 보내기 화면의 발송 버튼과 같은 계열 실측값이라 동일 색을 직접 지정.
+ */
+.addButton {
+  min-width: 92px;
+  height: 33px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  background: rgba(139, 92, 246, 0.88);
+  border: 1px solid rgba(139, 92, 246, 0.9);
+  box-shadow: 0 12px 20px -8px rgba(139, 92, 246, 0.22);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* 반응형: 좁은 화면에서 KPI 열 수 축소해 카드가 너무 작아지지 않게 함 */
+@media (max-width: 1024px) {
+  .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .kpiGrid {
+    grid-template-columns: 1fr;
+  }
+}

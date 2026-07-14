@@ -1,0 +1,61 @@
+{
+  "status": {
+    "value": "정상 운영중",
+    "badge": "점검 모드 OFF",
+    "desc": "현재 모든 결제, 정산, 담보금, 관리자 기능이 정상 운영 중입니다."
+  },
+  "rows": [
+    {
+      "no": "0001",
+      "registeredAt": "2026.06.14 06:59",
+      "maintenanceId": "MAIN-0101",
+      "scope": "기능별",
+      "countries": "전체",
+      "features": "오프라인 Sync",
+      "startAt": "06.20 21:00",
+      "endAt": "06.20 23:00",
+      "status": "예약됨",
+      "admin": "HQ MIna",
+      "action": "edit"
+    },
+    {
+      "no": "0001",
+      "registeredAt": "2026.06.14 06:59",
+      "maintenanceId": "MAIN-0100",
+      "scope": "전체",
+      "countries": "전체",
+      "features": "전체 서비스",
+      "startAt": "06.20 21:00",
+      "endAt": "06.20 23:00",
+      "status": "정상 종료",
+      "admin": "HQ Admin",
+      "action": "detail"
+    },
+    {
+      "no": "0001",
+      "registeredAt": "2026.06.14 06:59",
+      "maintenanceId": "MAIN-0099",
+      "scope": "전체",
+      "countries": "전체",
+      "features": "QR결제",
+      "startAt": "06.20 21:00",
+      "endAt": "06.20 23:00",
+      "status": "정상 종료",
+      "admin": "HQ MIna",
+      "action": "detail"
+    },
+    {
+      "no": "0001",
+      "registeredAt": "2026.06.14 06:59",
+      "maintenanceId": "MAIN-0098",
+      "scope": "전체",
+      "countries": "전체",
+      "features": "QR결제",
+      "startAt": "06.20 21:00",
+      "endAt": "06.20 23:00",
+      "status": "정상 종료",
+      "admin": "HQ MIna",
+      "action": "detail"
+    }
+  ]
+}

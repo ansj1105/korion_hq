@@ -1,0 +1,180 @@
+/*
+ * CollateralSettleOverlay — 회원 정산 상세 폼 (Figma 81:29616 "Drawer – 회원 정산 상세")
+ * 별도 라우팅 없이 현재 페이지 위에 고정 레이어로 노출.
+ * Figma 원본 패널(680×1137)은 한 화면보다 길어 세로 스크롤을 허용한다.
+ */
+
+/* 사이드바 영역을 제외한 콘텐츠 섹션 위에만 띄움 (CollateralDetailOverlay와 동일) */
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-width);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+}
+
+/*
+ * Figma 실측: bg rgba(11,7,20,.86) + 보라 테두리(#8b5cf6 계열 — 내역 상세(시안)/담보금 상세(초록)와
+ * 또 다른 색). 모서리는 다른 오버레이 폼과 통일한 radius 24(기존 결정).
+ */
+.panel {
+  background: rgba(11, 7, 20, 0.86);
+  border: 1px solid rgba(139, 92, 246, 0.75);
+  border-radius: 24px;
+  box-shadow: 0px 14px 24px -8px rgba(139, 92, 246, 0.11);
+  width: 680px;
+  max-width: 100%;
+  max-height: 92vh; /* 원본(1137px)이 화면보다 길면 패널 내부 스크롤 */
+  overflow-y: auto;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 헤더 — 좌: 제목/설명, 우: 닫기 버튼 (다른 담보금 오버레이와 동일 구성) */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Figma 26px bold #f7f3ff (토큰 스케일에 없어 직접 지정) */
+.title {
+  font-size: 26px;
+  font-weight: var(--font-weight-bold);
+  color: #f7f3ff;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  color: #afa7c8;
+}
+
+/* 시안 테두리 고스트 버튼 — 닫기(84×42)·트랜잭션 복사(132×42)가 같은 스타일이라 폭은 내용에 맡긴다 */
+.ghostButton {
+  flex-shrink: 0;
+  min-width: 84px;
+  height: 42px;
+  padding: 0 20px;
+  border-radius: var(--radius-md);
+  background: rgba(18, 13, 34, 0.16);
+  border: 1px solid rgba(34, 211, 238, 0.92);
+  color: #22d3ee;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+/* 읽기 전용 필드 2열 그리드 — 다른 담보금 오버레이와 동일 실측값 */
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 30px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* Figma의 빈 칸 배치 재현 — 이 필드부터 왼쪽 열(새 행)에서 시작 */
+.fieldNewRow {
+  grid-column-start: 1;
+}
+
+.fieldLabel {
+  font-size: var(--font-size-12);
+  color: #afa7c8;
+}
+
+.fieldValue {
+  display: flex;
+  align-items: center;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  background: rgba(8, 7, 20, 0.86);
+  border: 1px solid rgba(45, 36, 80, 0.82);
+  box-shadow: 0px 14px 24px -8px rgba(45, 36, 80, 0.11);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  color: #f7f3ff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 섹션 제목 — Figma 20px bold (토큰 스케일에 없어 직접 지정) */
+.sectionTitle {
+  font-size: 20px;
+  font-weight: var(--font-weight-bold);
+  color: #f7f3ff;
+  margin: 0;
+}
+
+/* 관련 거래 요약 — 미니 표 박스 (Figma 616 wide, radius 18) */
+.txBox {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border-radius: 18px;
+  background: rgba(8, 7, 20, 0.86);
+  border: 1px solid rgba(45, 36, 80, 0.68);
+  box-shadow: 0px 14px 24px -8px rgba(45, 36, 80, 0.11);
+}
+
+/* 표 행 — 5열 등폭 (거래 ID/거래일시/결제 금액/수취 금액/상태), Figma 행 피치 48 ≈ 높이 44 + 간격 */
+.txRow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  min-height: 44px;
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-12);
+  color: #f7f3ff;
+}
+
+/* 헤더 행 — 흐린 라벨색 + 아래 구분선(Figma Divider 실측 rgba(45,36,80,.8)) */
+.txHead {
+  min-height: 36px;
+  color: #afa7c8;
+  border-bottom: 1px solid rgba(45, 36, 80, 0.8);
+  border-radius: 0;
+}
+
+/* 가운데 행 지브라 배경 (Figma rgba(18,13,34,.42) / radius 10) */
+.txZebra {
+  background: rgba(18, 13, 34, 0.42);
+}
+
+.footer {
+  display: flex;
+  margin-top: 4px;
+}
+
+/* 반응형: 좁은 화면(<720px)에서 필드 2열 → 1열 */
+@media (max-width: 720px) {
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -76,6 +76,12 @@
 .mutedText .cell {
   color: var(--color-text-muted);
 }
+
+.tallToolbar .toolbarButton {
+  padding: 9px var(--space-3);
+  line-height: 1.35;
+}
+
 /* Figma 실측: 전체 간격 10px(기존 9px) */
 .mutedText {
   gap: 10px;

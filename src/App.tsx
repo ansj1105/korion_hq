@@ -49,6 +49,14 @@ import HqPaymentLog from './pages/hq/PaymentLog'
 import HqSettlementRequest from './pages/hq/SettlementRequest'
 import HqSettlementRequestDetail from './pages/hq/SettlementRequestDetail'
 import HqSettlementHistory from './pages/hq/SettlementHistory'
+import HqCommissionManagement from './pages/hq/CommissionManagement'
+import HqRateSetting from './pages/hq/RateSetting'
+import HqCollateralHistory from './pages/hq/CollateralHistory'
+import HqNoticeSend from './pages/hq/NoticeSend'
+import HqNoticeHistory from './pages/hq/NoticeHistory'
+import HqSystemCountry from './pages/hq/SystemCountry'
+import HqSystemErrorCode from './pages/hq/SystemErrorCode'
+import HqSystemMaintenance from './pages/hq/SystemMaintenance'
 import { ROLES } from './roles'
 import type { NavGroup } from './types'
 
@@ -77,6 +85,14 @@ const HQ_PAGES: Record<string, JSX.Element> = {
   'payments/logs': <HqPaymentLog />,
   'settlement/request': <HqSettlementRequest />,
   'settlement/history': <HqSettlementHistory />,
+  'settlement/commission': <HqCommissionManagement />,
+  'settlement/rate-setting': <HqRateSetting />,
+  'collateral/history': <HqCollateralHistory />,
+  'announcements/send': <HqNoticeSend />,
+  'announcements/history': <HqNoticeHistory />,
+  'system/country': <HqSystemCountry />,
+  'system/error-code': <HqSystemErrorCode />,
+  'system/maintenance-mode': <HqSystemMaintenance />,
 }
 
 const LEADER_PAGES: Record<string, JSX.Element> = {

@@ -1,0 +1,9 @@
+{
+  "rows": [
+    { "no": "0001", "adminCode": "-", "country": "나이지리아", "memberId": "Richard01", "memberName": "Richard jang", "totalWallet": "700 KORI", "availableWallet": "680 KORI", "collateralBalance": "20 KORI", "lastTopup": "2026.06.16", "lastPayment": "2026.06.16" },
+    { "no": "0001", "adminCode": "NG-READ-0001", "country": "나이지리아", "memberId": "Richard02", "memberName": "Richard jang", "totalWallet": "330 KORI", "availableWallet": "330 KORI", "collateralBalance": "0 KORI", "lastTopup": "2026.06.16", "lastPayment": "2026.06.16" },
+    { "no": "0001", "adminCode": "NG-SP-0001", "country": "나이지리아", "memberId": "Richard03", "memberName": "Richard jang", "totalWallet": "300 KORI", "availableWallet": "300 KORI", "collateralBalance": "0 KORI", "lastTopup": "2026.06.16", "lastPayment": "-" },
+    { "no": "0001", "adminCode": "NG-MER-0001", "country": "나이지리아", "memberId": "Richard04", "memberName": "Richard jang", "totalWallet": "45 KORI", "availableWallet": "45 KORI", "collateralBalance": "0 KORI", "lastTopup": "2026.06.16", "lastPayment": "2026.06.16" },
+    { "no": "0001", "adminCode": "-", "country": "나이지리아", "memberId": "Richard05", "memberName": "Richard jang", "totalWallet": "130 KORI", "availableWallet": "50 KORI", "collateralBalance": "80 KORI", "lastTopup": "2026.06.16", "lastPayment": "2026.06.16" }
+  ]
+}

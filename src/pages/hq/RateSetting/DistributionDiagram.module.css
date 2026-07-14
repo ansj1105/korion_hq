@@ -1,0 +1,119 @@
+/*
+ * DistributionDiagram — 기본 배분 구조 다이어그램 (Figma 81:23147 실측)
+ * 헤더/데이터 행이 같은 grid 템플릿(5열: 경로 라벨 + 배분 4열)을 공유해 열이 맞는다.
+ */
+
+/* 반응형: 다이어그램 최소폭보다 좁아지면 잘리는 대신 가로 스크롤 */
+.scroll {
+  overflow-x: auto;
+}
+
+/*
+ * Figma 열 피치(라벨 168 / 배분 열 170·170·167 / 마지막 열 129) + 우측 액션(저장) 1fr.
+ * 행마다 별도 grid라 가변(minmax) 트랙을 쓰면 좁은 컨테이너(모달)에서 행별로 트랙이
+ * 다르게 줄어들어 열이 어긋난다 → 고정폭 트랙으로 모든 행을 동일하게 정렬하고,
+ * 컨테이너가 더 좁으면 .scroll이 가로 스크롤로 받는다.
+ */
+.grid {
+  display: grid;
+  grid-template-columns: 168px 170px 170px 167px 129px minmax(0, 1fr);
+  align-items: center;
+  margin-top: 28px; /* Figma 행 간격(배지 30 + 28) */
+}
+/* 헤더(제목 + 역할 배지 + 액션) 행 — 첫 데이터 행과의 간격만 좁다(Figma 16) */
+.headerGrid {
+  margin-top: 0;
+}
+.headerGrid + .grid {
+  margin-top: 16px;
+}
+
+/* 헤더 행 제목 자리 — 경로 라벨 열과 같은 트랙. 제목이 조금 길어도 줄바꿈 없이 그대로 */
+.titleCell {
+  min-width: 0;
+  white-space: nowrap;
+}
+/* 헤더 행 액션(저장 버튼) 자리 — 우측 끝 정렬 (Figma 저장 x895) */
+.actionCell {
+  justify-self: end;
+}
+
+/* 한 배분 칸 묶음: [값 배지][%] + (다음 칸 있으면) [→] — 마지막 열(129px)에 딱 맞는 간격 */
+.slotGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* 배지 공통 — Figma h30, radius 999, 12px semibold */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 105px;
+  height: 30px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+/* 본사/값(회색) — Figma 94w */
+.bHq {
+  width: 94px;
+  background: rgba(92, 88, 120, 0.74);
+  border: 1px solid rgba(92, 88, 120, 0.32);
+  color: #e2dff8;
+}
+/* 헤더의 본사 배지만 글자가 순백(값 배지는 #e2dff8) */
+.headerBadge.bHq {
+  color: #ffffff;
+}
+/* 리더(초록) */
+.bLeader {
+  background: rgba(36, 230, 184, 0.92);
+  border: 1px solid rgba(36, 230, 184, 0.32);
+  color: #061612;
+}
+/* 파트너(노랑) */
+.bPartner {
+  background: rgba(246, 200, 90, 0.94);
+  border: 1px solid rgba(246, 200, 90, 0.32);
+  color: #1b1426;
+}
+/* 가맹점(청회색) */
+.bMerchant {
+  background: #6f7daf;
+  border: 1px solid rgba(92, 88, 120, 0.32);
+  color: #e2dff8;
+}
+/* 경로 라벨 — 파트너 경유(보라 틴트) / 직계약(파랑 틴트), Figma 94/92w */
+.bVia {
+  width: 94px;
+  background: rgba(124, 92, 255, 0.24);
+  border: 1px solid rgba(124, 92, 255, 0.32);
+  color: #ffffff;
+}
+.bDirect {
+  width: 92px;
+  background: rgba(42, 139, 255, 0.24);
+  border: 1px solid rgba(42, 139, 255, 0.32);
+  color: #ffffff;
+}
+
+.pct {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: #e2dff8;
+}
+
+/* 흐름 화살표 — 다음 배분 칸 직전(칸 끝)에 붙인다 */
+.arrow {
+  margin-left: auto;
+  padding-right: 10px;
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-bold);
+  color: #22d9ff;
+}

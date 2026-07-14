@@ -1,0 +1,219 @@
+/*
+ * NoticeDetailOverlay — 공지 발송 상세 폼 (Figma 81:29690 "Drawer – 공지 발송 상세")
+ * 별도 라우팅 없이 발송 내역 목록 위에 고정 레이어로 노출.
+ * Figma 원본 패널(668×1204)은 한 화면보다 길 수 있어 세로 스크롤을 허용한다.
+ */
+
+/* 사이드바 영역을 제외한 콘텐츠 섹션 위에만 띄움 (CollateralDetailOverlay와 동일) */
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-width);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+}
+
+/* Figma 실측: bg #050510(불투명) + 테두리 없는 각진 패널 */
+.panel {
+  width: 668px;
+  max-width: 100%;
+  max-height: 92vh; /* 원본(1204px)이 화면보다 길면 패널 내부 스크롤 */
+  overflow-y: auto;
+  padding: 32px;
+  background: #050510;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 헤더 — 좌: 제목, 우: 상태 배지 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: 30px;
+}
+
+/* Figma 26px bold #f7f3ff (토큰 스케일에 없어 직접 지정) */
+.title {
+  font-size: 26px;
+  font-weight: var(--font-weight-bold);
+  color: #f7f3ff;
+  margin: 0;
+}
+
+/* 상태 배지 — Figma 92×30 알약. 상태 값에 따라 색만 교체 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+/* 예약대기 — 호박색(Figma 실측 #fbbf24 계열, 토큰에 없어 직접 지정) */
+.badgeAmber {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.16);
+  border: 1px solid rgba(251, 191, 36, 0.76);
+}
+
+/* 완료 행에서 열었을 때 — 같은 배지 형태에 초록 토큰 색만 적용 */
+.badgeGreen {
+  color: var(--color-accent-green);
+  background: color-mix(in srgb, var(--color-accent-green) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent-green) 76%, transparent);
+}
+
+/* 발송 정보 2열 그리드 — Figma 열 폭 286×2 / 열 간격 32 / 행 간격 22 */
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px 32px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fieldLabel {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-medium);
+  color: #afa7c8;
+}
+
+/* 값 박스 — 인풋 모양이지만 읽기 전용 표시 (Figma h46 / radius 12) */
+.fieldValue {
+  display: flex;
+  align-items: center;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  background: rgba(8, 7, 20, 0.86);
+  border: 1px solid rgba(45, 36, 80, 0.82);
+  box-shadow: 0px 14px 24px -8px rgba(45, 36, 80, 0.11);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  color: #f7f3ff;
+  /* 긴 값(공지 제목 등)이 칸을 넘지 않게 말줄임 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 공지 제목 — Figma: 성공률 줄과 제목 사이 여백이 행 간격보다 넓음 */
+.titleField {
+  margin-top: 49px;
+}
+
+.bodyField {
+  margin-top: 30px;
+}
+
+/* 공지 본문 박스 — Figma 604×341 / radius 16 / 13px regular */
+.contentBox {
+  min-height: 341px;
+  padding: 30px 24px;
+  border-radius: 16px;
+  background: rgba(8, 7, 20, 0.86);
+  border: 1px solid rgba(45, 36, 80, 0.62);
+  box-shadow: 0px 14px 24px -8px rgba(45, 36, 80, 0.11);
+  font-size: 13px;
+  font-weight: var(--font-weight-regular);
+  color: #f7f3ff;
+  line-height: 1.5;
+}
+
+/*
+ * 하단 버튼 줄 — Figma: "발송취소"는 좌측 끝, "취소/발송하기" 쌍은 패널 가운데.
+ * margin auto 조합으로 좌측 고정 + 나머지 공간 가운데 정렬을 근사한다.
+ */
+.footer {
+  display: flex;
+  align-items: center;
+  margin-top: 78px;
+}
+
+.cancelSendButton {
+  margin-right: auto;
+  width: 112px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  /* Figma 실측 — 경고 빨강 #ff4e4e 솔리드(토큰 red와 다른 색조) + 보라 테두리 */
+  background: #ff4e4e;
+  border: 1px solid rgba(139, 92, 246, 0.92);
+  box-shadow: 0px 14px 20px -8px rgba(139, 92, 246, 0.2);
+  color: #ffffff;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.centerButtons {
+  display: flex;
+  gap: 12px;
+  margin-right: auto;
+  /* 좌측 발송취소 버튼 폭만큼 당겨 쌍이 패널 중앙에 오도록 보정 */
+  transform: translateX(-56px);
+}
+
+/* 취소 — 시안 테두리 고스트 버튼 (Figma 96×42) */
+.cancelButton {
+  width: 96px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background: rgba(18, 13, 34, 0.16);
+  border: 1px solid rgba(34, 211, 238, 0.92);
+  color: #22d3ee;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+/* 발송하기 — 보라 솔리드 버튼 (Figma 112×42) */
+.sendButton {
+  width: 112px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background: rgba(139, 92, 246, 0.9);
+  border: 1px solid rgba(139, 92, 246, 0.92);
+  box-shadow: 0px 14px 20px -8px rgba(139, 92, 246, 0.2);
+  color: #ffffff;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+/* 반응형: 좁은 화면(<720px)에서 필드 2열 → 1열, 버튼 줄은 세로 쌓기 */
+@media (max-width: 720px) {
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+  .footer {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  .cancelSendButton {
+    margin-right: 0;
+    width: 100%;
+  }
+  .centerButtons {
+    transform: none;
+    margin-right: 0;
+    justify-content: center;
+  }
+}

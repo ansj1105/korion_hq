@@ -1,0 +1,17 @@
+{
+  "fields": [
+    { "labelKey": "hqSystemCountry.add.field.name", "value": "Nigeria" },
+    { "labelKey": "hqSystemCountry.add.field.code", "value": "NG" },
+    { "labelKey": "hqSystemCountry.add.field.regions", "value": "Lagos, Abuja" },
+    { "labelKey": "hqSystemCountry.add.field.timezone", "value": "UTC+01:00" },
+    { "labelKey": "hqSystemCountry.add.field.currency", "value": "NGN" },
+    { "labelKey": "hqSystemCountry.add.field.language", "value": "English" },
+    { "labelKey": "hqSystemCountry.add.field.leader", "value": "JOEL" },
+    { "labelKey": "hqSystemCountry.add.field.status", "value": "활성" }
+  ],
+  "toggles": [
+    { "labelKey": "hqSystemCountry.add.field.paymentAllowed", "on": true },
+    { "labelKey": "hqSystemCountry.add.field.offlinePaymentAllowed", "on": true }
+  ],
+  "memo": "Nigeria 운영 활성화"
+}

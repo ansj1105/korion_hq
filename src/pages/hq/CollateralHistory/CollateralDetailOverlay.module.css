@@ -1,0 +1,174 @@
+/*
+ * CollateralDetailOverlay — 담보금 충전/해제 상세 폼 (Figma 81:29506 "Drawer – 담보금 충전 / 해제 상세")
+ * 별도 라우팅 없이 현재 페이지 위에 고정 레이어로 노출.
+ * Figma 원본 패널(680×1040)은 한 화면보다 길 수 있어 세로 스크롤을 허용한다.
+ */
+
+/* 사이드바 영역을 제외한 콘텐츠 섹션 위에만 띄움 (RequestDetailOverlay와 동일) */
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-width);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+}
+
+/*
+ * Figma 실측: bg rgba(11,7,20,.86) + 시안 테두리(#22d3ee 계열 — 토큰 cyan과 다른 색조).
+ * 시안은 각진 모서리(radius 0)지만 다른 오버레이 폼(RequestDetailOverlay 등)과 통일감 있게
+ * radius 24로 다듬음(사용자 요청).
+ */
+.panel {
+  background: rgba(11, 7, 20, 0.86);
+  border: 1px solid rgba(34, 211, 238, 0.75);
+  border-radius: 24px;
+  box-shadow: 0px 14px 24px -8px rgba(34, 211, 238, 0.11);
+  width: 680px;
+  max-width: 100%;
+  max-height: 92vh; /* 원본(1040px)이 화면보다 길면 패널 내부 스크롤 */
+  overflow-y: auto;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 헤더 — 좌: 제목/설명, 우: 닫기 버튼 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Figma 26px bold #f7f3ff (토큰 스케일에 없어 직접 지정) */
+.title {
+  font-size: 26px;
+  font-weight: var(--font-weight-bold);
+  color: #f7f3ff;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  color: #afa7c8;
+}
+
+/* 닫기 — 시안 테두리 고스트 버튼 (Figma 84×42) */
+.closeButton {
+  flex-shrink: 0;
+  width: 84px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background: rgba(18, 13, 34, 0.16);
+  border: 1px solid rgba(34, 211, 238, 0.92);
+  color: #22d3ee;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+/* 읽기 전용 필드 2열 그리드 — Figma 열 간격 30 / 행 간격 16 */
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 30px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.fieldLabel {
+  font-size: var(--font-size-12);
+  color: #afa7c8;
+}
+
+/* 값 박스 — 인풋 모양이지만 읽기 전용 표시 (Figma h46 / radius 12) */
+.fieldValue {
+  display: flex;
+  align-items: center;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  background: rgba(8, 7, 20, 0.86);
+  border: 1px solid rgba(45, 36, 80, 0.82);
+  box-shadow: 0px 14px 24px -8px rgba(45, 36, 80, 0.11);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  color: #f7f3ff;
+  /* 긴 값(처리번호 등)이 칸을 넘지 않게 말줄임 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 처리 사유 / 관리자 메모 박스 (Figma radius 18) */
+.memoBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 160px;
+  padding: 28px 24px;
+  border-radius: 18px;
+  background: rgba(8, 7, 20, 0.86);
+  border: 1px solid rgba(45, 36, 80, 0.6);
+  box-shadow: 0px 14px 24px -8px rgba(45, 36, 80, 0.11);
+  margin-top: 10px; /* Figma: 필드 그리드와 메모 박스 사이 여백이 필드 행 간격보다 넓음 */
+}
+
+.memoTitle {
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-medium);
+  color: #f7f3ff;
+  margin: 0;
+}
+
+.memoBody {
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  color: #afa7c8;
+  line-height: 1.5;
+}
+
+.footer {
+  display: flex;
+  margin-top: 10px;
+}
+
+/* 메모 수정 — 보라 솔리드 버튼 (Figma 110×42, #8b5cf6 계열 실측값) */
+.editMemoButton {
+  width: 110px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background: rgba(139, 92, 246, 0.9);
+  border: 1px solid rgba(139, 92, 246, 0.92);
+  box-shadow: 0px 14px 20px -8px rgba(139, 92, 246, 0.2);
+  color: #ffffff;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+/* 반응형: 좁은 화면(<720px)에서 필드 2열 → 1열 */
+@media (max-width: 720px) {
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+}

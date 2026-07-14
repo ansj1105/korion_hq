@@ -197,20 +197,17 @@
   },
   "activityLogs": {
     "rows": [
-      { "id": "l1", "admin": "HQ Mina", "menu": "파트너 승인", "action": "승인 처리", "targetId": "Partner-003", "time": "10:42", "ip": "121.xxx.10", "result": "성공", "riskLevel": "Low", "riskAccent": "blue" },
-      { "id": "l2", "admin": "HQ Admin", "menu": "정산 보류", "menuAccent": "orange", "action": "보류 처리", "actionAccent": "orange", "targetId": "Wallet TQ...", "time": "10:37", "ip": "121.xxx.11", "result": "성공", "riskLevel": "High", "riskAccent": "orange" },
-      { "id": "l3", "admin": "Security Admin", "menu": "지갑 차단", "action": "리스크 차단", "targetId": "Wallet TS...", "time": "10:21", "ip": "121.xxx.12", "result": "성공", "riskLevel": "Critical", "riskAccent": "red" },
-      { "id": "l4", "admin": "Ops Lee", "menu": "Sync 재시도", "action": "수동 처리", "targetId": "KP-001", "time": "10:12", "ip": "121.xxx.13", "result": "성공", "riskLevel": "Medium", "riskAccent": "amber" }
+      { "id": "l1", "adminId": "korionadmin", "admin": "korionadmin / HQ Admin", "eventType": "APPROVAL", "menu": "신청 승인", "menuAccent": "green", "action": "승인 처리", "actionAccent": "green", "targetId": "3003", "time": "2026.07.13 10:42", "ip": "121.xxx.10", "result": "성공", "resultAccent": "green", "riskLevel": "Medium", "riskAccent": "amber" },
+      { "id": "l2", "adminId": "korionadmin", "admin": "korionadmin / HQ Admin", "eventType": "SETTLEMENT", "menu": "정산 보류", "menuAccent": "orange", "action": "보류 처리", "actionAccent": "orange", "targetId": "4004", "time": "2026.07.13 10:37", "ip": "121.xxx.11", "result": "성공", "resultAccent": "green", "riskLevel": "High", "riskAccent": "orange" },
+      { "id": "l3", "adminId": "security01", "admin": "security01 / Security Admin", "eventType": "RISK", "menu": "리스크 관리", "menuAccent": "red", "action": "차단 처리", "actionAccent": "red", "targetId": "505", "time": "2026.07.13 10:21", "ip": "121.xxx.12", "result": "성공", "resultAccent": "green", "riskLevel": "Critical", "riskAccent": "red" },
+      { "id": "l4", "adminId": "ops01", "admin": "ops01 / Ops Lee", "eventType": "SYNC", "menu": "Sync 관리", "menuAccent": "purple", "action": "수동 처리", "actionAccent": "red", "targetId": "606", "time": "2026.07.13 10:12", "ip": "121.xxx.13", "result": "실패", "resultAccent": "red", "riskLevel": "High", "riskAccent": "orange" }
     ]
   },
   "aiInsight": {
     "items": [
-      { "id": "i1", "severity": "High", "severityAccent": "orange", "messageKey": "hqDashboard.aiInsight.msg1", "actionKey": "hqDashboard.aiInsight.action.checkRisk" },
-      { "id": "i2", "severity": "Medium", "severityAccent": "amber", "messageKey": "hqDashboard.aiInsight.msg2", "actionKey": "hqDashboard.aiInsight.action.viewLog" },
-      { "id": "i3", "severity": "Low", "severityAccent": "cyan", "messageKey": "hqDashboard.aiInsight.msg3", "actionKey": "hqDashboard.aiInsight.action.checkRisk" },
-      { "id": "i4", "severity": "High", "severityAccent": "orange", "messageKey": "hqDashboard.aiInsight.msg4", "actionKey": "hqDashboard.aiInsight.action.viewLog" },
-      { "id": "i5", "severity": "Medium", "severityAccent": "amber", "messageKey": "hqDashboard.aiInsight.msg5", "actionKey": "hqDashboard.aiInsight.action.checkRisk" },
-      { "id": "i6", "severity": "Low", "severityAccent": "cyan", "messageKey": "hqDashboard.aiInsight.msg6", "actionKey": "hqDashboard.aiInsight.action.viewLog" }
+      { "id": "sync-risk", "severity": "High", "severityAccent": "orange", "messageKey": "hqDashboard.aiInsight.msg1", "actionKey": "hqDashboard.aiInsight.action.checkRisk", "eventType": "OFFLINE_SYNC", "sourceKey": "hqDashboard.aiInsight.source.mcp", "collectorStatusKey": "hqDashboard.aiInsight.collector.ready", "collectorStatusAccent": "blue", "evidenceLabelKey": "hqDashboard.aiInsight.evidence", "evidenceCount": 7, "logQuery": "risk:offline-sync-failure", "actionRoute": "/hq/risk/settlement-hold" },
+      { "id": "settlement-risk", "severity": "Medium", "severityAccent": "amber", "messageKey": "hqDashboard.aiInsight.msg3", "actionKey": "hqDashboard.aiInsight.action.checkRisk", "eventType": "SETTLEMENT", "sourceKey": "hqDashboard.aiInsight.source.mcp", "collectorStatusKey": "hqDashboard.aiInsight.collector.ready", "collectorStatusAccent": "blue", "evidenceLabelKey": "hqDashboard.aiInsight.evidence", "evidenceCount": 4, "logQuery": "risk:settlement-repeat-failure", "actionRoute": "/hq/settlement/request" },
+      { "id": "growth-anomaly", "severity": "Low", "severityAccent": "cyan", "messageKey": "hqDashboard.aiInsight.msg4", "actionKey": "hqDashboard.aiInsight.action.viewLog", "eventType": "GROWTH", "sourceKey": "hqDashboard.aiInsight.source.mcp", "collectorStatusKey": "hqDashboard.aiInsight.collector.ready", "collectorStatusAccent": "blue", "evidenceLabelKey": "hqDashboard.aiInsight.evidence", "evidenceCount": 0, "logQuery": "growth:application-spike", "actionRoute": "/hq/applications" }
     ]
   },
   "quickActions": [

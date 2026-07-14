@@ -1,0 +1,46 @@
+{
+  "profile": {
+    "topLabel": "상위 리더 / 해당 국가",
+    "parentBadge": "본사",
+    "country": "나이지리아",
+    "code": "NG-SP-0004"
+  },
+  "kpiTop": [
+    { "id": "subReferrals", "labelKey": "hqPartnerSales.kpi.subReferrals", "value": "20" },
+    { "id": "activeMerchants", "labelKey": "hqPartnerSales.kpi.activeMerchants", "value": "60 / 150" },
+    { "id": "lastAccess", "labelKey": "hqPartnerSales.kpi.lastAccess", "value": "2026.06.14" },
+    { "id": "lastSettle", "labelKey": "hqPartnerSales.kpi.lastSettle", "value": "2026.06.14" }
+  ],
+  "account": {
+    "loginId": "jang2020111",
+    "password": "******",
+    "email": "jang2020111@gmail.com",
+    "telegram": "@gmail-001",
+    "phone": "+82 10 8227 0742",
+    "twitter": "@gmail-001",
+    "appliedAt": "2026.06.07",
+    "approvedAt": "2026.06.10"
+  },
+  "basic": {
+    "name": "Richard jang",
+    "country": "Nigeria",
+    "region": "Lagos",
+    "language": "English",
+    "directContractReason": "아는 파트너들이 없음",
+    "walletAddress": "Tdwaga2392md032jkor2304j3dawfwa2325r2"
+  },
+  "tabKpi": [
+    { "id": "totalTxCount", "labelKey": "hqPartnerSales.kpi.totalTxCount", "value": "150" },
+    { "id": "totalVolume", "labelKey": "hqPartnerSales.kpi.totalVolume", "value": "15,000" },
+    { "id": "txFee", "labelKey": "hqPartnerSales.kpi.txFee", "value": "150,000,000" },
+    { "id": "unsettledFee", "labelKey": "hqPartnerSales.kpi.unsettledFee", "value": "10,000,000" },
+    { "id": "holdAmount", "labelKey": "hqPartnerSales.kpi.holdAmount", "value": "10,000" }
+  ],
+  "merchantRows": [
+    { "no": "5", "partnerCode": "NG-SP-0005", "merchantCode": "NG-MER-0005", "city": "Laos", "merchantName": "samuel5", "sector": "편의점", "monthVolume": "100,000", "monthTxCount": "248", "fee": "100", "lastPaidAt": "2026.06.03", "usage": "45% · 30% · 25%" },
+    { "no": "4", "partnerCode": "NG-SP-0004", "merchantCode": "NG-MER-0004", "city": "Laos", "merchantName": "samuel4", "sector": "편의점", "monthVolume": "100,000", "monthTxCount": "248", "fee": "100", "lastPaidAt": "2026.06.03", "usage": "45% · 30% · 25%" },
+    { "no": "3", "partnerCode": "NG-SP-0003", "merchantCode": "NG-MER-0003", "city": "Laos", "merchantName": "samuel3", "sector": "편의점", "monthVolume": "100,000", "monthTxCount": "48", "fee": "100", "lastPaidAt": "2026.06.03", "usage": "45% · 30% · 25%" },
+    { "no": "2", "partnerCode": "NG-SP-0002", "merchantCode": "NG-MER-0002", "city": "Laos", "merchantName": "samuel2", "sector": "편의점", "monthVolume": "100,000", "monthTxCount": "8", "fee": "100", "lastPaidAt": "2026.06.03", "usage": "45% · 30% · 25%" },
+    { "no": "1", "partnerCode": "NG-SP-0001", "merchantCode": "NG-MER-0001", "city": "Laos", "merchantName": "samuel1", "sector": "편의점", "monthVolume": "100,000", "monthTxCount": "24", "fee": "100", "lastPaidAt": "2026.06.03", "usage": "45% · 30% · 25%" }
+  ]
+}

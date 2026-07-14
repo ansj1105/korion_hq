@@ -1,0 +1,43 @@
+{
+  "kpis": [
+    {
+      "id": "totalSent",
+      "labelKey": "hqNoticeSend.kpi.totalSent.label",
+      "value": "248건",
+      "noteKey": "hqNoticeSend.kpi.totalSent.note"
+    },
+    {
+      "id": "todaySent",
+      "labelKey": "hqNoticeSend.kpi.todaySent.label",
+      "value": "12건",
+      "noteKey": "hqNoticeSend.kpi.todaySent.note"
+    },
+    {
+      "id": "scheduledPending",
+      "labelKey": "hqNoticeSend.kpi.scheduledPending.label",
+      "value": "3건",
+      "noteKey": "hqNoticeSend.kpi.scheduledPending.note"
+    },
+    {
+      "id": "totalRecipients",
+      "labelKey": "hqNoticeSend.kpi.totalRecipients.label",
+      "value": "2,450명",
+      "noteKey": "hqNoticeSend.kpi.totalRecipients.note"
+    },
+    {
+      "id": "successRate",
+      "labelKey": "hqNoticeSend.kpi.successRate.label",
+      "value": "98.7%",
+      "noteKey": "hqNoticeSend.kpi.successRate.note"
+    }
+  ],
+  "form": {
+    "sender": "KORION HQ Admin",
+    "sendDate": "2026.06.20",
+    "sendTime": "21:00",
+    "timezone": "KST",
+    "recipients": "320명",
+    "noticeTitle": "KORION PAY 초기 테스트 이벤트 안내",
+    "noticeBody": "현재 KORION PAY 초기 테스트 및 런칭 이벤트가 진행 중입니다. 회원과 파트너 여러분은 이벤트 기간 동안 수수료 0% 혜택을 받을 수 있습니다."
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "badge": "정산완료",
+  "fields": [
+    { "labelKey": "hqSettle.histModal.field.settleId", "value": "SET-HIS-20260615-001" },
+    { "labelKey": "hqSettle.histModal.field.reqId", "value": "SET-LD-20260614-001" },
+    { "labelKey": "hqSettle.histModal.field.txAt", "value": "2026.01.19  18:46" },
+    { "labelKey": "hqSettle.histModal.field.processedAt", "value": "2026.01.21  18:46" },
+    { "labelKey": "hqSettle.histModal.field.period", "value": "2026.05.02 ~ 2026.06.01" },
+    { "labelKey": "hqSettle.histModal.field.target", "value": "리더 / 직계약(파트너)" },
+    { "labelKey": "hqSettle.histModal.field.country", "value": "나이지리아" },
+    { "labelKey": "hqSettle.histModal.field.leaderCode", "value": "NG-READ-0001" },
+    { "labelKey": "hqSettle.histModal.field.partnerCode", "value": "NG-SP-0001" },
+    { "labelKey": "hqSettle.histModal.field.totalAmount", "value": "1,840,000 KORI" },
+    { "labelKey": "hqSettle.histModal.field.partnerProfit", "value": "3,120" },
+    { "labelKey": "hqSettle.histModal.field.directProfit", "value": "1,480" },
+    { "labelKey": "hqSettle.histModal.field.partnerSettle", "value": "2,950" },
+    { "labelKey": "hqSettle.histModal.field.heldExcluded", "value": "640" },
+    { "labelKey": "hqSettle.histModal.field.finalAmount", "value": "2,950" },
+    { "labelKey": "hqSettle.histModal.field.payMethod", "value": "KORI", "gapBefore": true },
+    { "labelKey": "hqSettle.histModal.field.wallet", "value": "Tdkfgkaw233r329fdk23ddwa3432r4" },
+    { "labelKey": "hqSettle.histModal.field.settleStatus", "value": "지급 완료" },
+    { "labelKey": "hqSettle.histModal.field.riskStatus", "value": "정상" }
+  ],
+  "memo": "유럽에서 배낭 여행중 길에서 일반인에게 음료수를 거래함",
+  "adminMemoPlaceholder": "거래자 메모"
+}

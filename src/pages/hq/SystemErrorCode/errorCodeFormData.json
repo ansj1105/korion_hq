@@ -1,0 +1,13 @@
+{
+  "fields": [
+    { "labelKey": "hqSystemErrorCode.add.field.code", "value": "SYNC_FAILED" },
+    { "labelKey": "hqSystemErrorCode.add.field.name", "value": "서버 Sync 실패" },
+    { "labelKey": "hqSystemErrorCode.add.field.category", "value": "오프라인 Sync" },
+    { "labelKey": "hqSystemErrorCode.add.field.severity", "value": "주의" },
+    { "labelKey": "hqSystemErrorCode.add.field.userMessage", "value": "네트워크 복구 후 다시 동기화됩니다." },
+    { "labelKey": "hqSystemErrorCode.add.field.adminDesc", "value": "오프라인 거래가 서버 검증 단계로 전송되지 못함" },
+    { "labelKey": "hqSystemErrorCode.add.field.autoAction", "value": "재시도" },
+    { "labelKey": "hqSystemErrorCode.add.field.status", "value": "활성" },
+    { "labelKey": "hqSystemErrorCode.add.field.memo", "value": "Sync Worker 재시도 대상" }
+  ]
+}

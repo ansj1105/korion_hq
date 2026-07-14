@@ -1,0 +1,95 @@
+{
+  "kpis": [
+    {
+      "id": "totalSent",
+      "labelKey": "hqNoticeSend.kpi.totalSent.label",
+      "value": "248건",
+      "noteKey": "hqNoticeSend.kpi.totalSent.note"
+    },
+    {
+      "id": "todaySent",
+      "labelKey": "hqNoticeSend.kpi.todaySent.label",
+      "value": "12건",
+      "noteKey": "hqNoticeSend.kpi.todaySent.note"
+    },
+    {
+      "id": "scheduledPending",
+      "labelKey": "hqNoticeSend.kpi.scheduledPending.label",
+      "value": "3건",
+      "noteKey": "hqNoticeSend.kpi.scheduledPending.note"
+    },
+    {
+      "id": "totalRecipients",
+      "labelKey": "hqNoticeSend.kpi.totalRecipients.label",
+      "value": "2,450명",
+      "noteKey": "hqNoticeSend.kpi.totalRecipients.note"
+    },
+    {
+      "id": "successRate",
+      "labelKey": "hqNoticeSend.kpi.successRate.label",
+      "value": "98.7%",
+      "noteKey": "hqNoticeSend.kpi.successRate.note"
+    }
+  ],
+  "detail": {
+    "sender": "KORION HQ Admin",
+    "success": "-",
+    "fail": "-",
+    "rate": "-%",
+    "body": "현재 KORION PAY 초기 테스트 및 런칭 이벤트가 진행 중입니다. 회원과 파트너 여러분은 이벤트 기간 동안 수수료 0% 혜택을 받을 수 있습니다."
+  },
+  "history": {
+    "rows": [
+      {
+        "no": "0001",
+        "sentAt": "2026.06.14  06:59",
+        "title": "KORION PAY 초기 테스트 이벤트 안내",
+        "country": "전체국가",
+        "target": "리더,파트너,가맹점",
+        "recipients": "10,240",
+        "method": "예약",
+        "status": "예약대기"
+      },
+      {
+        "no": "0001",
+        "sentAt": "2026.06.14  06:59",
+        "title": "KORION PAY 초기 테스트 이벤트 안내",
+        "country": "전체국가",
+        "target": "리더",
+        "recipients": "1",
+        "method": "즉시",
+        "status": "완료"
+      },
+      {
+        "no": "0001",
+        "sentAt": "2026.06.14  06:59",
+        "title": "KORION PAY 초기 테스트 이벤트 안내",
+        "country": "전체국가",
+        "target": "파트너",
+        "recipients": "239",
+        "method": "즉시",
+        "status": "완료"
+      },
+      {
+        "no": "0001",
+        "sentAt": "2026.06.14  06:59",
+        "title": "KORION PAY 초기 테스트 이벤트 안내",
+        "country": "나이지리아",
+        "target": "가맹점",
+        "recipients": "1,000",
+        "method": "즉시",
+        "status": "완료"
+      },
+      {
+        "no": "0001",
+        "sentAt": "2026.06.14  06:59",
+        "title": "KORION PAY 초기 테스트 이벤트 안내",
+        "country": "나이지리아",
+        "target": "리더,파트너,가맹점",
+        "recipients": "1,240",
+        "method": "즉시",
+        "status": "완료"
+      }
+    ]
+  }
+}

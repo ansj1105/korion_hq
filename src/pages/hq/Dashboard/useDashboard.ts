@@ -130,7 +130,9 @@ interface CountryOpsRow {
 
 interface ActivityLogRow {
   id: string
+  adminId?: string
   admin: string
+  eventType?: string
   menu: string
   menuAccent?: AccentKey
   action: string
@@ -139,6 +141,7 @@ interface ActivityLogRow {
   time: string
   ip: string
   result: string
+  resultAccent?: AccentKey
   riskLevel: string
   riskAccent: AccentKey
 }
@@ -168,6 +171,14 @@ interface AiInsightRaw {
   severityAccent: AccentKey
   messageKey: string
   actionKey: string
+  eventType?: string
+  sourceKey?: string
+  collectorStatusKey?: string
+  collectorStatusAccent?: AccentKey
+  evidenceLabelKey?: string
+  evidenceCount?: number
+  logQuery?: string
+  actionRoute?: string
 }
 
 const ALL_COUNTRIES = 'all'
@@ -361,7 +372,7 @@ function withDashboardDefaults(payload: typeof data): typeof data {
       rows: withNonEmptyArray(payload.paymentMethod?.rows, data.paymentMethod.rows),
       donut: withNonEmptyArray(payload.paymentMethod?.donut, data.paymentMethod.donut),
     },
-    activityLogs: withRows(payload.activityLogs, data.activityLogs),
+    activityLogs: withRows(payload.activityLogs, { ...data.activityLogs, rows: [] }),
     aiInsight: withItems(payload.aiInsight, data.aiInsight),
     quickActions: withNonEmptyArray(payload.quickActions, data.quickActions),
   }
@@ -565,6 +576,9 @@ export function useDashboard(filters: UseDashboardFilters = {}) {
     ...i,
     message: t(i.messageKey),
     action: t(i.actionKey),
+    source: i.sourceKey ? t(i.sourceKey) : '',
+    collectorStatus: i.collectorStatusKey ? t(i.collectorStatusKey) : '',
+    evidenceLabel: i.evidenceLabelKey ? `${t(i.evidenceLabelKey)} ${i.evidenceCount ?? 0}` : '',
   }))
 
   const quickActions = source.quickActions.map((key) => ({

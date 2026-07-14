@@ -310,7 +310,7 @@ export default function Dashboard() {
       targetId: r.targetId,
       time: r.time,
       ip: r.ip,
-      result: r.result,
+      result: badgeOrText(r.result, r.resultAccent),
       riskLevel: (
         <Badge accent={r.riskAccent} size="cell">
           {r.riskLevel}
@@ -603,8 +603,27 @@ export default function Dashboard() {
               {aiInsight.map((item) => (
                 <div key={item.id} className={styles.insightCard}>
                   <Badge accent={item.severityAccent}>{item.severity}</Badge>
-                  <p className={styles.insightMessage}>{item.message}</p>
-                  <Button className={styles.insightButton}>{item.action}</Button>
+                  <div className={styles.insightContent}>
+                    <p className={styles.insightMessage}>{item.message}</p>
+                    <div className={styles.insightMeta}>
+                      {item.collectorStatus && (
+                        <Badge accent={item.collectorStatusAccent ?? 'blue'} size="cell">
+                          {item.collectorStatus}
+                        </Badge>
+                      )}
+                      {item.source && <span>{item.source}</span>}
+                      {item.evidenceLabel && <span>{item.evidenceLabel}</span>}
+                      {item.logQuery && <code>{item.logQuery}</code>}
+                    </div>
+                  </div>
+                  <Button
+                    className={styles.insightButton}
+                    onClick={() => {
+                      if (item.actionRoute) navigate(item.actionRoute)
+                    }}
+                  >
+                    {item.action}
+                  </Button>
                 </div>
               ))}
             </div>

@@ -1,0 +1,92 @@
+{
+  "summary": [
+    {
+      "labelKey": "settle.detail.b.total",
+      "value": "1,842,000 KORI"
+    },
+    {
+      "labelKey": "settle.detail.b.totalFee",
+      "value": "18,420 KORI"
+    },
+    {
+      "labelKey": "hqPartnerSales.settle.merchantProfit",
+      "value": "3,120 KORI"
+    },
+    {
+      "labelKey": "settle.detail.b.held",
+      "value": "640 KORI"
+    },
+    {
+      "labelKey": "settle.detail.b.finalAmount",
+      "value": "3,960 KORI",
+      "color": "#24e6b8"
+    }
+  ],
+  "heldRows": [
+    {
+      "txNo": "TX-001",
+      "merchant": "Kori Cafe",
+      "partner": "Samuel O.",
+      "reason": "환불 요청",
+      "amount": "120,000",
+      "heldFee": "600",
+      "status": "정산 보류"
+    },
+    {
+      "txNo": "TX-002",
+      "merchant": "Lagos Direct",
+      "partner": "직접 계약",
+      "reason": "Sync 실패",
+      "amount": "80,000",
+      "heldFee": "320",
+      "status": "정산 보류"
+    }
+  ],
+  "historyRows": [
+    {
+      "no": "SET-20260607-001",
+      "appliedDate": "2026.06.05",
+      "period": "2026.05.02~ 2026.06.01",
+      "partnerAmount": "2,950",
+      "held": "640",
+      "status": "본사 검토중",
+      "paidDate": "-"
+    },
+    {
+      "no": "SET-20260607-001",
+      "appliedDate": "2026.06.05",
+      "period": "2026.04.02~ 2026.05.01",
+      "partnerAmount": "2,950",
+      "held": "640",
+      "status": "지급 완료",
+      "paidDate": "2026.05.05"
+    },
+    {
+      "no": "SET-20260607-001",
+      "appliedDate": "2026.06.05",
+      "period": "2026.03.02~ 2026.04.01",
+      "partnerAmount": "2,950",
+      "held": "640",
+      "status": "지급 완료",
+      "paidDate": "2026.04.05"
+    },
+    {
+      "no": "SET-20260607-001",
+      "appliedDate": "2026.06.05",
+      "period": "2026.02.02~ 2026.03.01",
+      "partnerAmount": "2,950",
+      "held": "640",
+      "status": "지급 완료",
+      "paidDate": "2026.03.05"
+    },
+    {
+      "no": "SET-20260607-001",
+      "appliedDate": "2026.06.05",
+      "period": "2026.01.02~ 2026.02.01",
+      "partnerAmount": "2,950",
+      "held": "640",
+      "status": "지급 완료",
+      "paidDate": "2026.02.05"
+    }
+  ]
+}

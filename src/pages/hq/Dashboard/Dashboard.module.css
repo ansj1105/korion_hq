@@ -698,11 +698,35 @@
   font-size: var(--font-size-12);
 }
 
-.insightMessage {
+.insightContent {
   flex: 1;
+  min-width: 0;
+}
+
+.insightMessage {
   margin: 0;
   font-size: var(--font-size-12);
   color: var(--color-text);
+}
+
+.insightMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.insightMeta code {
+  max-width: 100%;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  overflow-wrap: anywhere;
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-bg-elevated) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 35%, transparent);
 }
 
 /* 인사이트 액션 버튼(리스크 확인/로그 보기) — Figma 실측 82×34, 12px */

@@ -1,0 +1,26 @@
+{
+  "kpis": [
+    { "labelKey": "hqCommission.kpi.configurable", "value": "2", "noteKey": "hqCommission.note.configurable" },
+    { "labelKey": "hqCommission.kpi.active", "value": "2", "noteKey": "hqCommission.note.active" },
+    { "labelKey": "hqCommission.kpi.coins", "value": "2", "noteKey": "hqCommission.note.coins" },
+    { "labelKey": "hqCommission.kpi.eventCountries", "value": "2", "noteKey": "hqCommission.note.eventCountries" }
+  ],
+  "globalFee": "0.1",
+  "rows": [
+    { "country": "나이지리아", "code": "NG", "baseFee": "0.1%", "online": "0.1%", "offline": "0.1%", "event": "적용", "actualFee": "0.1%", "coinCount": "3", "status": "active" },
+    { "country": "대한민국", "code": "KR", "baseFee": "0.1%", "online": "0.1%", "offline": "0.1%", "event": "미적용", "actualFee": "0.1%", "coinCount": "2", "status": "active" },
+    { "country": "미국", "code": "EN", "baseFee": "0.1%", "online": "0.1%", "offline": "0.1%", "event": "적용", "actualFee": "0.1%", "coinCount": "1", "status": "pending" }
+  ],
+  "modal": {
+    "country": "Nigeria",
+    "eventFee": "0.1",
+    "baseFee": "0.1",
+    "onlineFee": "0.1",
+    "offlineFee": "0.1",
+    "coins": [
+      { "name": "KORI  TRON  TRC-20", "fee": "0.1%" },
+      { "name": "USDT  TRON  TRC-20", "fee": "0.1%" },
+      { "name": "USDT  Ethereum  TRC-20", "fee": "0.1%" }
+    ]
+  }
+}

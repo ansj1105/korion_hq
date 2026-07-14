@@ -1,0 +1,29 @@
+{
+  "summary": [
+    { "labelKey": "settle.detail.b.total", "value": "1,842,000 KORI" },
+    { "labelKey": "settle.detail.b.totalFee", "value": "18,420 KORI" },
+    { "labelKey": "settle.detail.b.partnerProfit", "value": "3,120 KORI" },
+    { "labelKey": "settle.detail.b.directProfit", "value": "1,480 KORI" },
+    { "labelKey": "settle.detail.b.held", "value": "640 KORI" },
+    { "labelKey": "settle.detail.b.finalAmount", "value": "3,960 KORI", "color": "#24e6b8" },
+    { "labelKey": "settle.detail.b.autoSettle", "value": "2,950 KORI" }
+  ],
+  "partnerRows": [
+    { "name": "Samuel O.", "code": "NG-SP-0001", "amount": "620,000", "fee": "1,550", "status": "자동 예정", "paidDate": "-" },
+    { "name": "Lagos Mart", "code": "NG-SP-0002", "amount": "340,000", "fee": "850", "status": "자동 예정", "paidDate": "-" }
+  ],
+  "merchantRows": [
+    { "name": "Lagos Store", "code": "NG-MER-0044", "amount": "280,000", "fee": "900", "status": "정산 가능" }
+  ],
+  "heldRows": [
+    { "txNo": "TX-001", "merchant": "Kori Cafe", "partner": "Samuel O.", "reason": "환불 요청", "amount": "120,000", "heldFee": "600", "status": "정산 보류" },
+    { "txNo": "TX-002", "merchant": "Lagos Direct", "partner": "직접 계약", "reason": "Sync 실패", "amount": "80,000", "heldFee": "320", "status": "정산 보류" }
+  ],
+  "historyRows": [
+    { "no": "SET-20260607-001", "appliedDate": "2026.06.05", "period": "2026.05.02~ 2026.06.01", "totalAmount": "160,000 KORI", "partnerAmount": "2,950", "held": "640", "status": "본사 검토중", "paidDate": "-" },
+    { "no": "SET-20260607-001", "appliedDate": "2026.06.05", "period": "2026.04.02~ 2026.05.01", "totalAmount": "160,000 KORI", "partnerAmount": "2,950", "held": "640", "status": "지급 완료", "paidDate": "2026.05.05" },
+    { "no": "SET-20260607-001", "appliedDate": "2026.06.05", "period": "2026.03.02~ 2026.04.01", "totalAmount": "160,000 KORI", "partnerAmount": "2,950", "held": "640", "status": "지급 완료", "paidDate": "2026.04.05" },
+    { "no": "SET-20260607-001", "appliedDate": "2026.06.05", "period": "2026.02.02~ 2026.03.01", "totalAmount": "160,000 KORI", "partnerAmount": "2,950", "held": "640", "status": "지급 완료", "paidDate": "2026.03.05" },
+    { "no": "SET-20260607-001", "appliedDate": "2026.06.05", "period": "2026.01.02~ 2026.02.01", "totalAmount": "160,000 KORI", "partnerAmount": "2,950", "held": "640", "status": "지급 완료", "paidDate": "2026.02.05" }
+  ]
+}

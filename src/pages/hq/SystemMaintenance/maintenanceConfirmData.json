@@ -1,0 +1,11 @@
+{
+  "fields": [
+    { "labelKey": "hqSystemMaintenance.confirm.field.scope", "value": "기능별 점검" },
+    { "labelKey": "hqSystemMaintenance.confirm.field.countries", "value": "전체 국가" },
+    { "labelKey": "hqSystemMaintenance.confirm.field.features", "value": "오프라인 결제 / Sync" },
+    { "labelKey": "hqSystemMaintenance.confirm.field.startAt", "value": "즉시" },
+    { "labelKey": "hqSystemMaintenance.confirm.field.endAt", "value": "2026.06.20 23:00" },
+    { "labelKey": "hqSystemMaintenance.confirm.field.userMessage", "value": "현재 KORION PAY 서비스 점검이 진행 중입니다." },
+    { "labelKey": "hqSystemMaintenance.confirm.field.admin", "value": "HQ Mina" }
+  ]
+}

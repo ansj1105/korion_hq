@@ -1,0 +1,89 @@
+{
+  "kpis": [
+    {
+      "id": "total",
+      "labelKey": "hqSystemErrorCode.kpi.total",
+      "value": "48개",
+      "noteKey": "hqSystemErrorCode.kpi.totalNote",
+      "dense": true
+    },
+    {
+      "id": "payment",
+      "labelKey": "hqSystemErrorCode.kpi.payment",
+      "value": "16개",
+      "dense": true,
+      "alignTop": true
+    },
+    {
+      "id": "sync",
+      "labelKey": "hqSystemErrorCode.kpi.sync",
+      "value": "14건",
+      "dense": true,
+      "alignTop": true
+    },
+    {
+      "id": "security",
+      "labelKey": "hqSystemErrorCode.kpi.security",
+      "value": "8개",
+      "dense": true,
+      "alignTop": true
+    }
+  ],
+  "rows": [
+    {
+      "no": "0001",
+      "registeredAt": "2026.06.14 06:59",
+      "code": "NG",
+      "name": "NIghria",
+      "category": "오프라인 Sync",
+      "severity": "주의",
+      "userMessage": "승인 정보 확인 필요",
+      "autoAction": "검토 필요",
+      "status": "활성"
+    },
+    {
+      "no": "0001",
+      "registeredAt": "2026.06.14 06:59",
+      "code": "KR",
+      "name": "KOREA",
+      "category": "보안",
+      "severity": "위험",
+      "userMessage": "결제 검증 실패",
+      "autoAction": "자동 정산 보류",
+      "status": "활성"
+    },
+    {
+      "no": "0001",
+      "registeredAt": "2026.06.14 06:59",
+      "code": "PH",
+      "name": "Philippines",
+      "category": "오프라인 Sync",
+      "severity": "주의",
+      "userMessage": "네트워크 복구 후 동기화",
+      "autoAction": "재시다",
+      "status": "활성"
+    },
+    {
+      "no": "0001",
+      "registeredAt": "2026.06.14 06:59",
+      "code": "GH",
+      "name": "Ghana",
+      "category": "담보금",
+      "severity": "주의",
+      "userMessage": "사용 가능 담보금 부족",
+      "autoAction": "결제 차단",
+      "status": "활성"
+    },
+    {
+      "no": "0001",
+      "registeredAt": "2026.06.14 06:59",
+      "code": "VN",
+      "name": "Vietnam",
+      "category": "정산",
+      "severity": "주의",
+      "userMessage": "정산 처리 대기",
+      "autoAction": "관리자 검토",
+      "status": "활성"
+    }
+  ]
+}
