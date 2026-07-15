@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import PageHeader from '../../../components/organisms/PageHeader'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
 import Card from '../../../components/atoms/Card'
@@ -36,6 +36,7 @@ export default function PartnerSales() {
 
 function PartnerSalesDetail({ partnerCode, initialTab }: { partnerCode: string; initialTab?: string }) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { profile, kpiTop, accountInfo, basicInfo } = usePartnerOverview(partnerCode)
   const partnerMerchants = usePartnerMerchants(partnerCode)
   const partnerTransactions = usePartnerTransactions(partnerCode)
@@ -235,7 +236,7 @@ function PartnerSalesDetail({ partnerCode, initialTab }: { partnerCode: string; 
         ) : null}
 
         <div className={styles.actionRow}>
-          <button type="button" className={styles.confirmButton}>
+          <button type="button" className={styles.confirmButton} onClick={() => navigate('/hq/partners/sales')}>
             {t('hqLeaderSales.confirmButton')}
           </button>
         </div>

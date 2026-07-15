@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import PageHeader from '../../../components/organisms/PageHeader'
 import Button from '../../../components/atoms/Button'
 import MetricCard from '../../../components/molecules/MetricCard'
@@ -24,6 +24,21 @@ const ROLE_CHIPS: ChipDef[] = [
 const METHOD_CHIPS: ChipDef[] = [
   { key: 'immediate', labelKey: 'hqNoticeSend.method.immediate', chip: '#24e6b8' },
   { key: 'scheduled', labelKey: 'hqNoticeSend.method.scheduled', chip: '#7c5cff' },
+]
+
+const TIME_OPTIONS = Array.from({ length: 48 }, (_, index) => {
+  const hour = String(Math.floor(index / 2)).padStart(2, '0')
+  const minute = index % 2 === 0 ? '00' : '30'
+  return `${hour}:${minute}`
+})
+
+const TIMEZONE_OPTIONS = [
+  { value: 'Asia/Seoul', label: 'KST (UTC+09:00)', offset: '+09:00' },
+  { value: 'UTC', label: 'UTC (UTC+00:00)', offset: '+00:00' },
+  { value: 'Africa/Lagos', label: 'WAT (UTC+01:00)', offset: '+01:00' },
+  { value: 'Asia/Manila', label: 'PHT (UTC+08:00)', offset: '+08:00' },
+  { value: 'Asia/Ho_Chi_Minh', label: 'ICT (UTC+07:00)', offset: '+07:00' },
+  { value: 'America/New_York', label: 'ET (UTC-05:00)', offset: '-05:00' },
 ]
 
 const KPI_CHIPS: Record<string, { chip: string }> = {
@@ -74,6 +89,9 @@ export default function NoticeSend() {
   const [drafts, setDrafts] = useState<DraftRow[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const selectedCountryLabel = filters.countryOptions.find((option) => option.value === countryScope)?.label ?? countryScope
+  const dateOptions = useMemo(() => getDateOptions(), [])
+  const selectedTimezoneLabel = TIMEZONE_OPTIONS.find((option) => option.value === timezone)?.label ?? timezone
+  const sendButtonLabel = method === 'scheduled' ? t('notice.send.scheduleSend') : t('notice.send.send')
   const metricCards = kpis.map((kpi) => ({
     id: kpi.id,
     label: kpi.label,
@@ -85,10 +103,10 @@ export default function NoticeSend() {
   useEffect(() => {
     setNoticeTitle(form.noticeTitle)
     setNoticeBody(form.noticeBody)
-    setSendDate(form.sendDate)
-    setSendTime(form.sendTime)
-    setTimezone(form.timezone)
-  }, [form.noticeTitle, form.noticeBody, form.sendDate, form.sendTime, form.timezone])
+    setSendDate(normalizeDateValue(form.sendDate) || dateOptions[0]?.value || '')
+    setSendTime(normalizeTimeValue(form.sendTime) || '09:00')
+    setTimezone(normalizeTimezoneValue(form.timezone))
+  }, [dateOptions, form.noticeTitle, form.noticeBody, form.sendDate, form.sendTime, form.timezone])
 
   const getRangeLabel = (option: HqNoticeSendRange) => {
     if (option === 'ALL') return t('hqDashboard.filter.allPeriod')
@@ -102,7 +120,8 @@ export default function NoticeSend() {
   const getScheduledAt = () => {
     if (method === 'immediate') return null
     if (!sendDate || !sendTime) return null
-    return new Date(`${sendDate.replace(/\./g, '-')}T${sendTime}:00+09:00`).toISOString()
+    const timezoneOption = TIMEZONE_OPTIONS.find((option) => option.value === timezone) ?? TIMEZONE_OPTIONS[0]
+    return new Date(`${sendDate}T${sendTime}:00${timezoneOption.offset}`).toISOString()
   }
 
   const buildPayload = () => ({
@@ -163,6 +182,25 @@ export default function NoticeSend() {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const openConfirm = () => {
+    if (!noticeTitle.trim() || !noticeType.trim() || !noticeBody.trim()) {
+      showToast(t('notice.send.error.required'))
+      return
+    }
+    if (method === 'scheduled') {
+      const scheduledAt = getScheduledAt()
+      if (!scheduledAt) {
+        showToast(t('notice.send.error.scheduleRequired'))
+        return
+      }
+      if (new Date(scheduledAt).getTime() <= Date.now()) {
+        showToast(t('notice.send.error.scheduleFuture'))
+        return
+      }
+    }
+    setConfirmOpen(true)
   }
 
   const renderChip = (c: ChipDef, selected: boolean, onClick: () => void, checkmark: boolean) => (
@@ -275,30 +313,45 @@ export default function NoticeSend() {
           <div className={styles.field}>
             <span className={styles.fieldLabel}>{t('notice.send.scheduleLabel')}</span>
             <div className={`${styles.scheduleFields} ${method === 'immediate' ? styles.scheduleDisabled : ''}`}>
-              <input
+              <select
                 className={styles.schedule}
-                type="text"
                 aria-label={t('hqNoticeSend.form.sendDate')}
                 value={sendDate}
                 onChange={(e) => setSendDate(e.target.value)}
                 disabled={method === 'immediate'}
-              />
-              <input
+              >
+                {dateOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <select
                 className={styles.schedule}
-                type="text"
                 aria-label={t('hqNoticeSend.form.sendTime')}
                 value={sendTime}
                 onChange={(e) => setSendTime(e.target.value)}
                 disabled={method === 'immediate'}
-              />
-              <input
+              >
+                {TIME_OPTIONS.map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
+              <select
                 className={`${styles.schedule} ${styles.timezoneInput}`}
-                type="text"
                 aria-label={t('hqNoticeSend.form.timezone')}
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
                 disabled={method === 'immediate'}
-              />
+              >
+                {TIMEZONE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
@@ -309,8 +362,8 @@ export default function NoticeSend() {
           </Button>
           <Button variant="secondary" onClick={loadDrafts}>{t('hqNoticeSend.form.draftList')}</Button>
           <Button variant="secondary" onClick={saveDraft} disabled={isSubmitting}>{t('hqNoticeSend.form.draft')}</Button>
-          <Button variant="primary" onClick={() => setConfirmOpen(true)} disabled={isSubmitting}>
-            {t('hqNoticeSend.form.send')}
+          <Button variant="primary" onClick={openConfirm} disabled={isSubmitting}>
+            {sendButtonLabel}
           </Button>
         </div>
         {draftsOpen && (
@@ -337,7 +390,7 @@ export default function NoticeSend() {
             accent: c.chip,
           })),
           method: t(method === 'immediate' ? 'hqNoticeSend.method.immediate' : 'hqNoticeSend.method.scheduled'),
-          scheduleTime: method === 'immediate' ? '-' : `${sendDate} ${sendTime} (${timezone})`,
+          scheduleTime: method === 'immediate' ? '-' : `${sendDate} ${sendTime} (${selectedTimezoneLabel})`,
           sender: form.sender,
           recipients: form.recipients,
         }}
@@ -352,4 +405,38 @@ export default function NoticeSend() {
       )}
     </div>
   )
+}
+
+function getDateOptions() {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return Array.from({ length: 31 }, (_, index) => {
+    const date = new Date(today)
+    date.setDate(today.getDate() + index)
+    const value = toDateValue(date)
+    const label = index === 0 ? `${value} · Today` : value
+    return { value, label }
+  })
+}
+
+function toDateValue(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function normalizeDateValue(value: string) {
+  const normalized = value?.replace(/\./g, '-').trim()
+  return /^\d{4}-\d{2}-\d{2}$/.test(normalized) ? normalized : ''
+}
+
+function normalizeTimeValue(value: string) {
+  const normalized = value?.trim()
+  return TIME_OPTIONS.includes(normalized) ? normalized : ''
+}
+
+function normalizeTimezoneValue(value: string) {
+  if (!value || value === 'KST') return 'Asia/Seoul'
+  return TIMEZONE_OPTIONS.some((option) => option.value === value) ? value : 'Asia/Seoul'
 }

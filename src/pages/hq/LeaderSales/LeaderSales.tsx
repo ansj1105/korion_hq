@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import PageHeader from '../../../components/organisms/PageHeader'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
 import Card from '../../../components/atoms/Card'
@@ -44,6 +44,7 @@ export default function LeaderSales() {
 
 function LeaderSalesDetail({ leaderCode }: { leaderCode: string }) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { profile, kpiTop, accountInfo, basicInfo } = useLeaderSales(leaderCode)
   const leaderPartners = useLeaderPartners(leaderCode)
   const leaderMerchants = useLeaderMerchants(leaderCode)
@@ -313,7 +314,7 @@ function LeaderSalesDetail({ leaderCode }: { leaderCode: string }) {
 
         {/* Figma 레이어명은 "본사 정산 요청 보내기"지만, 버튼 안 실제 텍스트는 "확인"뿐이라 그대로 표기 */}
         <div className={styles.actionRow}>
-          <button type="button" className={styles.confirmButton}>
+          <button type="button" className={styles.confirmButton} onClick={() => navigate('/hq/leaders/sales')}>
             {t('hqLeaderSales.confirmButton')}
           </button>
         </div>
