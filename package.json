@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "KORION PAY 리더 어드민 프론트엔드 (UI 퍼블리싱)",
+  "description": "KORION PAY 본사 어드민 프론트엔드 (UI 퍼블리싱)",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
