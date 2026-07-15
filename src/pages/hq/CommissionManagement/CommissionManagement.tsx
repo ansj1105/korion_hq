@@ -55,7 +55,6 @@ export default function HqCommissionManagement() {
         <div onClick={(event) => event.stopPropagation()}>
           <ActionBadges
             labels={[editLabel, deleteLabel]}
-            accentByLabel={{ [editLabel]: 'cyan', [deleteLabel]: 'red' }}
             size="md"
             shape="rect"
             onLabelClick={(label) => {

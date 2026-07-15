@@ -129,10 +129,6 @@
   color: #ffffff;
   background-color: color-mix(in srgb, var(--chip) 24%, transparent);
 }
-.kpiLabelSolid {
-  color: #061612;
-  background-color: color-mix(in srgb, var(--chip) 92%, transparent);
-}
 .kpiValue {
   font-size: var(--font-size-23);
   font-weight: var(--font-weight-bold);

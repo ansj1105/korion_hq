@@ -3,6 +3,7 @@ import PageHeader from '../../../components/organisms/PageHeader'
 import StatCard from '../../../components/molecules/StatCard'
 import DataTable, { type TableRow } from '../../../components/organisms/DataTable'
 import Badge from '../../../components/atoms/Badge'
+import ActionBadges from '../../../components/molecules/ActionBadges'
 import Button from '../../../components/atoms/Button'
 import { useTranslation } from '../../../i18n'
 import type { AccentKey } from '../../../types'
@@ -13,13 +14,6 @@ import styles from './SystemSecurityPolicy.module.css'
 const ENFORCEMENT_ACCENT: Record<string, AccentKey> = {
   강제: 'red',
   권고: 'amber',
-}
-
-const ACTION_ACCENT: Record<string, AccentKey> = {
-  상세: 'cyan',
-  수정: 'blue',
-  비활성: 'red',
-  활성: 'green',
 }
 
 const AUTO_ACTION_ACCENT: Record<string, AccentKey> = {
@@ -118,18 +112,12 @@ export default function SystemSecurityPolicy() {
       ),
       action: (
         <div className={styles.actionGroup}>
-          {(row.actions?.length ? row.actions : [t('common.detail')]).map((label) => (
-            <Badge
-              key={label}
-              accent={ACTION_ACCENT[label] ?? 'cyan'}
-              solid
-              size="md"
-              shape="rect"
-              onClick={() => openEditModal(row)}
-            >
-              {label}
-            </Badge>
-          ))}
+          <ActionBadges
+            labels={row.actions?.length ? row.actions : [t('common.detail')]}
+            size="md"
+            shape="rect"
+            onLabelClick={() => openEditModal(row)}
+          />
         </div>
       ),
     },

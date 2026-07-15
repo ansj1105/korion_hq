@@ -680,3 +680,23 @@
 4. 공지 흐름: 즉시/예약/임시저장/취소/수신자 목록
 5. 리스크/로그: 액션 로그, 보안 로그, 위험 상태 처리
 6. UI 회귀: 뱃지 크기/색상, No 컬럼, 모바일, i18n, 검색/필터/엑셀
+
+## 공통 뱃지/액션 가시성 점검
+
+파트너 프로젝트 기준처럼 액션 의미별 색은 공통 규칙으로 결정하고, 페이지별 활성 상태에 따라 액션 배지 색이 바뀌지 않아야 한다. 색이 꽉 찬 solid 배지는 가독성이 떨어지므로 신규 UI에서 사용하지 않는다.
+
+- [x] `Badge` 컴포넌트에서 `solid` prop 제거
+- [x] `ActionBadges` 컴포넌트에서 `solid`/`solidByLabel` 제거
+- [x] `ActionBadges` 기본 색상은 `actionBadgeAccent(label)` 공통 매핑을 사용
+- [x] 페이지별 `확인/검토/위험/삭제` 활성 상태에 따른 액션 배지 색상 변경 제거
+- [x] 신청서 관리 `/hq/applications` 액션 배지는 활성 상태와 무관하게 동일 액션은 동일 색상 사용
+- [x] HQ 요청 하위 페이지 공통 row 액션 배지는 공통 매핑 사용
+- [x] 리더/파트너/가맹점/정산/관리자/로그/시스템 페이지 액션 배지는 공통 매핑 사용
+- [x] 공지 발송 chip의 solid 스타일 제거
+- [x] MetricCard/정산 KPI label의 solid 스타일 제거
+- [x] `chipSolid`, `labelSolid`, `kpiLabelSolid`, `solidByLabel`, `solid=` 잔여 호출부 검색 완료
+- [ ] 브라우저에서 `/hq/applications` 액션 배지 색상과 hover/click 상태 육안 확인
+- [ ] 브라우저에서 `/hq/requests/*` 액션 배지 색상과 상태 배지 구분 확인
+- [ ] 브라우저에서 `/hq/system/*`, `/hq/admin/*`, `/hq/logs/*` 액션 배지 색상 확인
+- [ ] 브라우저에서 공지/정산 KPI chip이 모두 translucent 형태인지 확인
+- [ ] 색상 대비가 낮은 라벨이 있으면 공통 `badgeAccents` 매핑만 수정하고 페이지별 override는 추가하지 않기

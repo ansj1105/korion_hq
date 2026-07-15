@@ -150,7 +150,7 @@ export default function PartnerSettlementRequest() {
         {kpis.map((k) => (
           <div key={k.id} className={styles.kpiCard}>
             <span
-              className={`${styles.kpiLabel} ${k.chipSolid ? styles.kpiLabelSolid : styles.kpiLabelTranslucent}`}
+              className={`${styles.kpiLabel} ${styles.kpiLabelTranslucent}`}
               style={{ '--chip': k.chip } as CSSProperties}
             >
               {k.label}

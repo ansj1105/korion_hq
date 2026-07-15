@@ -7,17 +7,11 @@ import ActionBadges from '../../../components/molecules/ActionBadges'
 import { useTranslation } from '../../../i18n'
 import { postHqPageData } from '../../../services/korionChongApi'
 import type { AccentKey } from '../../../types'
+import { actionCodeBadgeAccent } from '../../../utils/badgeAccents'
 import { useSettlementRequest, type RequestRow, type RequestStatus, type SettlementRequestActionCode } from './useSettlementRequest'
 import styles from './SettlementRequest.module.css'
 
 const DEFAULT_ACTIONS: SettlementRequestActionCode[] = ['APPROVE', 'REVIEW', 'HOLD', 'REQUEST_INFO', 'REJECT']
-const ACTION_ACCENT: Record<SettlementRequestActionCode, AccentKey> = {
-  APPROVE: 'green',
-  REVIEW: 'cyan',
-  HOLD: 'orange',
-  REQUEST_INFO: 'purple',
-  REJECT: 'red',
-}
 
 interface SettlementRequestActionResponse {
   settlementRequestId: number
@@ -86,7 +80,7 @@ export default function HqSettlementRequest() {
     const sourceStatus = override?.sourceStatus ?? r.sourceStatus
     const actions = override?.actions?.length ? override.actions : r.actions?.length ? r.actions : DEFAULT_ACTIONS
     const actionLabels = actions.map((action) => actionLabel[action])
-    const actionAccentByLabel = Object.fromEntries(actions.map((action) => [actionLabel[action], ACTION_ACCENT[action]])) as Record<string, AccentKey>
+    const actionAccentByLabel = Object.fromEntries(actions.map((action) => [actionLabel[action], actionCodeBadgeAccent(action)])) as Record<string, AccentKey>
     return {
       // 신청 ID가 샘플상 중복돼 있어 index로 key를 구분
       id: `${r.id}-${index}`,
@@ -114,7 +108,6 @@ export default function HqSettlementRequest() {
               accentByLabel={actionAccentByLabel}
               size="md"
               shape="rect"
-              solid
               onLabelClick={(label) => {
                 const action = actions.find((candidate) => actionLabel[candidate] === label)
                 if (action) void handleAction(r, action)

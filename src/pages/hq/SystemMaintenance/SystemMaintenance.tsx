@@ -119,7 +119,6 @@ export default function SystemMaintenance() {
             <Badge
               key={label}
               accent={actionAccent[label] ?? 'cyan'}
-              solid
               size="md"
               shape="rect"
               onClick={label === t('common.detail') || label === '상세' ? undefined : () => updateMaintenanceMode(r.maintenanceId, !isMaintenanceOn(r), r.userMessage)}

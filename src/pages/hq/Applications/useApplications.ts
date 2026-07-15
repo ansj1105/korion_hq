@@ -76,16 +76,11 @@ export function useApplications() {
     { key: 'action', label: t('hqApplications.col.action'), width: '300px' },
   ]
 
-  /*
-   * 상태 키 → 표시 라벨(번역) + 액션 배지 강조색 + solid 여부.
-   * Figma 기준: 활성 "대기/확인/검토"는 시안 틴트(solid=false), 활성 "위험"은 빨강 솔리드(solid=true).
-   * (비활성·삭제 배지는 호출부에서 항상 solid 회색으로 처리)
-   */
-  const statusMeta: Record<ApplicationStatus, { label: string; accent: 'cyan' | 'orange' | 'red'; solid: boolean }> = {
-    waiting: { label: t('hqApplications.status.waiting'), accent: 'orange', solid: false },
-    confirmed: { label: t('hqApplications.status.confirmed'), accent: 'cyan', solid: false },
-    review: { label: t('hqApplications.status.review'), accent: 'cyan', solid: false },
-    risk: { label: t('hqApplications.status.risk'), accent: 'red', solid: true },
+  const statusMeta: Record<ApplicationStatus, { label: string; accent: 'cyan' | 'orange' | 'red' }> = {
+    waiting: { label: t('hqApplications.status.waiting'), accent: 'orange' },
+    confirmed: { label: t('hqApplications.status.confirmed'), accent: 'cyan' },
+    review: { label: t('hqApplications.status.review'), accent: 'cyan' },
+    risk: { label: t('hqApplications.status.risk'), accent: 'red' },
   }
 
   return {

@@ -24,7 +24,6 @@ interface MetricRaw {
   note?: string
   noteKey?: string
   chip: string
-  chipSolid?: boolean
 }
 
 /*
@@ -46,7 +45,6 @@ export function useNoticeHistory() {
     value: m.value,
     note: m.note ?? (m.noteKey ? t(m.noteKey) : undefined),
     chip: m.chip,
-    chipSolid: m.chipSolid,
   }))
 
   const columns: Column[] = [

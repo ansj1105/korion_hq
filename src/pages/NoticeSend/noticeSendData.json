@@ -2,7 +2,7 @@
   "metrics": [
     { "id": "partner", "labelKey": "notice.send.kpi.partner", "value": "36명", "noteKey": "notice.send.kpi.partner.note", "chip": "#7c5cff" },
     { "id": "merchant", "labelKey": "notice.send.kpi.merchant", "value": "115개", "noteKey": "notice.send.kpi.merchant.note", "chip": "#2a8bff" },
-    { "id": "today", "labelKey": "notice.send.kpi.today", "value": "4건", "noteKey": "notice.send.kpi.today.note", "chip": "#24e6b8", "chipSolid": true },
-    { "id": "scheduled", "labelKey": "notice.send.kpi.scheduled", "value": "2건", "noteKey": "notice.send.kpi.scheduled.note", "chip": "#f6c85a", "chipSolid": true }
+    { "id": "today", "labelKey": "notice.send.kpi.today", "value": "4건", "noteKey": "notice.send.kpi.today.note", "chip": "#24e6b8" },
+    { "id": "scheduled", "labelKey": "notice.send.kpi.scheduled", "value": "2건", "noteKey": "notice.send.kpi.scheduled.note", "chip": "#f6c85a" }
   ]
 }

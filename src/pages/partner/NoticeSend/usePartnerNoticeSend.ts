@@ -9,7 +9,6 @@ interface MetricRaw {
   value: string
   noteKey?: string
   chip: string
-  chipSolid?: boolean
 }
 
 /*
@@ -27,7 +26,6 @@ export function usePartnerNoticeSend() {
     value: m.value,
     note: m.noteKey ? t(m.noteKey) : undefined,
     chip: m.chip,
-    chipSolid: m.chipSolid,
   }))
 
   return { metrics, isLoading, error }

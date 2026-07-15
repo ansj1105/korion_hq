@@ -4,7 +4,6 @@ import RequestListPage from '../../../components/templates/RequestListPage'
 import ActionBadges from '../../../components/molecules/ActionBadges'
 import Badge from '../../../components/atoms/Badge'
 import type { TableRow } from '../../../components/organisms/DataTable'
-import type { AccentKey } from '../../../types'
 import { useTranslation } from '../../../i18n'
 import { postHqPageData } from '../../../services/korionChongApi'
 import { useLeaders, type LeaderStatus } from './useLeaders'
@@ -56,7 +55,6 @@ export default function Leaders() {
     const status = statusOverrides[r.no] ?? r.status
     const active = statusMeta[status]
     const actionLabel = status === 'approved' ? t('hqLeaderList.action.suspend') : t('hqLeaderList.action.release')
-    const actionAccent: AccentKey = status === 'approved' ? 'red' : 'green'
 
     return {
       id: r.no,
@@ -72,7 +70,7 @@ export default function Leaders() {
         monthTxCount: r.monthTxCount,
         unsettledFee: r.unsettledFee,
         status: (
-          <Badge accent={active.accent} size="md" shape="rect" solid={active.solid}>
+          <Badge accent={active.accent} size="md" shape="rect">
             {active.label}
           </Badge>
         ),
@@ -80,8 +78,6 @@ export default function Leaders() {
           <div className={styles.actionStop} onClick={(event) => event.stopPropagation()}>
             <ActionBadges
               labels={[actionLabel]}
-              accentByLabel={{ [actionLabel]: actionAccent }}
-              solid
               size="md"
               shape="rect"
               onLabelClick={() => toggleLeaderStatus(r, status)}

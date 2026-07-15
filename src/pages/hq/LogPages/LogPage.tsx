@@ -12,10 +12,6 @@ interface LogPageProps {
   pageType: HqLogPageType
 }
 
-const ACTION_ACCENT: Record<string, AccentKey> = {
-  상세: 'cyan',
-}
-
 export default function LogPage({ pageType }: LogPageProps) {
   const { t } = useTranslation()
   const { title, desc, tableTitle, stats, columns, rows, isLoading, error } = useHqLogPage(pageType)
@@ -39,7 +35,7 @@ export default function LogPage({ pageType }: LogPageProps) {
         return [column.key, <Badge accent={(row.riskAccent as AccentKey) ?? 'blue'} size="md" shape="rect">{row.riskLevel}</Badge>]
       }
       if (column.key === 'actions') {
-        return [column.key, <ActionBadges labels={row.actions?.length ? row.actions : [t('common.detail')]} accentByLabel={ACTION_ACCENT} size="md" shape="rect" solid />]
+        return [column.key, <ActionBadges labels={row.actions?.length ? row.actions : [t('common.detail')]} size="md" shape="rect" />]
       }
       return [column.key, row[column.key] == null ? '-' : String(row[column.key])]
     })),

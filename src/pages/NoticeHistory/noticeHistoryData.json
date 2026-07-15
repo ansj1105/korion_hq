@@ -2,8 +2,8 @@
   "metrics": [
     { "id": "total", "labelKey": "notice.hist.kpi.total", "value": "128건", "noteKey": "notice.hist.kpi.total.note", "chip": "#2a8bff" },
     { "id": "month", "labelKey": "notice.hist.kpi.month", "value": "18건", "note": "2026.06", "chip": "#7c5cff" },
-    { "id": "scheduled", "labelKey": "notice.hist.kpi.scheduled", "value": "2건", "noteKey": "notice.hist.kpi.scheduled.note", "chip": "#f6c85a", "chipSolid": true },
-    { "id": "done", "labelKey": "notice.hist.kpi.done", "value": "112건", "noteKey": "notice.hist.kpi.done.note", "chip": "#24e6b8", "chipSolid": true },
+    { "id": "scheduled", "labelKey": "notice.hist.kpi.scheduled", "value": "2건", "noteKey": "notice.hist.kpi.scheduled.note", "chip": "#f6c85a" },
+    { "id": "done", "labelKey": "notice.hist.kpi.done", "value": "112건", "noteKey": "notice.hist.kpi.done.note", "chip": "#24e6b8" },
     { "id": "failed", "labelKey": "notice.hist.kpi.failed", "value": "3건", "noteKey": "notice.hist.kpi.failed.note", "chip": "#ff4d70" }
   ],
   "rows": [

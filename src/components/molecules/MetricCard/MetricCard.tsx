@@ -13,8 +13,6 @@ export interface MetricCardData {
   note?: string
   /** 색칩 색상 (Figma 지정 hex). 카드마다 다르므로 데이터로 주입 */
   chip: string
-  /** true면 솔리드 칩(어두운 글씨), false/미지정이면 반투명 칩(흰 글씨) */
-  chipSolid?: boolean
 }
 
 /*
@@ -25,13 +23,13 @@ export interface MetricCardData {
  * 색은 디자인 토큰이 아닌 Figma 카드별 고유색이라 chip prop으로 주입한다
  * (컴포넌트 CSS에 색을 박지 않기 위함 — 색 결정은 데이터 훅에 둔다).
  */
-export default function MetricCard({ label, value, note, chip, chipSolid }: MetricCardData) {
+export default function MetricCard({ label, value, note, chip }: MetricCardData) {
   const style = { '--chip': chip } as CSSProperties
 
   return (
     <article className={styles.card}>
       <span
-        className={`${styles.label} ${chipSolid ? styles.labelSolid : styles.labelTranslucent}`}
+        className={`${styles.label} ${styles.labelTranslucent}`}
         style={style}
       >
         {label}

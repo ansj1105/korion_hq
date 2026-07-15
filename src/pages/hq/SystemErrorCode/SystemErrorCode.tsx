@@ -41,13 +41,6 @@ export default function SystemErrorCode() {
     REQUEST_REVIEW: 'cyan',
     ESCALATE: 'purple',
   }
-  const actionAccent: Record<string, AccentKey> = {
-    [t('common.detail')]: 'cyan',
-    상세: 'cyan',
-    수정: 'blue',
-    삭제: 'red',
-  }
-
   const rows: TableRow[] = rawRows.map((r, i) => ({
     id: r.id ?? `${r.code}-${i}`,
     cells: {
@@ -75,8 +68,6 @@ export default function SystemErrorCode() {
       action: (
         <ActionBadges
           labels={r.actions?.length ? r.actions : [t('common.detail')]}
-          accentByLabel={actionAccent}
-          solid
           size="md"
           shape="rect"
         />

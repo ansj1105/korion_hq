@@ -67,10 +67,6 @@
   color: #ffffff;
   background-color: color-mix(in srgb, var(--chip) 24%, transparent);
 }
-.chipSolid {
-  color: #061612;
-  background-color: color-mix(in srgb, var(--chip) 92%, transparent);
-}
 .cardDesc {
   flex: 1;
   font-size: var(--font-size-12);

@@ -28,11 +28,6 @@
   color: #ffffff;
   background-color: color-mix(in srgb, var(--chip) 24%, transparent);
 }
-/* 솔리드 칩(청록/골드) — 어두운 글씨 */
-.labelSolid {
-  color: #061612;
-  background-color: color-mix(in srgb, var(--chip) 92%, transparent);
-}
 
 .value {
   font-size: var(--font-size-23);

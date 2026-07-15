@@ -8,7 +8,6 @@ interface StatRaw {
   value: string
   note?: string
   chip?: string
-  chipSolid?: boolean
 }
 export interface KpiItem {
   id: string
@@ -16,7 +15,6 @@ export interface KpiItem {
   value: string
   note?: string
   chip: string
-  chipSolid: boolean
 }
 interface FieldRaw {
   labelKey: string
@@ -68,7 +66,6 @@ export function usePartnerSettlementRequest() {
     value: s.value,
     note: s.note,
     chip: s.chip ?? '#7c5cff',
-    chipSolid: s.chipSolid ?? false,
   }))
 
   return {

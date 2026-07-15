@@ -3,7 +3,6 @@ import RequestListPage from '../../../components/templates/RequestListPage'
 import ActionBadges from '../../../components/molecules/ActionBadges'
 import Badge from '../../../components/atoms/Badge'
 import type { TableRow } from '../../../components/organisms/DataTable'
-import type { AccentKey } from '../../../types'
 import { useTranslation } from '../../../i18n'
 import { postHqPageData } from '../../../services/korionChongApi'
 import { useApplications } from './useApplications'
@@ -14,9 +13,8 @@ import styles from './Applications.module.css'
 /*
  * Applications (page) — 본사어드민 · 신청서 관리 · 제휴 / 투자 신청서
  * ------------------------------------------------------------------
- * RequestListPage 템플릿 재사용. 액션 컬럼은 라벨 목록형(ActionBadges)이 아니라
- * "확인/검토/위험" 중 그 행의 현재 상태 하나만 색이 켜지는 상태 표시 + "삭제" 액션이라
- * 행마다 accentByLabel을 동적으로 만들어 넘긴다(라벨 자체는 항상 4개 고정).
+ * RequestListPage 템플릿 재사용. 상태 컬럼은 현재 처리 상태를 보여주고,
+ * 액션 컬럼은 모든 행에서 공통 액션 배지 색상 규칙을 따른다.
  */
 export default function Applications() {
   const { t } = useTranslation()
@@ -39,14 +37,6 @@ export default function Applications() {
     [actionLabelByStatus.confirmed]: 'confirmed',
     [actionLabelByStatus.risk]: 'risk',
   }
-  const actionAccentByLabel: Record<string, AccentKey> = {
-    [actionLabelByStatus.waiting]: 'orange',
-    [actionLabelByStatus.review]: 'cyan',
-    [actionLabelByStatus.confirmed]: 'green',
-    [actionLabelByStatus.risk]: 'red',
-    [deleteLabel]: 'red',
-  }
-
   useEffect(() => {
     setApplicationRows(rawRows)
   }, [rawRows])
@@ -120,11 +110,6 @@ export default function Applications() {
     const displayNo = filteredRows.length - ((currentPage - 1) * pageSize + index)
     const labels = [actionLabelByStatus.waiting, actionLabelByStatus.review, actionLabelByStatus.confirmed, actionLabelByStatus.risk, deleteLabel]
     const active = statusMeta[r.status]
-    const activeActionLabel = actionLabelByStatus[r.status]
-    // 라벨별 색상은 유지하되, 현재 상태 배지만 기존 활성 solid/tint 규칙을 따른다.
-    const solidByLabel: Record<string, boolean> = Object.fromEntries(
-      labels.map((label) => [label, label === activeActionLabel ? active.solid : true]),
-    )
 
     return {
       id: rowId,
@@ -137,13 +122,11 @@ export default function Applications() {
         company: r.company,
         email: r.email,
         interest: <Badge accent="purple" size="md" shape="rect">{r.interest}</Badge>,
-        status: <Badge accent={active.accent} size="md" shape="rect" solid={active.solid}>{active.label}</Badge>,
+        status: <Badge accent={active.accent} size="md" shape="rect">{active.label}</Badge>,
         action: (
           <span onClick={(event) => event.stopPropagation()}>
             <ActionBadges
               labels={labels}
-              accentByLabel={actionAccentByLabel}
-              solidByLabel={solidByLabel}
               size="md"
               shape="rect"
               onLabelClick={(label) => handleAction(r, label)}

@@ -6,25 +6,24 @@ import { useTranslation } from '../../i18n'
 import { useNoticeSend } from './useNoticeSend'
 import styles from './NoticeSend.module.css'
 
-/** 칩 한 개의 정적 정의 (라벨 키 + 색 + 솔리드 여부) */
+/** 칩 한 개의 정적 정의 (라벨 키 + 색) */
 interface ChipDef {
   key: string
   labelKey: string
   chip: string
-  solid?: boolean
 }
 
 /* 대상 필터 칩 — Figma 색 그대로 (전체:청록 / 파트너:보라 / 가맹점:파랑 / 특정:골드) */
 const TARGET_CHIPS: ChipDef[] = [
-  { key: 'all', labelKey: 'notice.send.target.all', chip: '#24e6b8', solid: true },
+  { key: 'all', labelKey: 'notice.send.target.all', chip: '#24e6b8' },
   { key: 'partner', labelKey: 'notice.send.target.partner', chip: '#7c5cff' },
   { key: 'merchant', labelKey: 'notice.send.target.merchant', chip: '#2a8bff' },
-  { key: 'specific', labelKey: 'notice.send.target.specific', chip: '#f6c85a', solid: true },
+  { key: 'specific', labelKey: 'notice.send.target.specific', chip: '#f6c85a' },
 ]
 
 /* 발송 옵션 칩 — 즉시(청록) / 예약(보라) */
 const OPTION_CHIPS: ChipDef[] = [
-  { key: 'immediate', labelKey: 'notice.send.option.immediate', chip: '#24e6b8', solid: true },
+  { key: 'immediate', labelKey: 'notice.send.option.immediate', chip: '#24e6b8' },
   { key: 'scheduled', labelKey: 'notice.send.option.scheduled', chip: '#7c5cff' },
 ]
 
@@ -51,7 +50,7 @@ export default function NoticeSend() {
       type="button"
       onClick={onClick}
       style={{ '--chip': c.chip } as CSSProperties}
-      className={`${styles.chip} ${c.solid ? styles.chipSolid : styles.chipTranslucent} ${
+      className={`${styles.chip} ${styles.chipTranslucent} ${
         selected ? styles.chipActive : ''
       }`}
     >

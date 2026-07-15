@@ -4,7 +4,6 @@ import RequestListPage from '../../../components/templates/RequestListPage'
 import ActionBadges from '../../../components/molecules/ActionBadges'
 import Badge from '../../../components/atoms/Badge'
 import type { TableRow } from '../../../components/organisms/DataTable'
-import type { AccentKey } from '../../../types'
 import { useTranslation } from '../../../i18n'
 import { postHqPageData } from '../../../services/korionChongApi'
 import { usePartners, type HqPartnerStatus } from './usePartners'
@@ -62,7 +61,6 @@ export default function Partners({ detailTab }: PartnersProps = {}) {
   const rows: TableRow[] = filteredRows.map((r, index) => {
     const active = statusMeta[r.currentStatus]
     const actionLabel = r.currentStatus === 'approved' ? t('hqPartnerList.action.suspend') : t('hqPartnerList.action.release')
-    const actionAccent: AccentKey = r.currentStatus === 'approved' ? 'red' : 'green'
 
     return {
       id: r.no,
@@ -78,7 +76,7 @@ export default function Partners({ detailTab }: PartnersProps = {}) {
         monthTxCount: r.monthTxCount,
         unsettledFee: r.unsettledFee,
         status: (
-          <Badge accent={active.accent} size="md" shape="rect" solid={active.solid}>
+          <Badge accent={active.accent} size="md" shape="rect">
             {active.label}
           </Badge>
         ),
@@ -86,8 +84,6 @@ export default function Partners({ detailTab }: PartnersProps = {}) {
           <div className={styles.actionStop} onClick={(event) => event.stopPropagation()}>
             <ActionBadges
               labels={[actionLabel]}
-              accentByLabel={{ [actionLabel]: actionAccent }}
-              solid
               size="md"
               shape="rect"
               onLabelClick={() => togglePartnerStatus(r, r.currentStatus)}

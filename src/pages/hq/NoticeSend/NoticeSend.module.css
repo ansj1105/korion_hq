@@ -114,11 +114,6 @@
   background-color: color-mix(in srgb, var(--chip) 24%, transparent);
 }
 
-.chipSolid {
-  color: #061612;
-  background-color: color-mix(in srgb, var(--chip) 92%, transparent);
-}
-
 .chipActive {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--chip) 70%, transparent);
 }

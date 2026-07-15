@@ -7,14 +7,14 @@
     "method": "본사 승인 후 자동 정산"
   },
   "stats": [
-    { "labelKey": "settle.req.stat.targetAmount", "value": "1,842,000 KORI", "note": "2026.05.02 ~ 06.01", "chip": "#2a8bff", "chipSolid": false },
-    { "labelKey": "settle.req.stat.totalFee", "value": "18,420 KORI", "note": "거래금액의 1%", "chip": "#7c5cff", "chipSolid": false },
-    { "labelKey": "settle.req.stat.partnerFee", "value": "3,120 KORI", "note": "하부 파트너 수익", "chip": "#24e6b8", "chipSolid": true },
-    { "labelKey": "settle.req.stat.directFee", "value": "1,480 KORI", "note": "리더 직접 계약 수익", "chip": "#24e6b8", "chipSolid": true },
-    { "labelKey": "settle.req.stat.autoSettle", "value": "2,950 KORI", "note": "본사 승인 후 자동 처리", "chip": "#f6c85a", "chipSolid": true },
-    { "labelKey": "settle.req.stat.held", "value": "640 KORI", "note": "환불/Sync/리스크 제외", "chip": "#ff8a3d", "chipSolid": false },
-    { "labelKey": "settle.req.stat.finalAmount", "value": "3,960 KORI", "note": "본사 요청 가능 금액", "chip": "#24e6b8", "chipSolid": true },
-    { "labelKey": "settle.req.stat.problemCount", "value": "7건", "note": "보류/검토 대상", "chip": "#ff4d70", "chipSolid": false }
+    { "labelKey": "settle.req.stat.targetAmount", "value": "1,842,000 KORI", "note": "2026.05.02 ~ 06.01", "chip": "#2a8bff" },
+    { "labelKey": "settle.req.stat.totalFee", "value": "18,420 KORI", "note": "거래금액의 1%", "chip": "#7c5cff" },
+    { "labelKey": "settle.req.stat.partnerFee", "value": "3,120 KORI", "note": "하부 파트너 수익", "chip": "#24e6b8" },
+    { "labelKey": "settle.req.stat.directFee", "value": "1,480 KORI", "note": "리더 직접 계약 수익", "chip": "#24e6b8" },
+    { "labelKey": "settle.req.stat.autoSettle", "value": "2,950 KORI", "note": "본사 승인 후 자동 처리", "chip": "#f6c85a" },
+    { "labelKey": "settle.req.stat.held", "value": "640 KORI", "note": "환불/Sync/리스크 제외", "chip": "#ff8a3d" },
+    { "labelKey": "settle.req.stat.finalAmount", "value": "3,960 KORI", "note": "본사 요청 가능 금액", "chip": "#24e6b8" },
+    { "labelKey": "settle.req.stat.problemCount", "value": "7건", "note": "보류/검토 대상", "chip": "#ff4d70" }
   ],
   "calc": {
     "partnerProfit": "3,120",

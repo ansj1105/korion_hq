@@ -12,25 +12,24 @@ interface ChipDef {
   key: string
   labelKey: string
   chip: string
-  solid?: boolean
 }
 
 const ROLE_CHIPS: ChipDef[] = [
   { key: 'member', labelKey: 'hqNoticeSend.role.member', chip: '#2a8bff' },
   { key: 'leader', labelKey: 'hqNoticeSend.role.leader', chip: '#7c5cff' },
-  { key: 'partner', labelKey: 'hqNoticeSend.role.partner', chip: '#24e6b8', solid: true },
+  { key: 'partner', labelKey: 'hqNoticeSend.role.partner', chip: '#24e6b8' },
   { key: 'merchant', labelKey: 'hqNoticeSend.role.merchant', chip: '#22d9ff' },
 ]
 
 const METHOD_CHIPS: ChipDef[] = [
-  { key: 'immediate', labelKey: 'hqNoticeSend.method.immediate', chip: '#24e6b8', solid: true },
+  { key: 'immediate', labelKey: 'hqNoticeSend.method.immediate', chip: '#24e6b8' },
   { key: 'scheduled', labelKey: 'hqNoticeSend.method.scheduled', chip: '#7c5cff' },
 ]
 
-const KPI_CHIPS: Record<string, { chip: string; chipSolid?: boolean }> = {
-  totalSent: { chip: '#24e6b8', chipSolid: true },
+const KPI_CHIPS: Record<string, { chip: string }> = {
+  totalSent: { chip: '#24e6b8'},
   todaySent: { chip: '#7c5cff' },
-  scheduledPending: { chip: '#f6c85a', chipSolid: true },
+  scheduledPending: { chip: '#f6c85a'},
   totalRecipients: { chip: '#2a8bff' },
   successRate: { chip: '#22d9ff' },
 }
@@ -81,7 +80,6 @@ export default function NoticeSend() {
     value: kpi.value,
     note: kpi.delta,
     chip: KPI_CHIPS[kpi.id]?.chip ?? '#7c5cff',
-    chipSolid: KPI_CHIPS[kpi.id]?.chipSolid,
   }))
 
   useEffect(() => {
@@ -173,7 +171,7 @@ export default function NoticeSend() {
       type="button"
       onClick={onClick}
       style={{ '--chip': c.chip } as CSSProperties}
-      className={`${styles.chip} ${c.solid ? styles.chipSolid : styles.chipTranslucent} ${selected ? styles.chipActive : ''}`}
+      className={`${styles.chip} ${styles.chipTranslucent} ${selected ? styles.chipActive : ''}`}
       aria-pressed={selected}
     >
       {checkmark && selected ? `✓ ${t(c.labelKey)}` : t(c.labelKey)}

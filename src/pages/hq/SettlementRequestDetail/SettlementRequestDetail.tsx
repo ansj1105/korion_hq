@@ -86,7 +86,7 @@ export default function HqSettlementRequestDetail() {
     ? [targetName, targetType, targetCountry, targetStatus].filter((value): value is string => Boolean(value))
     : header.contextBadges
 
-  const detailCell = <ActionBadges labels={[t('hqSettle.reqDetail.view')]} solid />
+  const detailCell = <ActionBadges labels={[t('hqSettle.reqDetail.view')]} />
   const ptRows: TableRow[] = partnerTable.rows.map((r) => ({
     id: r.code,
     // '자동 예정' 값은 청록으로 강조 — 데이터는 그대로 두고 화면에서만 색 입힘
@@ -155,7 +155,7 @@ export default function HqSettlementRequestDetail() {
         {kpis.map((k) => (
           <div key={k.id} className={styles.kpiCard}>
             <span
-              className={`${styles.kpiLabel} ${k.chipSolid ? styles.kpiLabelSolid : styles.kpiLabelTranslucent}`}
+              className={`${styles.kpiLabel} ${styles.kpiLabelTranslucent}`}
               style={{ '--chip': k.chip } as CSSProperties}
             >
               {k.label}

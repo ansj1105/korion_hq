@@ -9,7 +9,6 @@ import styles from './AuthMain.module.css'
 interface CardDef {
   to: string
   chip: string
-  chipSolid?: boolean
   labelKey: string
   descKey: string
   buttonKey: string
@@ -20,7 +19,7 @@ interface CardDef {
 const LOGIN_CARDS: CardDef[] = [
   { to: '/login/leader', chip: '#7b5cff', labelKey: 'auth.card.leaderLogin', descKey: 'auth.card.leaderDesc', buttonKey: 'auth.btn.leaderLogin', primary: true },
   { to: '/login/partner', chip: '#238cff', labelKey: 'auth.card.partnerLogin', descKey: 'auth.card.partnerDesc', buttonKey: 'auth.btn.partnerLogin' },
-  { to: '/login/merchant', chip: '#26e6b2', chipSolid: true, labelKey: 'auth.card.merchantLogin', descKey: 'auth.card.merchantDesc', buttonKey: 'auth.btn.merchantLogin' },
+  { to: '/login/merchant', chip: '#26e6b2', labelKey: 'auth.card.merchantLogin', descKey: 'auth.card.merchantDesc', buttonKey: 'auth.btn.merchantLogin' },
 ]
 
 /* 회원가입 카드 2 (파트너 / 가맹점 — 리더는 본사 발급이라 가입 없음) */
@@ -66,7 +65,7 @@ export default function AuthMain() {
           {cards.map((c) => (
             <div key={c.to} className={styles.card}>
               <span
-                className={`${styles.chip} ${c.chipSolid ? styles.chipSolid : styles.chipTranslucent}`}
+                className={`${styles.chip} ${styles.chipTranslucent}`}
                 style={{ '--chip': c.chip } as CSSProperties}
               >
                 {t(c.labelKey)}

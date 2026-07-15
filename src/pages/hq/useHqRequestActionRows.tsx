@@ -69,14 +69,6 @@ export function useHqRequestActionRows<TRow extends HqRequestActionRow>({
     () => [approveLabel, rejectLabel, statusMeta.review.label, statusMeta.waiting.label, statusMeta.infoRequested.label],
     [approveLabel, rejectLabel, statusMeta.infoRequested.label, statusMeta.review.label, statusMeta.waiting.label],
   )
-  const actionAccentByLabel: Record<string, AccentKey> = {
-    [approveLabel]: 'green',
-    [rejectLabel]: 'red',
-    [statusMeta.review.label]: 'cyan',
-    [statusMeta.waiting.label]: 'orange',
-    [statusMeta.infoRequested.label]: 'purple',
-  }
-
   const runRemoteAction = async (row: TRow, action: keyof typeof ACTION_PATH, reason?: string) => {
     if (!row.applicationId) {
       window.alert('요청 식별자가 없어 처리할 수 없습니다.')
@@ -138,9 +130,7 @@ export function useHqRequestActionRows<TRow extends HqRequestActionRow>({
   }
 
   const tableRows: TableRow[] = sortedRows.map((row, index) => {
-    const activeLabel = row.status ? statusMeta[row.status].label : null
     const activeStatus = row.status ? statusMeta[row.status] : null
-    const solidByLabel: Record<string, boolean> = Object.fromEntries(actionLabels.map((label) => [label, label !== activeLabel]))
     const displayNo = sortedRows.length - index
 
     return {
@@ -159,10 +149,8 @@ export function useHqRequestActionRows<TRow extends HqRequestActionRow>({
         action: (
           <ActionBadges
             labels={actionLabels}
-            accentByLabel={actionAccentByLabel}
             size="md"
             shape="rect"
-            solidByLabel={solidByLabel}
             onLabelClick={(label) => handleAction(row, label)}
           />
         ),

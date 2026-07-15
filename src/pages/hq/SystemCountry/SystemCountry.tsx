@@ -26,13 +26,6 @@ export default function SystemCountry() {
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState<CountryRow | null>(rawRows[0] ?? null)
 
-  const actionAccent: Record<string, AccentKey> = {
-    [t('common.detail')]: 'cyan',
-    수정: 'blue',
-    제한: 'red',
-    활성: 'green',
-  }
-
   // Figma 시안은 번호가 전부 "0001"이라 리스트 key는 코드+인덱스로 보강
   const rows: TableRow[] = rawRows.map((r, i) => ({
     id: r.id ?? `${r.code}-${i}`,
@@ -50,7 +43,7 @@ export default function SystemCountry() {
       merchants: r.merchants,
       status: <Badge accent={(r.statusAccent as AccentKey) ?? (r.status === '활성' ? 'green' : 'orange')} size="md" shape="rect">{r.status}</Badge>,
       payment: <Badge accent={(r.paymentAccent as AccentKey) ?? (r.payment === 'ON' ? 'green' : 'red')} size="md" shape="rect">{r.payment}</Badge>,
-      action: <ActionBadges labels={r.actions ?? [t('common.detail')]} accentByLabel={actionAccent} solid size="md" shape="rect" />,
+      action: <ActionBadges labels={r.actions ?? [t('common.detail')]} size="md" shape="rect" />,
     },
   }))
 

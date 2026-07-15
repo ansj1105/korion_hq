@@ -11,10 +11,10 @@ import { useNoticeHistory, type HqNoticeHistoryRange, type NoticeHistoryRow, typ
 import NoticeDetailOverlay from './NoticeDetailOverlay'
 import styles from './NoticeHistory.module.css'
 
-const KPI_CHIPS: Record<string, { chip: string; chipSolid?: boolean }> = {
-  totalSent: { chip: '#24e6b8', chipSolid: true },
+const KPI_CHIPS: Record<string, { chip: string }> = {
+  totalSent: { chip: '#24e6b8'},
   todaySent: { chip: '#7c5cff' },
-  scheduledPending: { chip: '#f6c85a', chipSolid: true },
+  scheduledPending: { chip: '#f6c85a'},
   totalRecipients: { chip: '#2a8bff' },
   successRate: { chip: '#22d9ff' },
 }
@@ -47,7 +47,6 @@ export default function NoticeHistory() {
     value: kpi.value,
     note: kpi.delta,
     chip: KPI_CHIPS[kpi.id]?.chip ?? '#7c5cff',
-    chipSolid: KPI_CHIPS[kpi.id]?.chipSolid,
   }))
 
   const getRangeLabel = (option: HqNoticeHistoryRange) => {
@@ -108,8 +107,6 @@ export default function NoticeHistory() {
             t('hqCollateral.action.memberInfo'),
             ...(r.rawStatus === 'CANCELLED' ? [] : [t('hqNoticeHistory.action.cancelSend')]),
           ]}
-          accentByLabel={{ [t('hqNoticeHistory.action.cancelSend')]: 'red' }}
-          solid
           size="md"
           shape="rect"
           onLabelClick={(label) => {

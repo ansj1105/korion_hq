@@ -59,10 +59,6 @@
   color: #ffffff;
   background-color: color-mix(in srgb, var(--chip) 24%, transparent);
 }
-.chipSolid {
-  color: #061612;
-  background-color: color-mix(in srgb, var(--chip) 92%, transparent);
-}
 /* 선택된 칩 — 같은 색 링으로 강조 (UI 선택 상태만 표현) */
 .chipActive {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--chip) 70%, transparent);

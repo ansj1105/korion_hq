@@ -1,7 +1,7 @@
 {
   "metrics": [
     { "id": "recent", "labelKey": "act.kpi.recent", "value": "2026.06.07", "note": "04:28 KST", "chip": "#2a8bff" },
-    { "id": "visits", "labelKey": "act.kpi.visits", "value": "42회", "noteKey": "act.kpi.visits.note", "chip": "#24e6b8", "chipSolid": true },
+    { "id": "visits", "labelKey": "act.kpi.visits", "value": "42회", "noteKey": "act.kpi.visits.note", "chip": "#24e6b8" },
     { "id": "notices", "labelKey": "act.kpi.notices", "value": "18건", "noteKey": "act.kpi.notices.note", "chip": "#7c5cff" },
     { "id": "failed", "labelKey": "act.kpi.failed", "value": "2건", "noteKey": "act.kpi.failed.note", "chip": "#ff4d70" }
   ],

@@ -10,7 +10,6 @@ interface KpiRaw {
   noteKey?: string
   note?: string
   chip: string
-  chipSolid: boolean
 }
 interface FieldRaw {
   labelKey: string
@@ -72,7 +71,6 @@ export interface KpiItem {
   value: string
   note: string
   chip: string
-  chipSolid: boolean
 }
 
 const emptySettlementRequestDetailData: SettlementRequestDetailData = {
@@ -151,7 +149,6 @@ export function useSettlementRequestDetail(settlementRequestId?: string | null) 
     // 설명 키가 있으면 번역, 없으면(날짜 등 데이터성) 원문 그대로
     note: k.noteKey ? t(k.noteKey) : (k.note ?? ''),
     chip: k.chip,
-    chipSolid: k.chipSolid,
   }))
 
   const partnerColumns: Column[] = [

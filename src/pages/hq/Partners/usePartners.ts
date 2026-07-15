@@ -72,9 +72,9 @@ export function usePartners() {
     { key: 'action', label: t('hqPartnerList.col.action'), width: '0.8fr', align: 'center' },
   ]
 
-  const statusMeta: Record<HqPartnerStatus, { label: string; accent: 'green' | 'red'; solid: boolean }> = {
-    approved: { label: t('hqPartnerList.status.approved'), accent: 'green', solid: false },
-    suspended: { label: t('hqPartnerList.status.suspended'), accent: 'red', solid: true },
+  const statusMeta: Record<HqPartnerStatus, { label: string; accent: 'green' | 'red' }> = {
+    approved: { label: t('hqPartnerList.status.approved'), accent: 'green' },
+    suspended: { label: t('hqPartnerList.status.suspended'), accent: 'red' },
   }
 
   return { stats, columns, rows: pageData.rows as HqPartnerListRow[], statusMeta, isLoading, error, reload }

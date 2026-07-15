@@ -42,7 +42,6 @@ export default function RiskDuplicates() {
         detail: (
           <ActionBadges
             labels={[detailLabel]}
-            accentByLabel={{ [detailLabel]: 'cyan' }}
             size="md"
             shape="rect"
             onLabelClick={() => setSelectedRow(row)}

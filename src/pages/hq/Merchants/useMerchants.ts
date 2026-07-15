@@ -77,10 +77,10 @@ export function useMerchants() {
     { key: 'action', label: t('hqMerchantList.col.action'), width: '0.8fr', align: 'center' },
   ]
 
-  const statusMeta: Record<HqMerchantStatus, { label: string; accent: 'green' | 'red' | 'orange'; solid: boolean }> = {
-    approved: { label: t('hqMerchantList.status.approved'), accent: 'green', solid: false },
-    suspended: { label: t('hqMerchantList.status.suspended'), accent: 'red', solid: true },
-    black: { label: t('hqMerchantList.status.black'), accent: 'orange', solid: true },
+  const statusMeta: Record<HqMerchantStatus, { label: string; accent: 'green' | 'red' | 'orange' }> = {
+    approved: { label: t('hqMerchantList.status.approved'), accent: 'green' },
+    suspended: { label: t('hqMerchantList.status.suspended'), accent: 'red' },
+    black: { label: t('hqMerchantList.status.black'), accent: 'orange' },
   }
 
   return { stats, columns, rows: pageData.rows as HqMerchantListRow[], statusMeta, isLoading, error, reload }

@@ -27,17 +27,6 @@ const STATUS_ACCENT: Record<string, AccentKey> = {
   대기: 'orange',
 }
 
-const ACTION_ACCENT: Record<string, AccentKey> = {
-  상세: 'cyan',
-  수정: 'blue',
-  권한수정: 'blue',
-  정지: 'red',
-  해제: 'green',
-  삭제: 'red',
-  재설정: 'orange',
-  감사: 'purple',
-}
-
 const ROLE_OPTIONS = ['HQ_ADMIN', 'HQ_MANAGER', 'HQ_STAFF', 'VIEWER']
 const STATUS_OPTIONS = ['ACTIVE', 'SUSPENDED']
 
@@ -265,10 +254,8 @@ export default function AdminPage({ pageType }: AdminPageProps) {
         return [column.key, (
           <ActionBadges
             labels={actions}
-            accentByLabel={ACTION_ACCENT}
             size="md"
             shape="rect"
-            solid
             onLabelClick={(label) => {
               if (pageType === 'accounts') {
                 openAccountModal(row, label === '정지' ? 'SUSPENDED' : label === '해제' ? 'ACTIVE' : undefined)

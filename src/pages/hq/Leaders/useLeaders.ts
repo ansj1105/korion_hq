@@ -69,14 +69,9 @@ export function useLeaders() {
     { key: 'action', label: t('hqLeaderList.col.action'), width: '0.8fr', align: 'center' },
   ]
 
-  /*
-   * 상태 키 → 표시 라벨 + 액션 배지 강조색 + solid 여부.
-   * Figma 기준: 활성 "승인"은 녹색 65% 틴트(size sm, solid=false),
-   * 활성 "정지"는 빨강 솔리드(solid=true). 비활성·상세 배지는 호출부에서 항상 solid 회색.
-   */
-  const statusMeta: Record<LeaderStatus, { label: string; accent: 'green' | 'red'; solid: boolean }> = {
-    approved: { label: t('hqLeaderList.status.approved'), accent: 'green', solid: false },
-    suspended: { label: t('hqLeaderList.status.suspended'), accent: 'red', solid: true },
+  const statusMeta: Record<LeaderStatus, { label: string; accent: 'green' | 'red' }> = {
+    approved: { label: t('hqLeaderList.status.approved'), accent: 'green' },
+    suspended: { label: t('hqLeaderList.status.suspended'), accent: 'red' },
   }
 
   return { stats, columns, rows: pageData.rows as LeaderListRow[], statusMeta, detailLabel: '상세', isLoading, error, reload }

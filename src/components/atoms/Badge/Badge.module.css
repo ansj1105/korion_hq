@@ -76,15 +76,6 @@
   font-size: var(--font-size-12); /* 12px 고정 (표 cqi 축소를 따르지 않음) */
 }
 
-/*
- * 솔리드 변형 — 신청서 관리 표의 상태 배지(확인/검토/위험 중 하나만 활성)처럼
- * 틴트 없이 accent 색을 100% 채워야 하는 화면용. 색 자체는 그대로 accent/중립 토큰을 쓴다.
- */
-.solid {
-  background: var(--accent, var(--color-text-subtle));
-  border-color: var(--accent, var(--color-text-subtle));
-}
-
 /* onClick이 지정된 배지 — 버튼 역할임을 커서로만 표시(외형은 동일) */
 .clickable {
   cursor: pointer;

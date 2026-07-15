@@ -116,11 +116,6 @@
   color: #ffffff;
   background-color: color-mix(in srgb, var(--chip) 24%, transparent);
 }
-/* 솔리드 칩(청록/골드) — 어두운 글씨 */
-.kpiLabelSolid {
-  color: #061612;
-  background-color: color-mix(in srgb, var(--chip) 92%, transparent);
-}
 .kpiValue {
   font-size: var(--font-size-23);
   font-weight: var(--font-weight-bold);

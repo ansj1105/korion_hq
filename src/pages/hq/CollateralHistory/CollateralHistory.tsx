@@ -73,8 +73,6 @@ export default function CollateralHistory() {
         <div onClick={(event) => event.stopPropagation()}>
           <ActionBadges
             labels={[t('common.detail'), t('hqCollateral.action.memberInfo')]}
-            accentByLabel={{ [t('common.detail')]: 'cyan', [t('hqCollateral.action.memberInfo')]: 'purple' }}
-            solid
             equalWidth
             size="md"
             shape="rect"
@@ -112,8 +110,6 @@ export default function CollateralHistory() {
         <div onClick={(event) => event.stopPropagation()}>
           <ActionBadges
             labels={[t('common.detail')]}
-            accentByLabel={{ [t('common.detail')]: 'cyan' }}
-            solid
             equalWidth
             size="md"
             shape="rect"
@@ -145,8 +141,6 @@ export default function CollateralHistory() {
         <div onClick={(event) => event.stopPropagation()}>
           <ActionBadges
             labels={[t('common.detail'), t('hqCollateral.action.memberInfo')]}
-            accentByLabel={{ [t('common.detail')]: 'cyan', [t('hqCollateral.action.memberInfo')]: 'purple' }}
-            solid
             equalWidth
             size="md"
             shape="rect"

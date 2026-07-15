@@ -10,7 +10,6 @@ interface ChipDef {
   key: string
   labelKey: string
   chip: string
-  solid?: boolean
 }
 
 /* 파트너 대상 필터 — 본인이 유치한 가맹점만 대상이라 칩 1개(가맹점) */
@@ -18,7 +17,7 @@ const TARGET_CHIPS: ChipDef[] = [{ key: 'merchant', labelKey: 'notice.send.targe
 
 /* 발송 옵션 칩 — 즉시(청록) / 예약(보라) */
 const OPTION_CHIPS: ChipDef[] = [
-  { key: 'immediate', labelKey: 'notice.send.option.immediate', chip: '#24e6b8', solid: true },
+  { key: 'immediate', labelKey: 'notice.send.option.immediate', chip: '#24e6b8' },
   { key: 'scheduled', labelKey: 'notice.send.option.scheduled', chip: '#7c5cff' },
 ]
 
@@ -44,7 +43,7 @@ export default function PartnerNoticeSend() {
       type="button"
       onClick={onClick}
       style={{ '--chip': c.chip } as CSSProperties}
-      className={`${styles.chip} ${c.solid ? styles.chipSolid : styles.chipTranslucent} ${
+      className={`${styles.chip} ${styles.chipTranslucent} ${
         selected ? styles.chipActive : ''
       }`}
     >
