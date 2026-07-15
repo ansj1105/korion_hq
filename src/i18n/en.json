@@ -6,6 +6,8 @@
   "common.role.partner": "Sales Partner Admin",
   "common.role.merchant": "Merchant Admin",
   "common.allList": "All",
+  "common.previous": "Previous",
+  "common.next": "Next",
   "common.logout": "Log out",
   "common.logout.completeTitle": "Logged out",
   "common.logout.completeMessage": "You will be moved to the home page.",

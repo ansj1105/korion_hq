@@ -32,12 +32,17 @@ export default function RequestsLeader() {
     () => rawRows.find((row) => hqRequestRowId(row) === selectedRequestId) ?? null,
     [rawRows, selectedRequestId],
   )
+  const selectedIndex = useMemo(
+    () => rawRows.findIndex((row) => hqRequestRowId(row) === selectedRequestId),
+    [rawRows, selectedRequestId],
+  )
+  const previousRow = selectedIndex > 0 ? rawRows[selectedIndex - 1] : null
+  const nextRow = selectedIndex >= 0 && selectedIndex < rawRows.length - 1 ? rawRows[selectedIndex + 1] : null
 
-  return (
-    <div className={styles.page}>
-      <PageHeader title={t('hqRequestLeader.title')} />
-      <StatSection stats={stats} bare />
-      {selectedRow && (
+  if (selectedRow) {
+    return (
+      <div className={styles.page}>
+        <PageHeader title={t('hqRequestLeader.title')} />
         <HqRequestDetailForm
           row={selectedRow}
           title={t('hqRequestDetail.title')}
@@ -47,9 +52,20 @@ export default function RequestsLeader() {
           rejectLabel={rejectLabel}
           endpointBase="/api/hq/requests/leader"
           onClose={() => setSelectedRequestId(null)}
+          onPrevious={() => previousRow && setSelectedRequestId(hqRequestRowId(previousRow))}
+          onNext={() => nextRow && setSelectedRequestId(hqRequestRowId(nextRow))}
+          hasPrevious={Boolean(previousRow)}
+          hasNext={Boolean(nextRow)}
           onActionComplete={reload}
         />
-      )}
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.page}>
+      <PageHeader title={t('hqRequestLeader.title')} />
+      <StatSection stats={stats} bare />
       <DataTable
         title={t('hqRequestLeader.section')}
         columns={columns}

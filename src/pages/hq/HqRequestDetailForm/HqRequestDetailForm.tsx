@@ -37,6 +37,10 @@ interface HqRequestDetailFormProps<TRow extends HqRequestActionRow> {
   rejectLabel: string
   endpointBase: string
   onClose: () => void
+  onPrevious?: () => void
+  onNext?: () => void
+  hasPrevious?: boolean
+  hasNext?: boolean
   onActionComplete?: () => void
 }
 
@@ -49,6 +53,10 @@ export default function HqRequestDetailForm<TRow extends HqRequestActionRow>({
   rejectLabel,
   endpointBase,
   onClose,
+  onPrevious,
+  onNext,
+  hasPrevious = false,
+  hasNext = false,
   onActionComplete,
 }: HqRequestDetailFormProps<TRow>) {
   const { t } = useTranslation()
@@ -295,6 +303,12 @@ export default function HqRequestDetailForm<TRow extends HqRequestActionRow>({
         <div className={styles.floatingGroup}>
           <button type="button" className={styles.ghostButton} onClick={onClose}>
             {t('common.allList')}
+          </button>
+          <button type="button" className={styles.ghostButton} onClick={onPrevious} disabled={!hasPrevious}>
+            {t('common.previous')}
+          </button>
+          <button type="button" className={styles.ghostButton} onClick={onNext} disabled={!hasNext}>
+            {t('common.next')}
           </button>
         </div>
         <div className={styles.floatingGroup}>

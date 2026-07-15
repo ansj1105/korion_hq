@@ -6,6 +6,8 @@
   "common.role.partner": "세일즈 파트너 관리자",
   "common.role.merchant": "가맹점 관리자",
   "common.allList": "전체 목록",
+  "common.previous": "이전",
+  "common.next": "다음",
   "common.logout": "Log out",
   "common.logout.completeTitle": "로그아웃 되었습니다",
   "common.logout.completeMessage": "홈으로 이동합니다.",
