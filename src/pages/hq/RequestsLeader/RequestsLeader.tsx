@@ -1,9 +1,11 @@
+import { useMemo, useState } from 'react'
 import PageHeader from '../../../components/organisms/PageHeader'
 import StatSection from '../../../components/organisms/StatSection'
 import DataTable from '../../../components/organisms/DataTable'
 import { useTranslation } from '../../../i18n'
 import { useRequestsLeader } from './useRequestsLeader'
-import { useHqRequestActionRows } from '../useHqRequestActionRows'
+import HqRequestDetailForm from '../HqRequestDetailForm'
+import { hqRequestRowId, useHqRequestActionRows } from '../useHqRequestActionRows'
 import styles from './RequestsLeader.module.css'
 
 /*
@@ -16,6 +18,7 @@ import styles from './RequestsLeader.module.css'
  */
 export default function RequestsLeader() {
   const { t } = useTranslation()
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null)
   const { stats, columns, rows: rawRows, statusMeta, approveLabel, rejectLabel, reload } = useRequestsLeader()
   const { rows } = useHqRequestActionRows({
     rows: rawRows,
@@ -25,11 +28,28 @@ export default function RequestsLeader() {
     endpointBase: '/api/hq/requests/leader',
     onActionComplete: reload,
   })
+  const selectedRow = useMemo(
+    () => rawRows.find((row) => hqRequestRowId(row) === selectedRequestId) ?? null,
+    [rawRows, selectedRequestId],
+  )
 
   return (
     <div className={styles.page}>
       <PageHeader title={t('hqRequestLeader.title')} />
       <StatSection stats={stats} bare />
+      {selectedRow && (
+        <HqRequestDetailForm
+          row={selectedRow}
+          title={t('hqRequestDetail.title')}
+          requestTypeLabel={t('hqRequestLeader.title')}
+          statusMeta={statusMeta}
+          approveLabel={approveLabel}
+          rejectLabel={rejectLabel}
+          endpointBase="/api/hq/requests/leader"
+          onClose={() => setSelectedRequestId(null)}
+          onActionComplete={reload}
+        />
+      )}
       <DataTable
         title={t('hqRequestLeader.section')}
         columns={columns}
@@ -42,6 +62,7 @@ export default function RequestsLeader() {
         inlineToolbar
         mutedText
         headerBar
+        onRowClick={setSelectedRequestId}
       />
     </div>
   )

@@ -12,10 +12,39 @@ export interface HqRequestActionRow {
   applicationId?: number
   no: string
   appliedAt: string
+  applicationType?: string
+  applicantType?: string
+  requestedRole?: string
+  contractPath?: string
+  loginId?: string
+  email?: string
+  contact?: string
+  contactName?: string
+  phone?: string
+  telegram?: string
+  whatsapp?: string
   parentCode: string
   applicantCode: string
   country: string
+  region?: string
+  city?: string
+  address?: string
   partnerName: string
+  businessType?: string
+  walletNetwork?: string
+  walletAddress?: string
+  walletAuthStatus?: string
+  integrationPlan?: string
+  evidenceNote?: string
+  source?: string
+  requestId?: string
+  attachmentUrl?: string
+  attachmentFileName?: string
+  attachmentFileSize?: number | string
+  attachmentContentType?: string
+  attachmentDataUrl?: string
+  twitterProfile?: string
+  preferredLanguage?: string
   subMerchantCount: string
   monthVolume: string
   monthTxCount: string
@@ -93,11 +122,11 @@ export function useHqRequestActionRows<TRow extends HqRequestActionRow>({
 
   const handleAction = async (row: TRow, label: string) => {
     if (row.applicationId && loadingActionId === row.applicationId) return
-    const rowId = requestRowId(row)
+    const rowId = hqRequestRowId(row)
 
     if (label === approveLabel) {
       const ok = await runRemoteAction(row, 'approve')
-      if (ok) setLocalRows((prev) => prev.filter((item) => requestRowId(item) !== rowId))
+      if (ok) setLocalRows((prev) => prev.filter((item) => hqRequestRowId(item) !== rowId))
       return
     }
 
@@ -105,7 +134,7 @@ export function useHqRequestActionRows<TRow extends HqRequestActionRow>({
       const reason = window.prompt(t('hqRequestLeader.prompt.rejectReason'))
       if (reason === null) return
       const ok = await runRemoteAction(row, 'reject', reason.trim())
-      if (ok) setLocalRows((prev) => prev.filter((item) => requestRowId(item) !== rowId))
+      if (ok) setLocalRows((prev) => prev.filter((item) => hqRequestRowId(item) !== rowId))
       return
     }
 
@@ -134,7 +163,7 @@ export function useHqRequestActionRows<TRow extends HqRequestActionRow>({
     const displayNo = sortedRows.length - index
 
     return {
-      id: requestRowId(row),
+      id: hqRequestRowId(row),
       cells: {
         no: displayNo,
         appliedAt: row.appliedAt,
@@ -165,9 +194,9 @@ export function useHqRequestActionRows<TRow extends HqRequestActionRow>({
 }
 
 function updateStatus<TRow extends HqRequestActionRow>(rows: TRow[], rowId: string, status: HqRequestStatus) {
-  return rows.map((row) => (requestRowId(row) === rowId ? { ...row, status } : row))
+  return rows.map((row) => (hqRequestRowId(row) === rowId ? { ...row, status } : row))
 }
 
-function requestRowId(row: HqRequestActionRow) {
+export function hqRequestRowId(row: HqRequestActionRow) {
   return [row.no, row.appliedAt, row.parentCode, row.applicantCode, row.country, row.partnerName].join('|')
 }

@@ -1,9 +1,11 @@
+import { useMemo, useState } from 'react'
 import PageHeader from '../../../components/organisms/PageHeader'
 import StatSection from '../../../components/organisms/StatSection'
 import DataTable from '../../../components/organisms/DataTable'
 import { useTranslation } from '../../../i18n'
 import { useRequestsPartnerByLeader } from './useRequestsPartnerByLeader'
-import { useHqRequestActionRows } from '../useHqRequestActionRows'
+import HqRequestDetailForm from '../HqRequestDetailForm'
+import { hqRequestRowId, useHqRequestActionRows } from '../useHqRequestActionRows'
 import styles from './RequestsPartnerByLeader.module.css'
 
 /*
@@ -16,6 +18,7 @@ import styles from './RequestsPartnerByLeader.module.css'
  */
 export default function RequestsPartnerByLeader() {
   const { t } = useTranslation()
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null)
   const { stats, columns, rows: rawRows, statusMeta, approveLabel, rejectLabel, reload } = useRequestsPartnerByLeader()
   const { rows } = useHqRequestActionRows({
     rows: rawRows,
@@ -25,11 +28,28 @@ export default function RequestsPartnerByLeader() {
     endpointBase: '/api/hq/requests/partner-by-leader',
     onActionComplete: reload,
   })
+  const selectedRow = useMemo(
+    () => rawRows.find((row) => hqRequestRowId(row) === selectedRequestId) ?? null,
+    [rawRows, selectedRequestId],
+  )
 
   return (
     <div className={styles.page}>
       <PageHeader title={t('hqRequestPartnerByLeader.title')} />
       <StatSection stats={stats} bare />
+      {selectedRow && (
+        <HqRequestDetailForm
+          row={selectedRow}
+          title={t('hqRequestDetail.title')}
+          requestTypeLabel={t('hqRequestPartnerByLeader.title')}
+          statusMeta={statusMeta}
+          approveLabel={approveLabel}
+          rejectLabel={rejectLabel}
+          endpointBase="/api/hq/requests/partner-by-leader"
+          onClose={() => setSelectedRequestId(null)}
+          onActionComplete={reload}
+        />
+      )}
       <DataTable
         title={t('hqRequestPartnerByLeader.section')}
         columns={columns}
@@ -42,6 +62,7 @@ export default function RequestsPartnerByLeader() {
         inlineToolbar
         mutedText
         headerBar
+        onRowClick={setSelectedRequestId}
       />
     </div>
   )

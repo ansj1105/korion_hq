@@ -1,3 +1,5 @@
+import { hqTestDataForPath, withHqTestData } from './hqTestData'
+
 const API_BASE_URL = (import.meta.env.VITE_KORION_CHONG_API_URL ?? '').replace(/\/$/, '')
 type Headers = Record<string, string>
 
@@ -76,8 +78,16 @@ export function fetchMerchantPageData<T>(path: string, query?: Record<string, st
   return getJson<T>(path, query, merchantHeaders())
 }
 
-export function fetchHqPageData<T>(path: string, query?: Record<string, string | number | undefined>) {
-  return getJson<T>(path, query, hqHeaders())
+export async function fetchHqPageData<T>(path: string, query?: Record<string, string | number | undefined>) {
+  try {
+    const payload = await getJson<T>(path, query, hqHeaders())
+    return withHqTestData(path, payload)
+  } catch (error) {
+    if (error instanceof KorionChongApiError && error.code === 'UNAUTHORIZED') throw error
+    const testData = hqTestDataForPath<T>(path)
+    if (testData) return testData
+    throw error
+  }
 }
 
 export async function downloadHqExport(path: string, fallbackFilename: string) {
