@@ -20,7 +20,10 @@ export default function Applications() {
   const { t } = useTranslation()
   const [selectedApplication, setSelectedApplication] = useState<ApplicationListRow | null>(null)
   const [searchText, setSearchText] = useState('')
+  const [filterOpen, setFilterOpen] = useState(false)
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus | 'all'>('all')
+  const [countryFilter, setCountryFilter] = useState('all')
+  const [typeFilter, setTypeFilter] = useState('all')
   const [page, setPage] = useState(1)
   const { stats, columns, rows: rawRows, statusMeta, deleteLabel, reload } = useApplications()
   const [applicationRows, setApplicationRows] = useState<ApplicationListRow[]>(rawRows)
@@ -53,13 +56,20 @@ export default function Applications() {
     const query = searchText.trim().toLowerCase()
     return sortedRows.filter((row) => {
       const statusMatches = statusFilter === 'all' || row.status === statusFilter
+      const countryMatches = countryFilter === 'all' || row.country === countryFilter
+      const typeMatches = typeFilter === 'all' || row.type === typeFilter
       if (!statusMatches) return false
+      if (!countryMatches) return false
+      if (!typeMatches) return false
       if (!query) return true
       return [row.no, row.appliedAt, row.type, row.country, row.region, row.city, row.contact, row.company, row.email, row.phone, row.website, row.interest]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(query))
     })
-  }, [searchText, sortedRows, statusFilter])
+  }, [countryFilter, searchText, sortedRows, statusFilter, typeFilter])
+
+  const countryOptions = useMemo(() => uniqueOptions(sortedRows.map((row) => row.country)), [sortedRows])
+  const typeOptions = useMemo(() => uniqueOptions(sortedRows.map((row) => row.type)), [sortedRows])
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize))
   const currentPage = Math.min(page, totalPages)
@@ -162,30 +172,87 @@ export default function Applications() {
             <button type="button" className={styles.toolbarButton}>
               {t('common.search')}
             </button>
-            <select
-              className={styles.filterSelect}
-              value={statusFilter}
-              onChange={(event) => {
-                setStatusFilter(event.target.value as ApplicationStatus | 'all')
-                setPage(1)
-              }}
-              aria-label={t('hqApplications.filter.status')}
+            <button
+              type="button"
+              className={`${styles.toolbarButton} ${filterOpen ? styles.toolbarButtonActive : ''}`}
+              aria-expanded={filterOpen}
+              aria-controls="hq-applications-filter-panel"
+              onClick={() => setFilterOpen((open) => !open)}
             >
-              <option value="all">{t('hqApplications.filter.all')}</option>
-              <option value="waiting">{statusMeta.waiting.label}</option>
-              <option value="review">{statusMeta.review.label}</option>
-              <option value="confirmed">{statusMeta.confirmed.label}</option>
-              <option value="risk">{statusMeta.risk.label}</option>
-            </select>
-            <button type="button" className={styles.toolbarButton} onClick={() => {
-              setStatusFilter('all')
-              setPage(1)
-            }}>
               {t('common.filter')}
             </button>
             <button type="button" className={styles.toolbarButton} onClick={exportCsv}>
               {t('common.excel')}
             </button>
+            {filterOpen && (
+              <div id="hq-applications-filter-panel" className={styles.filterPanel}>
+                <label className={styles.filterField}>
+                  <span>{t('hqApplications.filter.status')}</span>
+                  <select
+                    className={styles.filterSelect}
+                    value={statusFilter}
+                    onChange={(event) => {
+                      setStatusFilter(event.target.value as ApplicationStatus | 'all')
+                      setPage(1)
+                    }}
+                  >
+                    <option value="all">{t('hqApplications.filter.all')}</option>
+                    <option value="waiting">{statusMeta.waiting.label}</option>
+                    <option value="review">{statusMeta.review.label}</option>
+                    <option value="confirmed">{statusMeta.confirmed.label}</option>
+                    <option value="risk">{statusMeta.risk.label}</option>
+                  </select>
+                </label>
+                <label className={styles.filterField}>
+                  <span>{t('hqApplications.filter.country')}</span>
+                  <select
+                    className={styles.filterSelect}
+                    value={countryFilter}
+                    onChange={(event) => {
+                      setCountryFilter(event.target.value)
+                      setPage(1)
+                    }}
+                  >
+                    <option value="all">{t('hqApplications.filter.allCountries')}</option>
+                    {countryOptions.map((country) => (
+                      <option key={country} value={country}>
+                        {country}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className={styles.filterField}>
+                  <span>{t('hqApplications.filter.type')}</span>
+                  <select
+                    className={styles.filterSelect}
+                    value={typeFilter}
+                    onChange={(event) => {
+                      setTypeFilter(event.target.value)
+                      setPage(1)
+                    }}
+                  >
+                    <option value="all">{t('hqApplications.filter.allTypes')}</option>
+                    {typeOptions.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  className={styles.toolbarButton}
+                  onClick={() => {
+                    setStatusFilter('all')
+                    setCountryFilter('all')
+                    setTypeFilter('all')
+                    setPage(1)
+                  }}
+                >
+                  {t('common.reset')}
+                </button>
+              </div>
+            )}
           </div>
         }
         toolbarInline
@@ -225,6 +292,10 @@ function applicationRowId(row: ApplicationListRow) {
 function applicationIdFromNo(no: string) {
   const parsed = Number(String(no).replace(/\D/g, ''))
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null
+}
+
+function uniqueOptions(values: Array<string | undefined>) {
+  return Array.from(new Set(values.filter((value): value is string => Boolean(value)))).sort((a, b) => a.localeCompare(b))
 }
 
 async function updateApplicationStatus(applicationId: number, status: ApplicationStatus | 'deleted') {
