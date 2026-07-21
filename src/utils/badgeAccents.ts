@@ -4,17 +4,20 @@ import { ACCENT_VAR } from './accent'
 export function statusBadgeAccent(status: string): AccentKey {
   const normalized = status.trim().toLowerCase()
   if (!normalized || normalized === '-') return 'cyan'
+  if (
+    status.includes('자료')
+    || normalized.includes('request info')
+    || normalized.includes('info requested')
+    || normalized.includes('need_more_info')
+  ) return 'blue'
   if (status.includes('승인요청') || normalized.includes('approval requested') || normalized.includes('request approval')) return 'purple'
   if (
     status.includes('대기')
     || status.includes('검토')
-    || status.includes('자료')
     || status.includes('요청')
     || normalized.includes('pending')
     || normalized.includes('review')
     || normalized.includes('request')
-    || normalized.includes('info')
-    || normalized.includes('need_more_info')
   ) return 'orange'
   if (status.includes('보류') || status.includes('재확인') || normalized.includes('hold') || normalized.includes('recheck')) return 'blue'
   if (
@@ -67,17 +70,19 @@ export function actionBadgeAccent(label: string): AccentKey {
   ) return 'red'
   if (label.includes('보류') || normalized.includes('hold')) return 'blue'
   if (
+    label.includes('자료')
+    || normalized.includes('request info')
+    || normalized.includes('info requested')
+    || normalized.includes('need_more_info')
+  ) return 'blue'
+  if (
     label.includes('대기')
-    || label.includes('자료')
     || label.includes('검토')
     || label.includes('재검토')
     || label.includes('재설정')
     || normalized.includes('reset')
     || normalized.includes('pending')
     || normalized.includes('waiting')
-    || normalized.includes('request info')
-    || normalized.includes('need more info')
-    || normalized.includes('need_more_info')
     || normalized.includes('review')
   ) return 'orange'
   if (label.includes('수정') || normalized.includes('edit')) return 'blue'
@@ -91,7 +96,8 @@ export function actionCodeBadgeAccent(action: string): AccentKey {
   if (['APPROVE', 'CONFIRM', 'ACTIVATE', 'PAY', 'COMPLETE'].includes(normalized)) return 'green'
   if (['REJECT', 'DELETE', 'BLOCK', 'BLACKLIST'].includes(normalized)) return 'red'
   if (['HOLD', 'SUSPEND', 'CANCEL'].includes(normalized)) return 'blue'
-  if (['REQUEST_INFO', 'REQUEST_MATERIAL', 'APPROVAL_REQUEST'].includes(normalized)) return 'purple'
+  if (['REQUEST_INFO', 'REQUEST_MATERIAL'].includes(normalized)) return 'blue'
+  if (['APPROVAL_REQUEST'].includes(normalized)) return 'purple'
   if (['REVIEW', 'WAITING', 'PENDING', 'INVESTIGATE'].includes(normalized)) return 'orange'
   if (['DETAIL', 'VIEW', 'MEMBER_INFO', 'EDIT'].includes(normalized)) return 'cyan'
   return actionBadgeAccent(action)

@@ -84,7 +84,12 @@ function LeaderSalesDetail({ leaderCode }: { leaderCode: string }) {
       monthTxCount: r.monthTxCount,
       unsettledFee: r.unsettledFee,
       lastActive: r.lastActive,
-      action: <ActionBadges labels={[t('common.detail')]} />,
+      action: (
+        <ActionBadges
+          labels={[t('common.detail')]}
+          onLabelClick={() => navigate(`/hq/partners/sales?partnerCode=${encodeURIComponent(r.code)}&partner=${encodeURIComponent(r.partnerName)}&tab=history`)}
+        />
+      ),
     },
   }))
 
@@ -100,7 +105,12 @@ function LeaderSalesDetail({ leaderCode }: { leaderCode: string }) {
       fee: r.fee,
       lastPaidAt: r.lastPaidAt,
       usage: r.usage,
-      action: <ActionBadges labels={[t('common.detail')]} />,
+      action: (
+        <ActionBadges
+          labels={[t('common.detail')]}
+          onLabelClick={() => navigate(`/hq/merchants/sales?merchantCode=${encodeURIComponent(r.merchantCode)}&merchant=${encodeURIComponent(r.merchantName)}`)}
+        />
+      ),
     },
   }))
 

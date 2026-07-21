@@ -8,14 +8,14 @@ import { useRequestResultLog, type AdminAction } from './useRequestResultLog'
 import RequestDetailOverlay from './RequestDetailOverlay'
 import styles from './RequestResultLog.module.css'
 
-const ADMIN_ACTION_ACCENT: Record<AdminAction, 'green' | 'orange' | 'red' | 'cyan' | 'purple'> = {
+const ADMIN_ACTION_ACCENT: Record<AdminAction, 'green' | 'orange' | 'red' | 'cyan' | 'blue'> = {
   approved: 'green',
   approveCancelled: 'orange',
   rejected: 'red',
   rejectCancelled: 'orange',
   review: 'cyan',
   waiting: 'orange',
-  infoRequested: 'purple',
+  infoRequested: 'blue',
   held: 'orange',
 }
 

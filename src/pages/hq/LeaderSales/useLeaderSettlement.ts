@@ -4,7 +4,8 @@ import type { Column } from '../../../components/organisms/DataTable'
 import { useHqPageData } from '../../../hooks/useHqPageData'
 
 interface FieldRaw {
-  labelKey: string
+  labelKey?: string
+  label?: string
   value: string
   /** 강조 값 색 (예: 청록 #24e6b8) — JSON에서 지정 */
   color?: string
@@ -44,7 +45,7 @@ export function useLeaderSettlement(leaderCode?: string) {
   )
 
   const summary: InfoItem[] = (pageData.summary as FieldRaw[]).map((f) => ({
-    label: t(f.labelKey),
+    label: f.labelKey ? t(f.labelKey) : f.label ?? '-',
     value: f.value,
     valueColor: f.color,
   }))

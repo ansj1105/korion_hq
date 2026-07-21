@@ -77,11 +77,11 @@ export function useRequestsLeader() {
     { key: 'action', label: t('hqRequestLeader.col.action'), width: '2.7fr' },
   ]
 
-  /** 상태 키 → 표시 라벨(번역) + 액션 배지 강조색(Figma 기준 셋 다 cyan) */
+  /** 상태 키 → 표시 라벨(번역) + 액션 배지 강조색 */
   const statusMeta: Record<LeaderRequestStatus, { label: string; accent: AccentKey }> = {
     review: { label: t('hqRequestLeader.status.review'), accent: 'cyan' },
     waiting: { label: t('hqRequestLeader.status.waiting'), accent: 'orange' },
-    infoRequested: { label: t('hqRequestLeader.status.infoRequested'), accent: 'purple' },
+    infoRequested: { label: t('hqRequestLeader.status.infoRequested'), accent: 'blue' },
   }
 
   return {

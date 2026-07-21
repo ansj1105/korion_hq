@@ -63,7 +63,12 @@ function PartnerSalesDetail({ partnerCode, initialTab }: { partnerCode: string; 
       fee: r.fee,
       lastPaidAt: r.lastPaidAt,
       usage: r.usage,
-      action: <ActionBadges labels={[t('common.detail')]} />,
+      action: (
+        <ActionBadges
+          labels={[t('common.detail')]}
+          onLabelClick={() => navigate(`/hq/merchants/sales?merchantCode=${encodeURIComponent(r.merchantCode)}&merchant=${encodeURIComponent(r.merchantName)}`)}
+        />
+      ),
     },
   }))
 

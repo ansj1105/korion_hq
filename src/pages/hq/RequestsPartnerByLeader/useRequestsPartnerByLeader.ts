@@ -77,11 +77,11 @@ export function useRequestsPartnerByLeader() {
     { key: 'action', label: t('hqRequestPartnerByLeader.col.action'), width: '2.7fr' },
   ]
 
-  /** 상태 키 → 표시 라벨(번역) + 액션 배지 강조색(Figma 기준 셋 다 cyan) */
+  /** 상태 키 → 표시 라벨(번역) + 액션 배지 강조색 */
   const statusMeta: Record<PartnerByLeaderRequestStatus, { label: string; accent: AccentKey }> = {
     review: { label: t('hqRequestPartnerByLeader.status.review'), accent: 'cyan' },
     waiting: { label: t('hqRequestPartnerByLeader.status.waiting'), accent: 'orange' },
-    infoRequested: { label: t('hqRequestPartnerByLeader.status.infoRequested'), accent: 'purple' },
+    infoRequested: { label: t('hqRequestPartnerByLeader.status.infoRequested'), accent: 'blue' },
   }
 
   return {

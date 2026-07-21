@@ -77,11 +77,11 @@ export function useRequestsPartnerDirect() {
     { key: 'action', label: t('hqRequestPartnerDirect.col.action'), width: '2.7fr' },
   ]
 
-  /** 상태 키 → 표시 라벨(번역) + 액션 배지 강조색(Figma 기준 셋 다 cyan) */
+  /** 상태 키 → 표시 라벨(번역) + 액션 배지 강조색 */
   const statusMeta: Record<PartnerDirectRequestStatus, { label: string; accent: AccentKey }> = {
     review: { label: t('hqRequestPartnerDirect.status.review'), accent: 'cyan' },
     waiting: { label: t('hqRequestPartnerDirect.status.waiting'), accent: 'orange' },
-    infoRequested: { label: t('hqRequestPartnerDirect.status.infoRequested'), accent: 'purple' },
+    infoRequested: { label: t('hqRequestPartnerDirect.status.infoRequested'), accent: 'blue' },
   }
 
   return {

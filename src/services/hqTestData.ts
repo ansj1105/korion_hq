@@ -328,6 +328,13 @@ const leaderRows = [
   { no: '2', appliedAt: '2026.07.14', leaderCode: 'NG-LEAD-TEST', country: 'NG', partnerName: `${TEST} Nigeria Test Leader`, subPartnerCount: '1', subMerchantCount: '4', monthVolume: '18,300 KORI', monthTxCount: '28', unsettledFee: '75.9 KORI', status: 'suspended' },
 ]
 
+const leaderStats = [
+  stat('countries', 'hqLeaderList.kpi.countries', '2'),
+  stat('totalLeaders', 'hqLeaderList.kpi.totalLeaders', '2'),
+  stat('approvedLeaders', 'hqLeaderList.kpi.approvedLeaders', '1'),
+  stat('suspendedLeaders', 'hqLeaderList.kpi.suspendedLeaders', '1'),
+]
+
 const partnerRows = [
   { no: '4', appliedAt: '2026.07.15', leaderCode: 'KR-LEAD-TEST', partnerCode: 'KR-SP-TEST', country: 'KR', partnerName: `${TEST} Partner Alpha`, subMerchantCount: '4', monthVolume: '12,500 KORI', monthTxCount: '18', unsettledFee: '42 KORI', status: 'approved' },
   { no: '3', appliedAt: '2026.07.14', leaderCode: 'NG-LEAD-TEST', partnerCode: 'NG-SP-TEST', country: 'NG', partnerName: `${TEST} Partner Beta`, subMerchantCount: '2', monthVolume: '8,300 KORI', monthTxCount: '11', unsettledFee: '33.9 KORI', status: 'suspended' },
@@ -344,7 +351,7 @@ const paymentRows = [
 ]
 
 const paymentSyncData = {
-  kpis: [kpi('pending', 'hqPaymentSyncIssues.kpi.pending', '3'), kpi('failed', 'hqPaymentSyncIssues.kpi.failed', '1')],
+  stats: [stat('total', 'hqPaymentSyncIssues.kpi.total', '3'), stat('failed', 'hqPaymentSyncIssues.kpi.failed', '1')],
   rows: [
     { id: 'SYNC-TEST-001', no: '2', txId: 'TX-TEST-002', sessionId: 'SESSION-TEST-002', proofId: 'PROOF-TEST-002', occurredAt: '2026.07.15 09:35', updatedAt: '2026.07.15 09:40', leaderCode: 'NG-LEAD-TEST', partnerCode: 'NG-SP-TEST', merchantCode: 'NG-MER-TEST', merchantName: `${TEST} Lagos Demo Shop`, country: 'NG', amount: '1,800 KORI', connection: 'OFFLINE', senderDeviceId: 'SENDER-TEST', receiverDeviceId: 'RECEIVER-TEST', senderUploadStatus: 'SUCCESS', receiverUploadStatus: 'WAITING', serverVerifyStatus: 'PENDING', settlementStatus: 'HOLD', sourceStatus: 'SYNC_FAILED', overallStatus: 'Sync 실패', overallAccent: 'red', senderAccent: 'green', receiverAccent: 'orange', longWaiting: true, retryable: true, reason: `${TEST} receiver evidence waiting`, actions: ['재시도', '상세'] },
   ],
@@ -567,12 +574,17 @@ const registry: Record<string, unknown> = {
   '/api/hq/requests/partner-direct': { stats: requestStats, rows: requestRows('partnerDirect') },
   '/api/hq/requests/merchant-direct': { stats: requestStats, rows: requestRows('merchantDirect') },
   '/api/hq/requests/result-log': { stats: [stat('total', 'hqRequestResultLog.stat.total', '4'), stat('approved', 'hqRequestResultLog.stat.approved', '2'), stat('rejected', 'hqRequestResultLog.stat.rejected', '1')], rows: requestResultRows },
-  '/api/hq/leaders': { stats: baseStats('hqLeaders'), rows: leaderRows },
+  '/api/hq/leaders': { stats: leaderStats, rows: leaderRows },
   '/api/hq/partners': { stats: baseStats('hqPartners'), rows: partnerRows },
   '/api/hq/merchants': { stats: baseStats('hqMerchants'), rows: merchantRows },
   '/api/hq/payments/logs': { pageTitle: 'HQ Payment Logs', title: 'Payment Logs', kpis: [kpi('total', 'hqPaymentLog.kpi.total', '2'), kpi('failed', 'hqPaymentLog.kpi.failed', '1')], rows: paymentRows },
   '/api/hq/payments/sync-issues': paymentSyncData,
-  '/api/hq/payments/error-codes': { kpis: [kpi('total', 'hqErrorCode.kpi.total', '1')], rows: errorCodeRows, options: { categories: ['오프라인 Sync', '정산', '보안'], severities: ['주의', '위험', '치명'], autoActions: ['재시도', '보류', '차단'], statuses: ['활성', '비활성'] } },
+  '/api/hq/payments/error-codes': {
+    stats: [stat('total', 'hqPaymentErrorCodes.kpi.total', '1')],
+    systemStats: [stat('total', 'hqSystemErrorCode.kpi.total', '1개')],
+    rows: errorCodeRows,
+    options: { categories: ['오프라인 Sync', '정산', '보안'], severities: ['주의', '위험', '치명'], autoActions: ['재시도', '보류', '차단'], statuses: ['활성', '비활성'] },
+  },
   '/api/hq/settlement-requests': { kpis: [kpi('pending', 'hqSettlementRequest.kpi.pending', '2'), kpi('hold', 'hqSettlementRequest.kpi.hold', '1')], rows: settlementRequestRows },
   '/api/hq/settlement-history': { kpis: [kpi('done', 'hqSettlementHistory.kpi.done', '1'), kpi('hold', 'hqSettlementHistory.kpi.hold', '1')], rows: settlementRequestRows.map((row) => ({ ...row, processedAt: '2026.07.15 11:00', code: row.id, status: row.status === 'review' ? 'done' : row.status })) },
   '/api/hq/commission-fees': { kpis: [kpi('countries', 'hqCommission.kpi.countries', '2')], rows: [{ no: '2', country: `${TEST} Korea`, code: 'KR', countryCode: 'KR', baseFee: '2.5%', baseFeeValue: '2.5', online: '1.0%', onlineFee: '1.0', offline: '1.5%', offlineFee: '1.5', event: 'OFF', eventEnabled: false, eventFee: '0', actualFee: '2.5%', coinCount: '1', status: 'active', statusAccent: 'green', scope: 'COUNTRY_ALL', coins: [{ assetCode: 'KORI', network: 'TRON', tokenStandard: 'TRC20', fee: '2.5%', name: 'KORI' }] }], countries: [{ code: 'KR', name: `${TEST} Korea` }], globalFee: '2.5' },
@@ -589,7 +601,17 @@ const registry: Record<string, unknown> = {
   '/api/hq/stats/country': { stats: baseStats('hqStatsCountry'), rows: statsRows.country, rankingPanels, heatmap: dashboardData.countryOps.heatmap },
   '/api/hq/stats/partner': { stats: baseStats('hqStatsPartner'), rows: statsRows.partner, rankingPanels },
   '/api/hq/stats/merchant': { stats: baseStats('hqStatsMerchant'), rows: statsRows.merchant, rankingPanels },
-  '/api/hq/stats/payment-method': { stats: baseStats('hqStatsPaymentMethod'), rows: statsRows.paymentMethod, rankingPanels, donut: dashboardData.paymentMethod.donut },
+  '/api/hq/stats/payment-method': {
+    stats: baseStats('hqStatsPaymentMethod'),
+    rows: statsRows.paymentMethod,
+    rankingPanels,
+    donut: dashboardData.paymentMethod.donut.map((segment) => ({
+      id: segment.label,
+      label: segment.label,
+      pct: segment.value,
+      accent: segment.accent,
+    })),
+  },
   '/api/hq/system/country': systemCountryData,
   '/api/hq/system/security-policy': securityPolicyData,
   '/api/hq/system/maintenance-mode': maintenanceData,
