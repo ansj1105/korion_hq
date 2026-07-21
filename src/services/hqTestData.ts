@@ -2,6 +2,12 @@ type JsonObject = Record<string, unknown>
 
 const TEST = '[TEST]'
 const TEST_NOTE = 'TEST DATA - API 데이터가 없을 때만 표시됩니다.'
+const HQ_TEST_DATA_VISIBILITY_KEY = 'korion.hq.showTestData'
+
+export function isHqTestDataVisible() {
+  if (typeof window === 'undefined') return true
+  return window.localStorage.getItem(HQ_TEST_DATA_VISIBILITY_KEY) !== 'false'
+}
 
 const stat = (id: string, labelKey: string, value: string, note = TEST_NOTE) => ({
   id,
@@ -778,6 +784,7 @@ function leaderSalesSettlementData() {
 }
 
 export function hqTestDataForPath<T>(path: string): T | null {
+  if (!isHqTestDataVisible()) return null
   const normalized = normalizePath(path)
   return ((registry[normalized] ?? dynamicFallback(normalized)) as T | undefined) ?? null
 }
@@ -813,6 +820,7 @@ function mergeMissingArrays(payload: unknown, fallback: unknown): unknown {
 }
 
 export function withHqTestData<T>(path: string, payload: T): T {
+  if (!isHqTestDataVisible()) return payload
   const fallback = hqTestDataForPath<T>(path)
   if (!fallback) return payload
   return mergeMissingArrays(payload, fallback) as T

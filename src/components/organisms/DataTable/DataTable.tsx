@@ -1,6 +1,10 @@
 import { isValidElement, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
 import { downloadHqExport } from '../../../services/korionChongApi'
+import { isHqTestDataVisible } from '../../../services/hqTestData'
 import styles from './DataTable.module.css'
+
+const HQ_TEST_DATA_VISIBILITY_KEY = 'korion.hq.showTestData'
+const HQ_TEST_DATA_VISIBILITY_EVENT = 'korion:hq-test-data-visibility'
 
 /** 테이블 컬럼 정의 */
 export interface Column {
@@ -86,6 +90,7 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
   const [filterOpen, setFilterOpen] = useState(false)
   const [filters, setFilters] = useState<Record<string, string>>({})
   const [currentPage, setCurrentPage] = useState(1)
+  const [showTestData, setShowTestData] = useState(isHqTestDataVisible)
   const [columnWidthOverrides, setColumnWidthOverrides] = useState<Record<string, number>>({})
   const columnKeySignature = columns.map((column) => column.key).join('|')
   const resizeStateRef = useRef<{
@@ -115,6 +120,7 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
   const displayRows = useMemo(() => {
     const normalizedSearchTerm = searchTerm.trim().toLowerCase()
     return rows.filter((row) => {
+      if (!showTestData && isTestDataRow(row)) return false
       if (normalizedSearchTerm) {
         const matchesSearch = searchableKeys.some((key) =>
           cellText(row.cells[key]).toLowerCase().includes(normalizedSearchTerm)
@@ -127,7 +133,7 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
         return cellText(row.cells[filter.key]) === selected
       })
     })
-  }, [filterOptions, filters, rows, searchTerm, searchableKeys])
+  }, [filterOptions, filters, rows, searchTerm, searchableKeys, showTestData])
   const totalPages = paginated ? Math.max(1, Math.ceil(displayRows.length / pageSize)) : 1
   const visibleRows = paginated ? displayRows.slice((currentPage - 1) * pageSize, currentPage * pageSize) : displayRows
 
@@ -185,7 +191,17 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchTerm, filters, pageSize, paginated])
+  }, [searchTerm, filters, pageSize, paginated, showTestData])
+
+  useEffect(() => {
+    const syncTestDataVisibility = () => setShowTestData(isHqTestDataVisible())
+    window.addEventListener('storage', syncTestDataVisibility)
+    window.addEventListener(HQ_TEST_DATA_VISIBILITY_EVENT, syncTestDataVisibility)
+    return () => {
+      window.removeEventListener('storage', syncTestDataVisibility)
+      window.removeEventListener(HQ_TEST_DATA_VISIBILITY_EVENT, syncTestDataVisibility)
+    }
+  }, [])
 
   useEffect(() => {
     setCurrentPage((page) => Math.min(page, totalPages))
@@ -205,6 +221,12 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
   }
 
   const applySearch = () => setSearchTerm(searchDraft)
+  const toggleTestDataVisibility = () => {
+    const next = !showTestData
+    window.localStorage.setItem(HQ_TEST_DATA_VISIBILITY_KEY, next ? 'true' : 'false')
+    setShowTestData(next)
+    window.dispatchEvent(new Event(HQ_TEST_DATA_VISIBILITY_EVENT))
+  }
 
   return (
     <div className={wrapClass}>
@@ -264,6 +286,15 @@ export default function DataTable({ columns, rows, title, titleRight, toolbar, t
                   </button>
                 )
               })}
+              <button
+                type="button"
+                className={showTestData ? styles.toolbarButton : `${styles.toolbarButton} ${styles.testDataHiddenButton}`}
+                aria-pressed={showTestData}
+                onClick={toggleTestDataVisibility}
+                title={englishToolbar ? 'Toggle test data rows' : '테스트 데이터 행 표시 여부를 전환합니다'}
+              >
+                {englishToolbar ? (showTestData ? 'Test data ON' : 'Test data OFF') : (showTestData ? '테스트 데이터 ON' : '테스트 데이터 OFF')}
+              </button>
               {toolbarExtra}
             </div>
           )}
@@ -427,6 +458,13 @@ function cellText(value: ReactNode): string {
     return cellText((value.props as { children?: ReactNode }).children)
   }
   return ''
+}
+
+function isTestDataRow(row: TableRow) {
+  return Object.values(row.cells).some((value) => {
+    const text = cellText(value)
+    return /\[TEST\]|TEST_DATA|TEST DATA|TTEST|test-/i.test(text)
+  })
 }
 
 function isSearchToolbarLabel(label: string) {
