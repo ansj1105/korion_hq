@@ -27,6 +27,44 @@ export function setHqTestDataVisible(visible: boolean) {
   window.dispatchEvent(new Event(HQ_TEST_DATA_VISIBILITY_EVENT))
 }
 
+function isExplicitHqTestData(value: unknown): boolean {
+  if (typeof value !== 'string') return false
+  const normalized = value.trim()
+  return normalized === 'TEST_DATA'
+    || normalized.startsWith('[TEST]')
+    || normalized.startsWith('TEST DATA')
+    || /^TTEST/i.test(normalized)
+    || /(^|[-_])TEST([-_]|$)/i.test(normalized)
+}
+
+function isHqTestDataObject(value: JsonObject): boolean {
+  return Object.entries(value).some(([key, item]) => {
+    if (!isExplicitHqTestData(item)) return false
+    return key === 'source'
+      || key === 'sourceStatus'
+      || key === 'id'
+      || key === 'code'
+      || key === 'requestId'
+      || key === 'applicationId'
+      || key === 'txNo'
+      || key === 'name'
+      || key.endsWith('Name')
+      || key.endsWith('Code')
+  })
+}
+
+function removeHqTestData(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value
+      .filter((item) => !isPlainObject(item) || !isHqTestDataObject(item))
+      .map(removeHqTestData)
+  }
+  if (isPlainObject(value)) {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, removeHqTestData(item)]))
+  }
+  return value
+}
+
 const stat = (id: string, labelKey: string, value: string, note = TEST_NOTE) => ({
   id,
   labelKey,
@@ -880,7 +918,7 @@ function mergeMissingArrays(payload: unknown, fallback: unknown, key?: string): 
 }
 
 export function withHqTestData<T>(path: string, payload: T): T {
-  if (!isHqTestDataVisible()) return payload
+  if (!isHqTestDataVisible()) return removeHqTestData(payload) as T
   const fallback = hqTestDataForPath<T>(path)
   if (!fallback) return payload
   return mergeMissingArrays(payload, fallback) as T
