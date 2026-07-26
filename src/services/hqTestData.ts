@@ -2,11 +2,29 @@ type JsonObject = Record<string, unknown>
 
 const TEST = '[TEST]'
 const TEST_NOTE = 'TEST DATA - API 데이터가 없을 때만 표시됩니다.'
-const HQ_TEST_DATA_VISIBILITY_KEY = 'korion.hq.showTestData'
+export const HQ_TEST_DATA_VISIBILITY_KEY = 'korion.hq.showTestData'
+export const HQ_TEST_DATA_VISIBILITY_EVENT = 'korion:hq-test-data-visibility'
+const TEST_ROW_ARRAY_KEYS = new Set([
+  'applications',
+  'heldRows',
+  'historyRows',
+  'logRows',
+  'logs',
+  'merchantRows',
+  'partnerRows',
+  'requests',
+  'rows',
+])
 
 export function isHqTestDataVisible() {
-  if (typeof window === 'undefined') return true
-  return window.localStorage.getItem(HQ_TEST_DATA_VISIBILITY_KEY) !== 'false'
+  if (typeof window === 'undefined') return false
+  return window.localStorage.getItem(HQ_TEST_DATA_VISIBILITY_KEY) === 'true'
+}
+
+export function setHqTestDataVisible(visible: boolean) {
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(HQ_TEST_DATA_VISIBILITY_KEY, visible ? 'true' : 'false')
+  window.dispatchEvent(new Event(HQ_TEST_DATA_VISIBILITY_EVENT))
 }
 
 const stat = (id: string, labelKey: string, value: string, note = TEST_NOTE) => ({
@@ -821,9 +839,29 @@ function isEmptyValue(value: unknown) {
   return value === undefined || value === null || value === ''
 }
 
-function mergeMissingArrays(payload: unknown, fallback: unknown): unknown {
+function testDataFingerprint(value: unknown) {
+  if (isPlainObject(value)) {
+    const stableKeys = ['id', 'no', 'code', 'requestId', 'applicationId', 'targetId', 'txNo']
+    const stableValue = stableKeys.map((key) => `${key}:${String(value[key] ?? '')}`).join('|')
+    if (stableValue.replace(/\w+:/g, '').trim()) return stableValue
+  }
+  return JSON.stringify(value)
+}
+
+function mergeArrays(payload: unknown, fallback: unknown[], key?: string): unknown[] {
+  const payloadArray = Array.isArray(payload) ? payload : []
+  if (!TEST_ROW_ARRAY_KEYS.has(key ?? '')) {
+    return payloadArray.length > 0 ? payloadArray : fallback
+  }
+  if (payloadArray.length === 0) return fallback
+  const seen = new Set(payloadArray.map(testDataFingerprint))
+  const additions = fallback.filter((item) => !seen.has(testDataFingerprint(item)))
+  return [...payloadArray, ...additions]
+}
+
+function mergeMissingArrays(payload: unknown, fallback: unknown, key?: string): unknown {
   if (Array.isArray(fallback)) {
-    return Array.isArray(payload) && payload.length > 0 ? payload : fallback
+    return mergeArrays(payload, fallback, key)
   }
   if (isPlainObject(fallback)) {
     const payloadObject = isPlainObject(payload) ? payload : {}
@@ -833,7 +871,7 @@ function mergeMissingArrays(payload: unknown, fallback: unknown): unknown {
       if (isEmptyValue(payloadValue)) {
         next[key] = fallbackValue
       } else if (isPlainObject(fallbackValue) || Array.isArray(fallbackValue)) {
-        next[key] = mergeMissingArrays(payloadValue, fallbackValue)
+        next[key] = mergeMissingArrays(payloadValue, fallbackValue, key)
       }
     })
     return next

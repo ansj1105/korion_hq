@@ -5,6 +5,7 @@ import { Bell, CheckCircle2, Globe2, LogOut, X } from 'lucide-react'
 import { useTranslation } from '../../../i18n'
 import { clearAuthSession, readAuthSession } from '../../../services/authSession'
 import { fetchHqPageData } from '../../../services/korionChongApi'
+import { HQ_TEST_DATA_VISIBILITY_EVENT, isHqTestDataVisible, setHqTestDataVisible } from '../../../services/hqTestData'
 import styles from './TopControls.module.css'
 
 type NotificationItem = {
@@ -25,15 +26,17 @@ const DEFAULT_NOTIFICATIONS: NotificationItem[] = []
 export default function TopControls() {
   const { lang, toggleLang, t } = useTranslation()
   const navigate = useNavigate()
+  const session = readAuthSession()
+  const isHq = session?.role === 'hq'
   const [logoutOpen, setLogoutOpen] = useState(false)
   const [notificationOpen, setNotificationOpen] = useState(false)
   const [notifications, setNotifications] = useState(DEFAULT_NOTIFICATIONS)
+  const [showTestData, setShowTestData] = useState(isHqTestDataVisible)
   const langLabel = lang === 'ko' ? 'KR · 한국어' : 'EN · English'
   const unreadCount = useMemo(() => notifications.filter((item) => !item.read).length, [notifications])
 
   useEffect(() => {
-    const session = readAuthSession()
-    if (session?.role !== 'hq') return
+    if (!isHq) return
 
     let cancelled = false
     fetchHqPageData<NotificationResponse>('/api/hq/notifications')
@@ -47,7 +50,19 @@ export default function TopControls() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [isHq])
+
+  useEffect(() => {
+    if (!isHq) return undefined
+
+    const syncTestDataVisibility = () => setShowTestData(isHqTestDataVisible())
+    window.addEventListener('storage', syncTestDataVisibility)
+    window.addEventListener(HQ_TEST_DATA_VISIBILITY_EVENT, syncTestDataVisibility)
+    return () => {
+      window.removeEventListener('storage', syncTestDataVisibility)
+      window.removeEventListener(HQ_TEST_DATA_VISIBILITY_EVENT, syncTestDataVisibility)
+    }
+  }, [isHq])
 
   const confirmLogout = () => {
     clearAuthSession()
@@ -63,8 +78,33 @@ export default function TopControls() {
     }
   }
 
+  const toggleTestDataVisibility = () => {
+    const next = !showTestData
+    setHqTestDataVisible(next)
+    setShowTestData(next)
+    window.location.reload()
+  }
+
   return (
     <div className={styles.controls}>
+      {isHq && (
+        <button
+          type="button"
+          className={[styles.testModeSwitch, showTestData && styles.testModeSwitchOn].filter(Boolean).join(' ')}
+          role="switch"
+          aria-checked={showTestData}
+          aria-label={showTestData ? t('common.testMode.disable') : t('common.testMode.enable')}
+          onClick={toggleTestDataVisibility}
+          title={showTestData ? t('common.testMode.disable') : t('common.testMode.enable')}
+        >
+          <span className={styles.testModeLabel}>{t('common.testMode')}</span>
+          <span className={styles.testModeTrack} aria-hidden="true">
+            <span className={styles.testModeKnob} />
+          </span>
+          <span className={styles.testModeState}>{showTestData ? 'ON' : 'OFF'}</span>
+        </button>
+      )}
+
       <div className={styles.notificationShell}>
         <button
           type="button"

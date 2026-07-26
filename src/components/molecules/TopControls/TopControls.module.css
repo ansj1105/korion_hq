@@ -36,6 +36,72 @@
   padding: 0;
 }
 
+.testModeSwitch {
+  min-height: 38px;
+  padding: 0 var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-border-accent) 40%, transparent);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.testModeSwitch:hover,
+.testModeSwitch:focus-visible {
+  border-color: color-mix(in srgb, var(--color-accent-cyan) 58%, transparent);
+  background: rgba(26, 209, 255, 0.09);
+  outline: none;
+}
+
+.testModeSwitchOn {
+  border-color: color-mix(in srgb, var(--color-accent-green) 58%, transparent);
+  background: color-mix(in srgb, var(--color-accent-green) 14%, transparent);
+  color: var(--color-text);
+}
+
+.testModeTrack {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.18);
+  flex: 0 0 auto;
+  transition: background-color 160ms ease;
+}
+
+.testModeSwitchOn .testModeTrack {
+  background: var(--color-accent-green);
+}
+
+.testModeKnob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
+  transition: transform 160ms ease;
+}
+
+.testModeSwitchOn .testModeKnob {
+  transform: translateX(16px);
+}
+
+.testModeState {
+  min-width: 24px;
+  text-align: left;
+  color: currentColor;
+}
+
 .badge {
   position: absolute;
   top: -6px;
@@ -220,6 +286,15 @@
   }
 
   .button span {
+    display: none;
+  }
+
+  .testModeSwitch {
+    min-height: 36px;
+    padding-inline: var(--space-2);
+  }
+
+  .testModeLabel {
     display: none;
   }
 }
