@@ -310,6 +310,7 @@ export interface SignupOptionsApiResponse {
 
 export interface SignupApplicationApiRequest {
   applicantType: 'PARTNER' | 'MERCHANT'
+  requestedRole?: 'COUNTRY_LEADER' | 'SALES_PARTNER' | 'MERCHANT'
   loginId: string
   password: string
   email: string

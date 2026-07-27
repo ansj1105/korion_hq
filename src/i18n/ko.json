@@ -1339,7 +1339,7 @@
   "hqDashboard.kpi.collateralTopup.label": "총 담보 충전 금액",
   "hqDashboard.kpi.collateralTopupCount.label": "총 담보 충전 건수",
   "hqDashboard.kpi.collateralRelease.label": "총 담보 해제 금액",
-  "hqDashboard.kpi.newApplicationsToday.label": "오늘 신규 신청",
+  "hqDashboard.kpi.newApplicationsToday.label": "기간 신규 신청",
   "hqDashboard.kpi.newApplicationsToday.note": "리더 4 · 파트너 18 · 가맹점 15",
   "hqDashboard.kpi.todayPaymentCount.label": "결제건수",
   "hqDashboard.kpi.todayPaymentCount.note": "성공율 96.8%",

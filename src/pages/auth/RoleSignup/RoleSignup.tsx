@@ -631,6 +631,7 @@ export default function RoleSignup() {
         throw new Error(validationError)
       }
       const applicantType = role === 'merchant' ? 'MERCHANT' : 'PARTNER'
+      const requestedRole = role === 'leader' ? 'COUNTRY_LEADER' : role === 'merchant' ? 'MERCHANT' : 'SALES_PARTNER'
       const companyName = applicantType === 'MERCHANT'
         ? form.storeName.trim()
         : form.companyName.trim()
@@ -655,6 +656,7 @@ export default function RoleSignup() {
       }
       const response = await createSignupApplication({
         applicantType,
+        requestedRole,
         loginId: form.loginId.trim(),
         password: form.password,
         email: form.email.trim(),

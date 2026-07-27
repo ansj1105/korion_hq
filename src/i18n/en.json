@@ -1339,7 +1339,7 @@
   "hqDashboard.kpi.collateralTopup.label": "Total Collateral Top-up Amount",
   "hqDashboard.kpi.collateralTopupCount.label": "Total Collateral Top-up Count",
   "hqDashboard.kpi.collateralRelease.label": "Total Collateral Release Amount",
-  "hqDashboard.kpi.newApplicationsToday.label": "New Applications Today",
+  "hqDashboard.kpi.newApplicationsToday.label": "Period New Applications",
   "hqDashboard.kpi.newApplicationsToday.note": "Leaders 4 · Partners 18 · Merchants 15",
   "hqDashboard.kpi.todayPaymentCount.label": "Payment Count",
   "hqDashboard.kpi.todayPaymentCount.note": "Success rate 96.8%",
